@@ -9,7 +9,7 @@
         android:theme="@style/AppTheme" >
 
         <activity
-            android:name=".TabsIconMainUI"
+            android:name=".ui.TabsIconMainUI"
             android:label="Wifi Pidgin"
             android:theme="@style/StyledIndicators">
             <intent-filter>

@@ -1,4 +1,4 @@
-package com.wifipidgin;
+package com.wifipidgin.ui;
 
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.ArrayAdapter;
 
+import com.wifipidgin.R;
 
 
 public final class TabIconFragment extends ListFragment {

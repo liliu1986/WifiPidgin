@@ -1,4 +1,4 @@
-package com.wifipidgin;
+package com.wifipidgin.ui;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.util.Log;
 
 import com.viewpagerindicator.IconPagerAdapter;
+import com.wifipidgin.R;
 
 /**
  * Created by fire on 2/2/15.
