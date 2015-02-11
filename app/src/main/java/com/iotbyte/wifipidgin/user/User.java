@@ -1,4 +1,4 @@
-package com.wifipidgin.user;
+package com.iotbyte.wifipidgin.user;
 
 import java.net.InetAddress;
 

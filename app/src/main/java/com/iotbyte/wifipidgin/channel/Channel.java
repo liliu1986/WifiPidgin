@@ -1,4 +1,4 @@
-package com.wifipidgin.channel;
+package com.iotbyte.wifipidgin.channel;
 
 
 public class Channel {

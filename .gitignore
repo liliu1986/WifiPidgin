@@ -28,8 +28,10 @@ Thumbs.db
 # Android Studio
 /.idea/workspace.xml
 /.idea/libraries
+.idea
 #.idea/workspace.xml - remove # and delete .idea if it better suit your needs.
 .gradle
 /build
+build/
 
 #wifipidgin.iml

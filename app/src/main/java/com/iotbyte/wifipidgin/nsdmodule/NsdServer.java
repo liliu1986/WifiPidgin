@@ -1,4 +1,4 @@
-package com.wifipidgin.nsdmodule;
+package com.iotbyte.wifipidgin.nsdmodule;
 
 import android.content.Context;
 import android.net.nsd.NsdManager;
@@ -22,8 +22,8 @@ public class NsdServer {
     
     private static final String TAG = "NsdServer";
     public static final String SERVICE_TYPE = "_http._tcp.";
-    
-    public String mServiceName = "MyNsdService";
+
+    public String mServiceName = "WiFiPidginNsdService";
     public String mServiceName2 = "MyNsdService";
     
     private int mServerPort = -1;

@@ -1,4 +1,4 @@
-package com.wifipidgin.nsdmodule;
+package com.iotbyte.wifipidgin.nsdmodule;
 
 /*
  * Copyright (C) Li Liu

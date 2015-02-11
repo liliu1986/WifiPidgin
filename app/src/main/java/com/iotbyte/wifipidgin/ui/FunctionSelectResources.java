@@ -1,4 +1,4 @@
-package com.wifipidgin.ui;
+package com.iotbyte.wifipidgin.ui;
 
 import android.util.Log;
 import android.view.View;

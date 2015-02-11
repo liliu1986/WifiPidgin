@@ -1,11 +1,11 @@
-package com.wifipidgin.nsdmodule;
+package com.iotbyte.wifipidgin.nsdmodule;
 
 import android.content.Context;
 import android.net.nsd.NsdManager;
 import android.os.Handler;
 import android.util.Log;
 
-import com.wifipidgin.user.User;
+import com.iotbyte.wifipidgin.user.User;
 
 import java.util.List;
 

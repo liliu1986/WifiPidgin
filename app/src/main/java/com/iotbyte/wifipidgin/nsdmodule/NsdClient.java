@@ -1,12 +1,12 @@
-package com.wifipidgin.nsdmodule;
+package com.iotbyte.wifipidgin.nsdmodule;
 
 import android.content.Context;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.util.Log;
 
-import com.wifipidgin.channel.Channel;
-import com.wifipidgin.user.User;
+import com.iotbyte.wifipidgin.channel.Channel;
+import com.iotbyte.wifipidgin.user.User;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ public class NsdClient {
     NsdManager mNsdManager;
     
     public static final String SERVICE_TYPE = "_http._tcp.";
-    public String mServiceName = "MyNsdService";
+    public String mServiceName = "WiFiPidginNsdService";
     public String mServiceName2 = "MyNsdService";
     
     NsdServiceInfo mService;
