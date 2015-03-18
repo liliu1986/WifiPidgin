@@ -36,6 +36,14 @@ public class FunctionSelectResources {
                         Log.d(TAG, "Selected Tab: " + 2);
                     }
                 };
+            case 3:
+                Log.d(TAG, "Selected Tab: " + 3);
+                return new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.d(TAG, "Selected Tab: " + 3);
+                    }
+                };
             default:
                 return new View.OnClickListener() {
                     @Override

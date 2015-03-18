@@ -11,6 +11,8 @@ import android.widget.ArrayAdapter;
 
 import com.iotbyte.wifipidgin.R;
 
+import java.util.ArrayList;
+
 
 public final class TabIconFragment extends ListFragment {
 
@@ -20,13 +22,24 @@ public final class TabIconFragment extends ListFragment {
 
     private static final String KEY_CONTENT_Int = "TabIconFragment:Content_Int";
 
-    String[] values = new String[] { "Sue", "FiFi", "DQ",
-            "Xiao Pang", "Lao8"};
+    ArrayList<String> values = new ArrayList<String>() {{
+        add("Sue");
+        add("FiFi");
+        add("DQ");
+    }};
+    ArrayList<String> values2 = new ArrayList<String>() {{
+        add("Sue");
+        add("FiFi");
+        add("DQ");
+        add("PangPang");
+    }};
+    ArrayList<String> values3 = new ArrayList<String>() {{
+        add("Sue");
+        add("FiFi");
+        add("DQ");
+        add("Hao");
+    }};
 
-    String[] values2 = new String[] { "Sue", "FiFi" };
-
-
-    String[] values3 = new String[] {  "DQ", "Xiao Pang", "Lao8" };
 
     private View.OnClickListener mTitleOnClickListener;
     private int mTabIdx = -1;
@@ -83,6 +96,9 @@ public final class TabIconFragment extends ListFragment {
             case 2:
                 setListAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, values3));
                 break;
+            case 3:
+                setListAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, values3));
+                break;
             default:
                 setListAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, values));
 
@@ -101,6 +117,9 @@ public final class TabIconFragment extends ListFragment {
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
         Log.d(TAG, "Clicked User: " + getListAdapter().getItem(position).toString());
+        ArrayAdapter<String> adapter=(ArrayAdapter<String>)getListAdapter();
+        adapter.insert("NEW", adapter.getCount());
 
+        adapter.notifyDataSetChanged();
     }
 }

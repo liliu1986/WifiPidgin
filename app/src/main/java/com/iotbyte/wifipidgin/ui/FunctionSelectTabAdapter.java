@@ -19,11 +19,12 @@ class FunctionSelectTabAdapter extends FragmentPagerAdapter implements IconPager
 
     private static final String TAG = "FunctionSelectTabAdapter";
 
-    private static final String[] CONTENT = new String[] { "Chats", "Contacts", "Discover"};
+    private static final String[] CONTENT = new String[] { "Chats", "Contacts", "Discover", "Setting"};
 
     private static final int[] ICONS = new int[] {
             R.drawable.perm_group_calendar,
             R.drawable.perm_group_camera,
+            R.drawable.perm_group_device_alarms,
             R.drawable.perm_group_device_alarms,
     };
 
