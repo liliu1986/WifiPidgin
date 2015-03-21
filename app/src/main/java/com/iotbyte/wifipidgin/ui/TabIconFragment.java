@@ -22,6 +22,8 @@ public final class TabIconFragment extends ListFragment {
 
     private static final String KEY_CONTENT_Int = "TabIconFragment:Content_Int";
 
+    private SettingsManager sm;
+
     ArrayList<String> values = new ArrayList<String>() {{
         add("Sue");
         add("FiFi");
@@ -85,26 +87,32 @@ public final class TabIconFragment extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.contact_list, container, false);
+        //View rootView = inflater.inflate(R.layout.list_friends, container, false);
+
         switch (mTabIdx) {
+            //Channel Tab
             case 0:
-                setListAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, values));
+                setListAdapter(new ArrayAdapter<String>(getActivity(), R.layout.list_friends, R.id.text1, values));
                 break;
+            //Contact Tab
             case 1:
-                setListAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, values2));
+                setListAdapter(new ArrayAdapter<String>(getActivity(), R.layout.list_friends, R.id.text1, values2));
                 break;
+            //Discover Tab
             case 2:
-                setListAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, values3));
+                setListAdapter(new ArrayAdapter<String>(getActivity(), R.layout.list_friends, R.id.text1, values3));
                 break;
+            //Setting Tab
             case 3:
-                setListAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, values3));
+                sm = new SettingsManager(getActivity(), this);
+                sm.InflateSettingView();
                 break;
             default:
-                setListAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, values));
+                setListAdapter(new ArrayAdapter<String>(getActivity(), R.layout.list_friends, R.id.text1, values));
 
         }
 
-        return rootView;
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -117,6 +125,30 @@ public final class TabIconFragment extends ListFragment {
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
         Log.d(TAG, "Clicked User: " + getListAdapter().getItem(position).toString());
+
+        switch (mTabIdx) {
+            //Channel Tab
+            case 0:
+
+                break;
+            //Contact Tab
+            case 1:
+
+                break;
+            //Discover Tab
+            case 2:
+
+                break;
+            //Setting Tab
+            case 3:
+
+                break;
+            default:
+
+        }
+
+
+
         ArrayAdapter<String> adapter=(ArrayAdapter<String>)getListAdapter();
         adapter.insert("NEW", adapter.getCount());
 
