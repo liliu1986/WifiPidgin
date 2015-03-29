@@ -35,3 +35,6 @@ Thumbs.db
 build/
 
 #wifipidgin.iml
+
+#gradle local config file
+/gradle/local.properties
