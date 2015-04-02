@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.iotbyte.wifipidgin.friend.Friend;
+import com.iotbyte.wifipidgin.utils.Utils;
 import com.iotbyte.wifipidgin.ui.tempDb;
 
 import java.util.List;

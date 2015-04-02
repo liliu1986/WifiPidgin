@@ -25,30 +25,30 @@ public class tempDb {
 
         //Searching through the list to see if the friend is already in the online list.
         for(i = 0; i < nearbyFriendList.size(); i++){
-            if(nearbyFriendList.get(i).getUserIP().equals(inFriend.getUserIP())){
+            if(nearbyFriendList.get(i).getIp().toString().equals(inFriend.getIp().toString())){
                 isIn = 1;
             }
         }
         //If not, add him/her to the list.
         if (isIn == 0){
-            Log.d(TAG, "Adding friend to the list " + inFriend.getUserIP());
+            Log.d(TAG, "Adding friend to the list " + inFriend.getIp().toString());
             nearbyFriendList.add(inFriend);
         }else{
-            Log.d(TAG, "The friend is already in the list " + inFriend.getUserIP());
+            Log.d(TAG, "The friend is already in the list " + inFriend.getIp().toString());
         }
     }
     public void removeFriendFromList(Friend inFriend){
         int i;
         //iterate through the list to find the existing friend;
         for(i = 0; i < nearbyFriendList.size(); i++){
-            if(nearbyFriendList.get(i).getUserIP().equals(inFriend.getUserIP())){
+            if(nearbyFriendList.get(i).getIp().toString().equals(inFriend.getIp().toString())){
                 //Found the user, remove him/her from the list since offline.
                 nearbyFriendList.remove(i);
             }
         }
 
         if(i == nearbyFriendList.size()){
-            Log.w(TAG, "The friend %s is not in the online list: "+ inFriend.getUserIP());
+            Log.w(TAG, "The friend %s is not in the online list: "+ inFriend.getIp().toString());
         }
 
     }

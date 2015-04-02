@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.iotbyte.wifipidgin.channel.Channel;
 import com.iotbyte.wifipidgin.friend.Friend;
+import com.iotbyte.wifipidgin.utils.Utils;
 import com.iotbyte.wifipidgin.ui.tempDb;
 
 import java.net.InetAddress;
@@ -67,17 +68,16 @@ public class NsdClient {
                         @Override
                         public void onServiceResolved(NsdServiceInfo serviceInfo) {
                             Log.e(TAG, "Resolve Succeeded. " + serviceInfo.getServiceName());
-
+                            mService = serviceInfo;
                             if (serviceInfo.getServiceName().equals(mServiceName)) {
                                 Log.d(TAG, "Same Service Name." + mService.getHost().getHostAddress());
                                 return;
                             }else if (serviceInfo.getServiceName().contains(mServiceName)){
-                                mService = serviceInfo;
                                 InetAddress host = mService.getHost();
                                 Log.d(TAG, "The friend's ip is " + host.getHostAddress());
                                 Log.d(TAG, "The ip for my current device is " + Utils.getIPAddress(true));
                                 if (!host.getHostAddress().equals(Utils.getIPAddress(true))){
-                                    Friend newFriend = new Friend(host);
+                                    Friend newFriend = new Friend(host, Utils.hexStringToByteArray("ABCD"));
                                     mdb.addFriendToList(newFriend);
                                 }else{
                                     Log.d(TAG, "Same IP.");
@@ -140,7 +140,7 @@ public class NsdClient {
                 Log.d(TAG, "The host ip is " + host.getHostAddress());
                 Log.d(TAG, "The ip for my current device is " + Utils.getIPAddress(true));
 
-                Friend newFriend = new Friend(host);
+                Friend newFriend = new Friend(host, Utils.hexStringToByteArray("ABCD"));
                 mdb.addFriendToList(newFriend);
             }
         };
