@@ -3,79 +3,159 @@ package com.iotbyte.wifipidgin.channel;
 
 import android.util.Log;
 
+import com.iotbyte.wifipidgin.friend.Friend;
+
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by yefwen@iotbyte.com on 26/03/15.
  */
 
 public class Channel {
-    private String channelName;
-    private String channelDescription;
-    private String channelIdentifier;
-    private ArrayList<Friends> channelFriendsList;
+    private String name;
+    private String description;
+    private final String channelIdentifier;
+    private List<Friend> friendList;
+    private int id;   // id is added as the primary key to be used in data persist
+    public static final int NO_ID = -1;
     public static final String CHANNEL_TAG = "Channel Class";
+    // TODO:: the following string should be move to res/string later
+    public static final String DEFAULT_CHANNEL_NAME = "Un-named Channel";
+    public static final String DEFAULT_CHANNEL_DESCRIPTION = "Too lazy to leave one";
 
-    public Channel(ArrayList<Friends> friendsList, String channelName, String description) {
-        this.channelName = channelName;
-        this.channelDescription = description;
-        this.channelFriendsList = friendsList;
+    /**
+     * Default constructor create the required channelIdentifier, set id to NO_ID
+     * allocate friendList
+     */
 
+    public Channel(){
+        this.name = DEFAULT_CHANNEL_NAME;
+        this.description = DEFAULT_CHANNEL_DESCRIPTION;
+        this.id = NO_ID;
+        friendList = new ArrayList<Friend>();
         // The channelIdentifier is sha1 of creating device (wifi) MAC concatenate with channel
-        // creation timestamp
-
 
         // Get Device MAC Address
 
         //The MAC address feature will work on a real device but not on emulator
         //As the current emulator does not support WiFi
         String address = com.iotbyte.wifipidgin.utils.Utils.getMACAddress("wlan0");
-        Log.v(CHANNEL_TAG,"the MAC address is "+ address);
+        Log.v(CHANNEL_TAG, "the MAC address is " + address);
 
 
         // Get Timestamp
         Date mDate = new Date();
         Timestamp mTimestamp = new Timestamp(mDate.getTime());
         String identifier = address + mTimestamp.toString();
+        String identifierHolder;
         try {
-            this.channelIdentifier = com.iotbyte.wifipidgin.utils.Utils.sha1(identifier);
+            identifierHolder = com.iotbyte.wifipidgin.utils.Utils.sha1(identifier);
         } catch (NoSuchAlgorithmException e) {
-            this.channelIdentifier = identifier;
+            identifierHolder = identifier;
         }
-        Log.v(CHANNEL_TAG,"the channelIdentifier is "+ this.channelIdentifier);
+        this.channelIdentifier = identifierHolder;
+
+        Log.v(CHANNEL_TAG, "the channelIdentifier is " + this.channelIdentifier);
     }
 
-    public String getChannelName() {
-        return channelName;
+    public Channel(List<Friend> friendList, String name, String description) {
+        this();
+        this.name = name;
+        this.description = description;
+        this.friendList = friendList;
     }
 
-    public String getChannelDescription() {
-        return channelDescription;
+    /**
+     * Getter method of name
+     *
+     * @return name
+     */
+    public String getName() {
+        return name;
     }
 
+    /**
+     * Setter method of name
+     *
+     * @param name
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Getter method of description
+     *
+     * @return description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Setter method of description
+     *
+     * @param description
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+     * Getter method of channelIdentifier
+     *
+     * @return channelIdentifier
+     */
     public String getChannelIdentifier() {
         return channelIdentifier;
     }
 
-    public ArrayList<Friends> getChannelFriendsList() {
-        return channelFriendsList;
+    /**
+     * Getter method of friendsList
+     *
+     * @return friendList
+     */
+    public List<Friend> getFriendsList() {
+        return friendList;
     }
 
-    //TODO: implement the getChannelStatus
-    public boolean getChannelStatus() {
-        return false;
+    /**
+     * Getter method of id
+     *
+     * @return id
+     */
+    public long getId() {
+        return id;
     }
 
+    /**
+     * Setter method of id
+     *
+     * @param id
+     */
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    /**
+     * Add friend to the list
+     *
+     * @param friend
+     * @return true for successfully added,
+     * false for duplicated friend found
+     */
+    public boolean addFriend(Friend friend) {
+        if (friendList.contains(friend)) {
+           return false;
+        } else
+        {
+            friendList.add(friend);
+            return true;
+        }
+    }
 }
 
-
-//TODO: Remove mock Friends Class
-
-class Friends {
-    Friends() {
-
-    }
-}
