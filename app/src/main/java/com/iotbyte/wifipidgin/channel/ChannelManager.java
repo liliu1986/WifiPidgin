@@ -18,6 +18,7 @@ public class ChannelManager {
     private HashMap<String, Channel> channelMap; // ChannelIdentifier and Channel pair
 
     private ChannelManager() {
+
         //Calling database to grep existing channelList
         // or create a new channelList if there is nothing been retrieved
 
@@ -34,7 +35,6 @@ public class ChannelManager {
                     instance = new ChannelManager();
                 }
             }
-            instance = new ChannelManager();
         }
         return instance;
     }
