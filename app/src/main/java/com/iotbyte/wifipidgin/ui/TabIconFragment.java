@@ -149,9 +149,9 @@ public final class TabIconFragment extends ListFragment {
 
 
 
-        ArrayAdapter<String> adapter=(ArrayAdapter<String>)getListAdapter();
-        adapter.insert("NEW", adapter.getCount());
+        //ArrayAdapter<String> adapter=(ArrayAdapter<String>)getListAdapter();
+        //adapter.insert("NEW", adapter.getCount());
 
-        adapter.notifyDataSetChanged();
+        //adapter.notifyDataSetChanged();
     }
 }
