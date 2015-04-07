@@ -15,12 +15,13 @@ public class SettingsManager {
 
     FragmentActivity mFragmentActivity;
     ListFragment mListFragment;
-    ArrayList<String> values3 = new ArrayList<String>() {{
-        add("Sue");
-        add("FiFi");
-        add("DQ");
-        add("Hao");
+
+    ArrayList<String> settingItems = new ArrayList<String>() {{
+        add("My Visibility");
+        add("Alias and Description");
+        add("About");
     }};
+
 
     public SettingsManager(FragmentActivity inActivity , ListFragment inFragment) {
         mFragmentActivity = inActivity;
@@ -29,7 +30,8 @@ public class SettingsManager {
 
     public int InflateSettingView(){
         int err = 0;
-        mListFragment.setListAdapter(new ArrayAdapter<String>(mFragmentActivity, R.layout.list_settings, R.id.text1, values3));
+        SettingAdapter adapter = new SettingAdapter(mFragmentActivity, settingItems);
+        mListFragment.setListAdapter(adapter);
         return err;
     }
 }
