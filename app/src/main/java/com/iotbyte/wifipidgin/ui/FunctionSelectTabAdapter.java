@@ -12,21 +12,14 @@ import com.iotbyte.wifipidgin.R;
  * Created by fire on 2/2/15.
  */
 
-class FunctionSelectTabAdapter extends FragmentPagerAdapter implements IconPagerAdapter {
+class FunctionSelectTabAdapter extends FragmentPagerAdapter {
     public FunctionSelectTabAdapter(FragmentManager fm) {
         super(fm);
     }
 
-    private static final String TAG = "FunctionSelectTabAdapter";
+    private static final String TAG = "FunctionSelectTab";
 
-    private static final String[] CONTENT = new String[] { "Chats", "Contacts", "Discover", "Setting"};
-
-    private static final int[] ICONS = new int[] {
-            R.drawable.perm_group_calendar,
-            R.drawable.perm_group_camera,
-            R.drawable.perm_group_device_alarms,
-            R.drawable.perm_group_device_alarms,
-    };
+    private static final String[] CONTENT = new String[] { "Chats", "Contacts", "Discover"};
 
     @Override
     public Fragment getItem(int position) {
@@ -41,10 +34,6 @@ class FunctionSelectTabAdapter extends FragmentPagerAdapter implements IconPager
     @Override
     public CharSequence getPageTitle(int position) {
         return CONTENT[position % CONTENT.length].toUpperCase();
-    }
-
-    @Override public int getIconResId(int index) {
-        return ICONS[index];
     }
 
     @Override

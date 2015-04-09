@@ -22,7 +22,7 @@ public final class TabIconFragment extends ListFragment {
 
     private static final String KEY_CONTENT_Int = "TabIconFragment:Content_Int";
 
-    private SettingsManager sm;
+
 
     ArrayList<String> values = new ArrayList<String>() {{
         add("Sue");
@@ -103,10 +103,10 @@ public final class TabIconFragment extends ListFragment {
                 setListAdapter(new ArrayAdapter<String>(getActivity(), R.layout.list_friends, R.id.text1, values3));
                 break;
             //Setting Tab
-            case 3:
-                sm = new SettingsManager(getActivity(), this);
-                sm.InflateSettingView();
-                break;
+            //case 3:
+            //    sm = new SettingsManager(getActivity(), this);
+            //    sm.InflateSettingView();
+            //    break;
             default:
                 setListAdapter(new ArrayAdapter<String>(getActivity(), R.layout.list_friends, R.id.text1, values));
 
