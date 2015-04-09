@@ -4,5 +4,7 @@
     <string name="app_name">Wifipidgin</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_about_page">About_page</string>
+    <string name="title_activity_about">About</string>
 
 </resources>
