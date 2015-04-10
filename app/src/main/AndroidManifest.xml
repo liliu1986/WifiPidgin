@@ -22,10 +22,15 @@
             android:name=".ui.About"
             android:label="@string/title_activity_about"
             android:theme="@style/Theme.AppCompat.Light" >
+            <intent-filter>
+                <action android:name=".ui.About" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".ui.SettingsActivity"
             android:label="@string/title_activity_settings" >
+
         </activity>
     </application>
 
