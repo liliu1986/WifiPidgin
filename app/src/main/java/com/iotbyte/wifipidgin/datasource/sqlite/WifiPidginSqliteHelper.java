@@ -1,7 +1,6 @@
 package com.iotbyte.wifipidgin.datasource.sqlite;
 
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -14,11 +13,11 @@ import java.io.IOException;
 public class WifiPidginSqliteHelper extends SQLiteOpenHelper {
     public WifiPidginSqliteHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
+        this.context = context;
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        AssetManager assets = this.context.getAssets();
         try {
             db.setForeignKeyConstraintsEnabled(true);
             DbUtils.executeSqlScript(context, db, CREATE_DB_SCRIPT);
@@ -38,6 +37,7 @@ public class WifiPidginSqliteHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // TODO: onUpgrade - Not tested.
         db.setForeignKeyConstraintsEnabled(false);
         try {
             DbUtils.executeSqlScript(context, db, DROP_DB_SCRIPT);
@@ -45,6 +45,7 @@ public class WifiPidginSqliteHelper extends SQLiteOpenHelper {
             Log.e(TAG, "Failed to open " + DROP_DB_SCRIPT + " to delete database.");
             e.printStackTrace();
         }
+        onCreate(db);
     }
 
     /** Tag for logging */
