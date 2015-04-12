@@ -11,6 +11,9 @@ import java.io.IOException;
  * SQLite database helper for WifiPidgin
  */
 public class WifiPidginSqliteHelper extends SQLiteOpenHelper {
+    /** SQLite database name */
+    public static final String DB_NAME = "WifiPidgin";
+
     public WifiPidginSqliteHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
         this.context = context;
@@ -19,7 +22,6 @@ public class WifiPidginSqliteHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         try {
-            db.setForeignKeyConstraintsEnabled(true);
             DbUtils.executeSqlScript(context, db, CREATE_DB_SCRIPT);
         } catch (IOException e) {
             Log.e(TAG, "Failed to open " + CREATE_DB_SCRIPT + " to create database.");
@@ -38,7 +40,6 @@ public class WifiPidginSqliteHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // TODO: onUpgrade - Not tested.
-        db.setForeignKeyConstraintsEnabled(false);
         try {
             DbUtils.executeSqlScript(context, db, DROP_DB_SCRIPT);
         } catch (IOException e) {
@@ -50,8 +51,6 @@ public class WifiPidginSqliteHelper extends SQLiteOpenHelper {
 
     /** Tag for logging */
     private static final String TAG = "WifiPidginSqliteHelper";
-    /** SQLite database name */
-    private static final String DB_NAME = "WifiPidgin";
     /** SQLite database version */
     private static final int DB_VERSION = 1;
     /** SQLite create database script */
