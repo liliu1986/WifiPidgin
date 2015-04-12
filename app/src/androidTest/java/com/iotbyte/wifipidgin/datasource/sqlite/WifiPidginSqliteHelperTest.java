@@ -25,6 +25,8 @@ public class WifiPidginSqliteHelperTest extends AndroidTestCase {
     /** Test a writable database can be created and all expected tables are in the database */
     public void testOnCreate() {
         Context context = getContext();
+        context.deleteDatabase(WifiPidginSqliteHelper.DB_NAME);
+
         WifiPidginSqliteHelper dut = new WifiPidginSqliteHelper(context);
 
         // implicitly calls dut.onCreate() if the database is not yet created.
@@ -54,5 +56,6 @@ public class WifiPidginSqliteHelperTest extends AndroidTestCase {
 
         c.close();
         db.close();
+        context.deleteDatabase(WifiPidginSqliteHelper.DB_NAME);
     }
 }
