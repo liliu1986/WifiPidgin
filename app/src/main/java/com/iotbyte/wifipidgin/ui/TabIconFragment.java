@@ -22,7 +22,7 @@ public final class TabIconFragment extends ListFragment {
 
     private static final String KEY_CONTENT_Int = "TabIconFragment:Content_Int";
 
-
+    private FriendListManager fm;
 
     ArrayList<String> values = new ArrayList<String>() {{
         add("Sue");
@@ -92,15 +92,16 @@ public final class TabIconFragment extends ListFragment {
         switch (mTabIdx) {
             //Channel Tab
             case 0:
-                setListAdapter(new ArrayAdapter<String>(getActivity(), R.layout.list_friends, R.id.text1, values));
+                setListAdapter(new ArrayAdapter<String>(getActivity(), R.layout.list_friends, R.id.friendName, values));
                 break;
             //Contact Tab
             case 1:
-                setListAdapter(new ArrayAdapter<String>(getActivity(), R.layout.list_friends, R.id.text1, values2));
+                fm = new FriendListManager(getActivity(), this);
+                fm.InflateSettingView();
                 break;
             //Discover Tab
             case 2:
-                setListAdapter(new ArrayAdapter<String>(getActivity(), R.layout.list_friends, R.id.text1, values3));
+                setListAdapter(new ArrayAdapter<String>(getActivity(), R.layout.list_friends, R.id.friendName, values3));
                 break;
             //Setting Tab
             //case 3:
@@ -108,7 +109,7 @@ public final class TabIconFragment extends ListFragment {
             //    sm.InflateSettingView();
             //    break;
             default:
-                setListAdapter(new ArrayAdapter<String>(getActivity(), R.layout.list_friends, R.id.text1, values));
+                setListAdapter(new ArrayAdapter<String>(getActivity(), R.layout.list_friends, R.id.friendName, values));
 
         }
 
