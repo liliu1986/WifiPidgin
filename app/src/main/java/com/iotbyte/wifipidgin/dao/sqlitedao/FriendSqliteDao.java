@@ -1,16 +1,27 @@
-package com.iotbyte.wifipidgin.dao.dummydao;
+package com.iotbyte.wifipidgin.dao.sqlitedao;
+
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 
 import com.iotbyte.wifipidgin.dao.DaoError;
 import com.iotbyte.wifipidgin.dao.FriendDao;
+import com.iotbyte.wifipidgin.datasource.sqlite.WifiPidginSqliteHelper;
 import com.iotbyte.wifipidgin.friend.Friend;
 
 import java.net.InetAddress;
 import java.util.List;
 
 /**
- * Dummy implementation of FriendDao interface to make code compile.
+ * SQLite implementation of FriendDao
  */
-public class DummyFriendDao implements FriendDao {
+public class FriendSqliteDao implements FriendDao {
+    /**
+     * Constructor
+     * @param context Context
+     */
+    public FriendSqliteDao(Context context) {
+        this.sqliteHelper = new WifiPidginSqliteHelper(context);
+    }
 
     @Override
     public DaoError add(Friend friend) {
@@ -56,4 +67,7 @@ public class DummyFriendDao implements FriendDao {
     public List<Friend> findAll() {
         return null;
     }
+
+    /** Database helper for db operation */
+    private WifiPidginSqliteHelper sqliteHelper;
 }
