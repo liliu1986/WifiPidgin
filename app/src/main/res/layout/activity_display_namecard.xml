@@ -6,7 +6,87 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="com.iotbyte.wifipidgin.ui.DisplayNamecardActivity">
 
-    <TextView android:text="@string/hello_world" android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <TextView android:text="User Name" android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/user_name"
+        android:textSize="25dp" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/user_image"
+        android:background="@drawable/image_border"
+        android:maxHeight="450px"
+        android:maxWidth="450px"
+        android:minHeight="450px"
+        android:minWidth="450px"
+        android:adjustViewBounds="true"
+        android:scaleType="centerInside"
+        android:layout_below="@+id/user_name"
+        android:layout_centerHorizontal="true" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/user_saved"
+
+        android:maxHeight="180px"
+        android:maxWidth="180px"
+        android:minHeight="180px"
+        android:minWidth="180px"
+        android:adjustViewBounds="true"
+        android:scaleType="fitXY"
+        android:layout_marginRight="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginTop="39dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignTop="@+id/user_image"
+        android:layout_toLeftOf="@+id/user_image"
+        android:layout_toStartOf="@+id/user_image"
+        android:clickable="true" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/user_online"
+
+        android:maxHeight="180px"
+        android:maxWidth="180px"
+        android:minHeight="180px"
+        android:minWidth="180px"
+        android:adjustViewBounds="true"
+        android:scaleType="fitXY"
+        android:layout_marginLeft="30dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="39dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignTop="@+id/user_image"
+        android:layout_toRightOf="@+id/user_image"
+        android:layout_toEndOf="@+id/user_image"
+        android:clickable="true" />
+
+    <TextView
+        android:text="User Description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/image_border"
+        android:id="@+id/user_description"
+        android:maxWidth = "450sp"
+        android:textSize="18dp"
+        android:gravity="center_vertical"
+        android:layout_marginTop="37dp"
+        android:layout_below="@+id/user_image"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="StartChat"
+        android:id="@+id/startChatButton"
+        android:layout_below="@+id/user_description"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="42dp" />
+
 
 </RelativeLayout>
