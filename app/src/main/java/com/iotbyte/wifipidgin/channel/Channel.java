@@ -12,6 +12,13 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * Channel Class defines a channel, includes it's name, description, channelIdentifier
+ * and a list of friend. id is what been used to track with the database.
+ *
+ * All channels are managed by ChannelManager. Channel class constructor should be called
+ * only by the ChannelManager.addChannel method, due to the weak relationship between Channel
+ * and ChannelManager
+ *
  * Created by yefwen@iotbyte.com on 26/03/15.
  */
 
@@ -21,11 +28,11 @@ public class Channel {
     private final String channelIdentifier;
     private List<Friend> friendList;
     private int id;   // id is added as the primary key to be used in data persist
-    public static final int NO_ID = -1;
-    public static final String CHANNEL_TAG = "Channel Class";
+    private static final int NO_ID = -1;
+    private static final String CHANNEL_TAG = "Channel Class";
     // TODO:: the following string should be move to res/string later
-    public static final String DEFAULT_CHANNEL_NAME = "Un-named Channel";
-    public static final String DEFAULT_CHANNEL_DESCRIPTION = "Too lazy to leave one";
+    private static final String DEFAULT_CHANNEL_NAME = "Un-named Channel";
+    private static final String DEFAULT_CHANNEL_DESCRIPTION = "Too lazy to leave one";
 
     /**
      * Default constructor create the required channelIdentifier, set id to NO_ID
@@ -36,7 +43,7 @@ public class Channel {
         this.name = DEFAULT_CHANNEL_NAME;
         this.description = DEFAULT_CHANNEL_DESCRIPTION;
         this.id = NO_ID;
-        friendList = new ArrayList<Friend>();
+        friendList = new ArrayList<>();
         // The channelIdentifier is sha1 of creating device (wifi) MAC concatenate with channel
 
         // Get Device MAC Address
@@ -81,7 +88,7 @@ public class Channel {
     /**
      * Setter method of name
      *
-     * @param name
+     * @param name name of the channel
      */
     public void setName(String name) {
         this.name = name;
@@ -99,7 +106,7 @@ public class Channel {
     /**
      * Setter method of description
      *
-     * @param description
+     * @param description description of the channel
      */
     public void setDescription(String description) {
         this.description = description;
@@ -135,7 +142,7 @@ public class Channel {
     /**
      * Setter method of id
      *
-     * @param id
+     * @param id id of the channel
      */
     public void setId(int id) {
         this.id = id;
@@ -144,7 +151,7 @@ public class Channel {
     /**
      * Add friend to the list
      *
-     * @param friend
+     * @param friend target friend to be added
      * @return true for successfully added,
      * false for duplicated friend found
      */

@@ -24,6 +24,9 @@ public final class TabIconFragment extends ListFragment {
 
     private FriendListManager fm;
 
+    private DiscoverManager dm;
+
+
     ArrayList<String> values = new ArrayList<String>() {{
         add("Sue");
         add("FiFi");
@@ -101,7 +104,8 @@ public final class TabIconFragment extends ListFragment {
                 break;
             //Discover Tab
             case 2:
-                setListAdapter(new ArrayAdapter<String>(getActivity(), R.layout.list_friends, R.id.friendName, values3));
+                dm = new DiscoverManager(getActivity(), this);
+                dm.InflateSettingView();
                 break;
             //Setting Tab
             //case 3:
