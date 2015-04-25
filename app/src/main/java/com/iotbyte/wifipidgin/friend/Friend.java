@@ -10,37 +10,49 @@ import java.net.InetAddress;
 public class Friend {
 
     /** No id indicates this object has not been published to storage */
-    public static final int NO_ID = -1;
+    public static final long NO_ID = -1;
 
     /** Status a friend can be in */
     public enum FriendStatus {
-        ONLINE,
-        BUSY,
-        INVISIBLE,
-        OFFLINE,
+        ONLINE(0),
+        BUSY(1),
+        INVISIBLE(2),
+        OFFLINE(3);
+
+        public int getValue() {
+            return value;
+        }
+
+        private FriendStatus(int value) {
+            this.value = value;
+        }
+
+        private final int value;
     }
 
     /**
       * Constructor
-      * @param ip IP address of the Friend.
       * @param mac MAC address of the Friend.
       */
-	public Friend(InetAddress ip, byte[] mac) {
-		this.ip = ip;
+	public Friend(byte[] mac) {
         this.mac = mac;
         this.id = NO_ID;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
     public InetAddress getIp() {
         return ip;
+    }
+
+    public void setIp(InetAddress ip) {
+        this.ip = ip;
     }
 
     public byte[] getMac() {
@@ -71,6 +83,14 @@ public class Friend {
         this.status = status;
     }
 
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
     public boolean isFavourite() {
         return isFavourite;
     }
@@ -80,10 +100,10 @@ public class Friend {
     }
 
     /** id to identify friend in storage. */
-    private int id;
+    private long id;
 
     /** IP address of Friend. */
-    private final InetAddress ip;
+    private InetAddress ip;
 
     /** MAC address of Friend. */
     private final byte[] mac;
@@ -96,6 +116,9 @@ public class Friend {
 
     /** Status of this Friend. */
     private FriendStatus status;
+
+    /** Friend image path */
+    private String imagePath;
 
     /** Whether this Friend has is a favourite */
     private boolean isFavourite;

@@ -13,6 +13,9 @@ public interface ChannelDao {
      * <p/>
      * The id field of channel is updated to the id to find it in the storage after successfully
      * publishing the channel to storage.
+     * <p/>
+     * If the channel has any friends associated with it, these friends MUST have already been
+     * published to the storage.
      *
      * @param channel Channel to be published. Must have id == NO_ID else will error.
      * @return NO_ERROR upon successfully publishing channel to storage. Otherwise respective error
@@ -29,12 +32,15 @@ public interface ChannelDao {
      * @return NO_ERROR upon successfully deleting channel from storage. Otherwise respective error
      * code.
      */
-    public DaoError delete(int id);
+    public DaoError delete(long id);
 
     /**
      * Update a channel in the storage.
      * <p/>
      * The channel object must already have been published to the storage.
+     *
+     * If the channel has any friends associated with it, these friends MUST have already been
+     * published to the storage.
      *
      * @param channel Channel object to be updated.
      * @return NO_ERROR upon successfully updating channel in storage. Otherwise respective error
@@ -49,7 +55,7 @@ public interface ChannelDao {
      * @return A reference to Channel object found in storage. null if no channel with such ID
      * exists.
      */
-    public Channel findById(int id);
+    public Channel findById(long id);
 
     /**
      * Find a channel in storage by its channelIdentifier address.

@@ -20,8 +20,8 @@ public class Channel {
     private String description;
     private final String channelIdentifier;
     private List<Friend> friendList;
-    private int id;   // id is added as the primary key to be used in data persist
-    public static final int NO_ID = -1;
+    private long id;   // id is added as the primary key to be used in data persist
+    public static final long NO_ID = -1;
     public static final String CHANNEL_TAG = "Channel Class";
     // TODO:: the following string should be move to res/string later
     public static final String DEFAULT_CHANNEL_NAME = "Un-named Channel";
@@ -137,7 +137,7 @@ public class Channel {
      *
      * @param id
      */
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
