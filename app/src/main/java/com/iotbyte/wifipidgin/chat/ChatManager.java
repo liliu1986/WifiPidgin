@@ -1,5 +1,8 @@
 package com.iotbyte.wifipidgin.chat;
 
+import org.json.JSONException;
+
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -65,7 +68,14 @@ public class ChatManager {
 
     //TODO:: require exception handling here for corrupted json string
     public boolean enqueueIncomingMessageQueue(String jsonString) {
-        return incomingMessageQueue.offer(new Message(jsonString));
+        try {
+            return incomingMessageQueue.offer(new Message(jsonString));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**
