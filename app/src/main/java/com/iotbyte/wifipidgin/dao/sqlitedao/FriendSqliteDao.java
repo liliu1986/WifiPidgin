@@ -261,7 +261,7 @@ public class FriendSqliteDao implements FriendDao {
                 +  " macAddr:" + macAddr
                 +  " ip:" + ip.getAddress()
                 +  " name:" + name
-                +  " description:" + description.substring(0, 10)
+                +  " description:" + description
                 +  " status:" + statusInt
                 +  " imagePath:" + imagePath
                 +  " isFavourite:" + isFavourite);
