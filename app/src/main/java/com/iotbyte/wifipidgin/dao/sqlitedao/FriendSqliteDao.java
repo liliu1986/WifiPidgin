@@ -50,6 +50,8 @@ public class FriendSqliteDao implements FriendDao {
         db.close();
 
         if (rows == 0) {
+            //FIXME: delete violating foreign key will also cause rows == 0.
+            //       need to return a different error type here.
             return DaoError.ERROR_NO_RECORD;
         }
         assert rows == 1;
@@ -246,9 +248,8 @@ public class FriendSqliteDao implements FriendDao {
         String imagePath = c.getString(c.getColumnIndex(FriendSqliteDao.IMAGE_PATH_FIELD));
         boolean isFavourite = c.getInt(c.getColumnIndex(FriendSqliteDao.IS_FAVOURITE_FIELD)) == 0;
 
-        Friend f = new Friend(macAddr);
+        Friend f = new Friend(macAddr, ip);
         f.setId(id);
-        f.setIp(ip);
         f.setName(name);
         f.setDescription(description);
         f.setStatus(status);
