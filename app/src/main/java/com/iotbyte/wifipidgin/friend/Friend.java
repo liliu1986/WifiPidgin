@@ -14,10 +14,11 @@ public class Friend {
 
     /** Status a friend can be in */
     public enum FriendStatus {
-        ONLINE(0),
-        BUSY(1),
-        INVISIBLE(2),
-        OFFLINE(3);
+        UNINIT(0),
+        ONLINE(1),
+        BUSY(2),
+        INVISIBLE(3),
+        OFFLINE(4);
 
         public int getValue() {
             return value;
@@ -33,10 +34,17 @@ public class Friend {
     /**
       * Constructor
       * @param mac MAC address of the Friend.
+      * @param ip IP address of the Friend.
       */
-	public Friend(byte[] mac) {
+	public Friend(byte[] mac, InetAddress ip) {
         this.mac = mac;
         this.id = NO_ID;
+        this.ip = ip;
+        this.name = UNINIT_STRING;
+        this.description = UNINIT_STRING;
+        this.status = FriendStatus.UNINIT;
+        this.imagePath = UNINIT_STRING;
+        this.isFavourite = false;
     }
 
     public long getId() {
@@ -98,6 +106,8 @@ public class Friend {
     public void setFavourite(boolean isFavourite) {
         this.isFavourite = isFavourite;
     }
+
+    static private final String UNINIT_STRING = "Un-init";
 
     /** id to identify friend in storage. */
     private long id;
