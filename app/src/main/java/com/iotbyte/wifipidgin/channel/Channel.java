@@ -77,6 +77,21 @@ public class Channel {
     }
 
     /**
+     * Single variable Constructor for database data recovery
+     *
+     * @param channelIdentifier the ChannelIdentifier of the channel
+     *
+     */
+    public Channel(String channelIdentifier){
+        this.channelIdentifier = channelIdentifier;
+        this.name = null;
+        this.description = null;
+        this.id = NO_ID;
+        this.friendList = new ArrayList<>();
+    }
+
+
+    /**
      * Getter method of name
      *
      * @return name
