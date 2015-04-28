@@ -5,17 +5,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-/**ChannelManager is a Singleton class to manage the all existing Channels.
+/**
+ * ChannelManager is a Singleton class to manage the all existing Channels.
  * Any channel will  become available to user if it is managed under
  * ChannelManager
- *
- *
+ * <p/>
+ * <p/>
  * Created by yefwen@iotbyte.com on 26/03/15.
  */
 public class ChannelManager {
     private static ChannelManager instance = null;
 
-    private HashMap<String, Channel> channelMap; // ChannelIdentifier and Channel pair
+    private HashMap<String, Channel> channelMap; // channelIdentifier and Channel pair
 
     private ChannelManager() {
 
@@ -24,7 +25,7 @@ public class ChannelManager {
 
         //TODO: remove the mocked channelList
         //TODO: Adding channelList retrieval functionality from database
-        channelMap = new HashMap<String, Channel>();
+        channelMap = new HashMap<>();
     }
 
     public static ChannelManager getInstance() {
@@ -39,12 +40,38 @@ public class ChannelManager {
         return instance;
     }
 
+    /**
+     * saveChannelsInfoIntoDatabase()
+     * <p/>
+     * It will save all information back to the database, this should be called
+     * properly to retain all channel information
+     *
+     * @return true if all channel information is saved successfully, false otherwise.
+     */
+
+    //TODO: adding implementation to add all channels back to database
+    public boolean saveChannelsInfoIntoDatabase() {
+        return true;
+    }
+
+    /**
+     * getChannelStatus()
+     * <p/>
+     * it returns the Status of a channel with it's given channelIdentifier
+     *
+     * @param channelIdentifier the channelIdentifier to be lookup
+     * @return ChannelStatus.ONLINE if the channel is active, ChannelStatus.OFFLINE if the channel
+     * is not active
+     */
+
     //TODO: implement the getChannelStatus
     public ChannelStatus getChannelStatus(String channelIdentifier) {
         return ChannelStatus.OFFLINE;
     }
 
     /**
+     * getChannelByIdentifier()
+     * <p/>
      * Return the channel object with given channelIdentifier
      *
      * @param channelIdentifier the channelIdentifier of the channel under request
@@ -59,6 +86,8 @@ public class ChannelManager {
     }
 
     /**
+     * addChannel()
+     * <p/>
      * Add a channel to the ChannelManager
      * Require update the UI when return true
      *
@@ -66,32 +95,35 @@ public class ChannelManager {
      * @return true for add successfully or false for channel already exist
      */
     public boolean addChannel(Channel channel) {
-        if (channelMap.containsKey(channel)){
+        if (channelMap.containsKey(channel)) {
             return false;
-        } else{
+        } else {
             channelMap.put(channel.getChannelIdentifier(), channel);
             return true;
         }
     }
 
     /**
+     * deleteChannel()
+     * <p/>
      * Remove a channel from ChannelManager
      * Require update the UI when return true
      *
      * @param channel the channel to be deleted
      * @return true for successfully delete or false for channel does not exist previously.
-     *
      */
     public boolean deleteChannel(Channel channel) {
-        if (!channelMap.containsKey(channel)){
+        if (!channelMap.containsKey(channel)) {
             return false;
-        }else {
+        } else {
             channelMap.remove(channel.getChannelIdentifier());
             return true;
         }
     }
 
     /**
+     * getChannelList()
+     * <p/>
      * Return a List representation of the channels managed under ChannelManager
      *
      * @return a List representation of the channels, which is backed by ArrayList
