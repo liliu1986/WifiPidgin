@@ -323,14 +323,10 @@ public class ChannelSqliteDao implements ChannelDao {
         String channelIdentifier = c.getString(c.getColumnIndex(ChannelSqliteDao.IDENTIFIER_FIELD));
         String name = c.getString(c.getColumnIndex(ChannelSqliteDao.NAME_FIELD));
         String description = c.getString(c.getColumnIndex(ChannelSqliteDao.DESCRIPTIO_FIELD));
-        Channel channel = new Channel();
+        Channel channel = new Channel(channelIdentifier);
         channel.setId(id);
         channel.setName(name);
         channel.setDescription(description);
-        // FIXME: Need ability to create channel with a specific identifier
-        //channel.setChannelIdentifier(channelIdentifier);
-        // FIXME: This assert will always fail for current channel implementation.
-        assert channel.getChannelIdentifier() == channelIdentifier;
 
         Log.d(TAG, "Creating channel from cursor data."
                 + " id:" + id
