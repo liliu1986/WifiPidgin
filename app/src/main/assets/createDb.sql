@@ -6,9 +6,9 @@
 CREATE TABLE friend
 (
     _id         INTEGER PRIMARY KEY AUTOINCREMENT,
-    -- MAC stored as a byte field
+    -- MAC stored as hex string
     mac_addr    TEXT NOT NULL UNIQUE,
-    -- IP stored as a byte field
+    -- IP stored as string (InetAddress.getHostAddress())
     ip          TEXT NOT NULL UNIQUE,
     name        TEXT,
     description TEXT,
