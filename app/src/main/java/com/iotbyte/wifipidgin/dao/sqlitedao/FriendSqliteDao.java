@@ -30,6 +30,8 @@ public class FriendSqliteDao implements FriendDao {
 
     @Override
     public DaoError add(Friend friend) {
+        Log.d(TAG, "About to add friend. mac:" + friend.getMac().toString() +
+                   " ip:" + friend.getIp().getHostAddress());
         ContentValues values = friendToContentValues(friend);
         SQLiteDatabase db = sqliteHelper.getWritableDatabase();
         long rowId = db.insert(FRIEND_TABLE, null, values);
@@ -86,8 +88,8 @@ public class FriendSqliteDao implements FriendDao {
             String[] whereArgs = {Long.toString(id)};
             c = db.query(FRIEND_TABLE, ALL_COLUMNS, ID_FIELD + " = ?", whereArgs, null, null, null);
             List<Friend> fl = getFriendsFromCursor(c);
-            assert fl.size() == 1;
-            return fl.get(0);
+            assert fl.size() <= 1;
+            return fl.size() == 0 ? null : fl.get(0);
         } finally {
             cleanup(db, c);
         }
@@ -98,7 +100,7 @@ public class FriendSqliteDao implements FriendDao {
         SQLiteDatabase db = sqliteHelper.getReadableDatabase();
         Cursor c = null;
         try {
-            String[] whereArgs = {ip.getAddress().toString()};
+            String[] whereArgs = {ip.getHostAddress()};
             c = db.query(FRIEND_TABLE, ALL_COLUMNS, IP_FIELD + " = ?", whereArgs, null, null, null);
             List<Friend> fl = getFriendsFromCursor(c);
             assert fl.size() <= 1;
@@ -192,7 +194,7 @@ public class FriendSqliteDao implements FriendDao {
     private ContentValues friendToContentValues(Friend f) {
         ContentValues values = new ContentValues();
         values.put(MAC_ADDR_FIELD, f.getMac());
-        values.put(IP_FIELD, f.getIp().getAddress());
+        values.put(IP_FIELD, f.getIp().getHostAddress());
         values.put(NAME_FIELD, f.getName());
         values.put(DESCRIPTION_FIELD, f.getDescription());
         values.put(STATUS_FIELD, f.getStatus().getValue());
@@ -222,13 +224,13 @@ public class FriendSqliteDao implements FriendDao {
         long id = c.getLong(c.getColumnIndex(FriendSqliteDao.ID_FIELD));
         byte[] macAddr = c.getBlob(c.getColumnIndex(FriendSqliteDao.MAC_ADDR_FIELD));
         InetAddress ip = null;
-        byte[] ipBytes = c.getBlob(c.getColumnIndex(FriendSqliteDao.IP_FIELD));
+        String ipHost = c.getString(c.getColumnIndex(FriendSqliteDao.IP_FIELD));
         try {
-            ip = InetAddress.getByAddress(ipBytes);
+            ip = InetAddress.getByName(ipHost);
         } catch (UnknownHostException e) {
             // should not hit this, only if database is corrupted
             assert false;
-            Log.e(TAG, "Unknown ip:" + ipBytes
+            Log.e(TAG, "Unknown ip:" + ipHost
                     + ", rowId:" + id + " read from database.");
             return null;
         }
