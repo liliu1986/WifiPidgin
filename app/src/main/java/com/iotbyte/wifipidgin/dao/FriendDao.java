@@ -29,7 +29,7 @@ public interface FriendDao {
      * @param id ID of friend to be deleted from storage.
      * @return NO_ERROR upon successfully deleting friend from storage. Otherwise respective error code.
      */
-    public DaoError delete(int id);
+    public DaoError delete(long id);
 
     /**
      * Update a friend in the storage.
@@ -47,7 +47,7 @@ public interface FriendDao {
      * @param id Id to find friend by.
      * @return A reference to Friend object found in storage. null if no friend with such ID exists.
      */
-    public Friend findById(int id);
+    public Friend findById(long id);
 
     /**
      * Find a friend in storage by its ip address.
@@ -63,7 +63,7 @@ public interface FriendDao {
      * @param mac MAC address to find friend by.
      * @return A reference to Friend object found in storage. null if no friend with such ID exists.
      */
-    public Friend findByMacAddress(long mac);
+    public Friend findByMacAddress(byte[] mac);
 
     /**
      * Find friend in storage with a certain name.
