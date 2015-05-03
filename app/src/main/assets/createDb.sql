@@ -10,6 +10,7 @@ CREATE TABLE friend
     mac_addr    TEXT NOT NULL UNIQUE,
     -- IP stored as string (InetAddress.getHostAddress())
     ip          TEXT NOT NULL UNIQUE,
+    port        INTEGER NOT NULL,
     name        TEXT,
     description TEXT,
     status      INTEGER,
