@@ -7,5 +7,6 @@
     <string name="title_activity_about_page">About_page</string>
     <string name="title_activity_about">About</string>
     <string name="title_activity_display_namecard">DisplayNamecardActivity</string>
-
+    <string name="title_activity_test_chat">testChat</string>
+    <string name="message_server_service_name">Message Server Service</string>
 </resources>
