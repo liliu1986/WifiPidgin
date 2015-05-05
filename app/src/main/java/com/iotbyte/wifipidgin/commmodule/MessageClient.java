@@ -49,12 +49,12 @@ public class MessageClient {
     }
 
     class MessageSendingThread implements Runnable {
-        BlockingQueue<String> mMessageQueue;
+        //BlockingQueue<String> mMessageQueue;
 
-        String response = "";
+        //String response = "";
 
         public MessageSendingThread() {
-            mMessageQueue = new ArrayBlockingQueue<String>(QUEUE_CAPACITY);
+            //mMessageQueue = new ArrayBlockingQueue<String>(QUEUE_CAPACITY);
         }
 
         @Override
@@ -115,7 +115,6 @@ public class MessageClient {
                             new OutputStreamWriter(getSocket().getOutputStream())), true);
             out.println(msg);
             out.flush();
-            //updateMessages(msg, true);
         } catch (UnknownHostException e) {
             Log.d(MSG_CLIENT_TAG, "Unknown Host", e);
         } catch (IOException e) {
@@ -128,8 +127,6 @@ public class MessageClient {
     private Socket mSocket;
 
     private Thread mSendThread;
-
-    private int QUEUE_CAPACITY = 10;
 
     private InetAddress mAddress;
     private int PORT;
