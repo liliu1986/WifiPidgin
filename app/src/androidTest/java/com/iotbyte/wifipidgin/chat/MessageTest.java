@@ -46,11 +46,11 @@ public class MessageTest extends TestCase {
         //the following construct a message to be send out
         InetAddress aIp = InetAddress.getByName("www.google.com");
         byte[] aMac = {0xf,0xc,0xa,0xa,0x1,0x4,0x7,0x9,0xa,0xe,0xb,0xd}; //fc:aa:14:79:ae:bd
-        Friend aFriend = new Friend(aIp,aMac);
+        Friend aFriend = new Friend(aMac,aIp);
 
         InetAddress bIp = InetAddress.getByName("localhost");
         byte[] bMac = {0xf,0xc,0xa,0xa,0x1,0x4,0x7,0x9,0xa,0xe,0xb,0xf};//fc:aa:14:79:ae:bf
-        Friend bFriend = new Friend(bIp,bMac);
+        Friend bFriend = new Friend(bMac,bIp);
 
         Message message = new Message(aFriend,"12345","hahaha");
         Log.v(MESSAGE_TEST,message.convertMessageToJson());
@@ -97,7 +97,7 @@ public class MessageTest extends TestCase {
     public void testGetMessageBody() throws Exception {
         InetAddress aIp = InetAddress.getByName("www.google.com");
         byte[] aMac = {0xf,0xc,0xa,0xa,0x1,0x4,0x7,0x9,0xa,0xe,0xb,0xd}; //fc:aa:14:79:ae:bd
-        Friend aFriend = new Friend(aIp,aMac);
+        Friend aFriend = new Friend(aMac,aIp);
 
         Message message = new Message(aFriend,"12345","hahaha");
         assertEquals("Can't get proper message body","hahaha",message.getMessageBody());
@@ -107,7 +107,7 @@ public class MessageTest extends TestCase {
     public void testSetMessageBody() throws Exception {
         InetAddress aIp = InetAddress.getByName("www.google.com");
         byte[] aMac = {0xf,0xc,0xa,0xa,0x1,0x4,0x7,0x9,0xa,0xe,0xb,0xd}; //fc:aa:14:79:ae:bd
-        Friend aFriend = new Friend(aIp,aMac);
+        Friend aFriend = new Friend(aMac,aIp);
 
         Message message = new Message(aFriend,"12345","hahaha");
         message.setMessageBody("this is insane!");
@@ -119,7 +119,7 @@ public class MessageTest extends TestCase {
         //the following construct a message to be send out
         InetAddress aIp = InetAddress.getByName("www.google.com");
         byte[] aMac = {0xf,0xc,0xa,0xa,0x1,0x4,0x7,0x9,0xa,0xe,0xb,0xd}; //fc:aa:14:79:ae:bd
-        Friend aFriend = new Friend(aIp,aMac);
+        Friend aFriend = new Friend(aMac,aIp);
 
         Message message = new Message(aFriend,"12345","hahaha");
 
@@ -129,7 +129,7 @@ public class MessageTest extends TestCase {
     public void testGetTimestamp() throws Exception {
         InetAddress aIp = InetAddress.getByName("www.google.com");
         byte[] aMac = {0xf,0xc,0xa,0xa,0x1,0x4,0x7,0x9,0xa,0xe,0xb,0xd}; //fc:aa:14:79:ae:bd
-        Friend aFriend = new Friend(aIp,aMac);
+        Friend aFriend = new Friend(aMac,aIp);
 
         Message message = new Message(aFriend,"12345","hahaha");
         assertTrue(message.getTimestamp().toString().matches("^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d{3}(?: [AP]M)?(?: [+-]\\d{4})?$"));
@@ -138,7 +138,7 @@ public class MessageTest extends TestCase {
     public void testConstructor() throws Exception {
         InetAddress aIp = InetAddress.getByName("192.168.0.2");
         byte[] aMac = {0xf,0xc,0xa,0xa,0x1,0x4,0x7,0x9,0xa,0xe,0xb,0xd}; //fc:aa:14:79:ae:bd
-        Friend aFriend = new Friend(aIp,aMac);
+        Friend aFriend = new Friend(aMac,aIp);
 
         Message message = new Message(aFriend,"12345","hahaha");
         String json = message.convertMessageToJson();
