@@ -27,9 +27,10 @@ public class Channel {
     private String description;
     private final String channelIdentifier;
     private List<Friend> friendList;
-    private int id;   // id is added as the primary key to be used in data persist
-    private static final int NO_ID = -1;
-    private static final String CHANNEL_TAG = "Channel Class";
+    private long id;   // id is added as the primary key to be used in data persist
+    public static final long NO_ID = -1;
+    public static final String CHANNEL_TAG = "Channel Class";
+
     // TODO:: the following string should be move to res/string later
     private static final String DEFAULT_CHANNEL_NAME = "Un-named Channel";
     private static final String DEFAULT_CHANNEL_DESCRIPTION = "Too lazy to leave one";
@@ -75,6 +76,21 @@ public class Channel {
         this.description = description;
         this.friendList = friendList;
     }
+
+    /**
+     * Single variable Constructor for database data recovery
+     *
+     * @param channelIdentifier the ChannelIdentifier of the channel
+     *
+     */
+    public Channel(String channelIdentifier){
+        this.channelIdentifier = channelIdentifier;
+        this.name = null;
+        this.description = null;
+        this.id = NO_ID;
+        this.friendList = new ArrayList<>();
+    }
+
 
     /**
      * Getter method of name
@@ -144,7 +160,7 @@ public class Channel {
      *
      * @param id id of the channel
      */
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

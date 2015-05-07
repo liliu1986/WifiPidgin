@@ -6,6 +6,9 @@ import android.net.nsd.NsdServiceInfo;
 import android.util.Log;
 
 import com.iotbyte.wifipidgin.channel.Channel;
+import com.iotbyte.wifipidgin.dao.DaoError;
+import com.iotbyte.wifipidgin.dao.DaoFactory;
+import com.iotbyte.wifipidgin.dao.FriendDao;
 import com.iotbyte.wifipidgin.friend.Friend;
 import com.iotbyte.wifipidgin.utils.Utils;
 import com.iotbyte.wifipidgin.ui.tempDb;
@@ -77,8 +80,31 @@ public class NsdClient {
                                 Log.d(TAG, "The friend's ip is " + host.getHostAddress());
                                 Log.d(TAG, "The ip for my current device is " + Utils.getIPAddress(true));
                                 if (!host.getHostAddress().equals(Utils.getIPAddress(true))){
-                                    Friend newFriend = new Friend(host, Utils.hexStringToByteArray("ABCD"));
-                                    mdb.addFriendToList(newFriend);
+
+                                    Friend newFriend = new Friend(Utils.hexStringToByteArray("f0761c0a1778"), host);
+                                    newFriend.setIp(host);
+
+                                    //mdb.addFriendToList(newFriend);
+                                    FriendDao fd = DaoFactory.getInstance()
+                                            .getFriendDao(mContext, DaoFactory.DaoType.SQLITE_DAO, null);
+
+                                    List <Friend> listFriend = fd.findAll();
+                                    Log.d(TAG, "Here comes the list of the friends in the db");
+                                    for (int i = 0; i < listFriend.size(); i++){
+                                        Log.d(TAG, "" + listFriend.get(i).getIp().getHostAddress().toString());
+                                    }
+                                    DaoError err = DaoError.NO_ERROR;
+                                    Log.d(TAG, "About to look for " + host.getHostAddress().toString());
+                                    if (fd.findByIp(host) == null) {
+                                        err = fd.add(newFriend);
+                                    } else {
+                                        Log.d(TAG, "Friend with IP:" + host.getHostAddress() + " already exist.");
+                                    }
+
+                                    if (err != DaoError.NO_ERROR){
+                                        Log.e(TAG, "wth, something wrong" + err.getValue());
+
+                                    }
                                 }else{
                                     Log.d(TAG, "Same IP.");
                                 }
@@ -140,8 +166,8 @@ public class NsdClient {
                 Log.d(TAG, "The host ip is " + host.getHostAddress());
                 Log.d(TAG, "The ip for my current device is " + Utils.getIPAddress(true));
 
-                Friend newFriend = new Friend(host, Utils.hexStringToByteArray("ABCD"));
-                mdb.addFriendToList(newFriend);
+                //Friend newFriend = new Friend(host, Utils.hexStringToByteArray("ABCD"));
+                //mdb.addFriendToList(newFriend);
             }
         };
     }

@@ -6,11 +6,14 @@
 CREATE TABLE friend
 (
     _id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    -- MAC stored as hex string
     mac_addr    TEXT NOT NULL UNIQUE,
-    ip          INTEGER NOT NULL UNIQUE,
+    -- IP stored as string (InetAddress.getHostAddress())
+    ip          TEXT NOT NULL UNIQUE,
     name        TEXT,
     description TEXT,
     status      INTEGER,
+    image_path  TEXT,
     is_favourite INTEGER NOT NULL DEFAULT 0
 );
 
