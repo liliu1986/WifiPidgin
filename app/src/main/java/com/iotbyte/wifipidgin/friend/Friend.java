@@ -35,11 +35,13 @@ public class Friend {
       * Constructor
       * @param mac MAC address of the Friend.
       * @param ip IP address of the Friend.
+      * @param port Port number to communicate with the Friend.
       */
-	public Friend(byte[] mac, InetAddress ip) {
+	public Friend(byte[] mac, InetAddress ip, int port) {
         this.mac = mac;
         this.id = NO_ID;
         this.ip = ip;
+        this.port = port;
         this.name = UNINIT_STRING;
         this.description = UNINIT_STRING;
         this.status = FriendStatus.UNINIT;
@@ -61,6 +63,14 @@ public class Friend {
 
     public void setIp(InetAddress ip) {
         this.ip = ip;
+    }
+
+    public int getPort() {
+        return port;
+    }
+    
+    public void setPort(int port) {
+        this.port = port;
     }
 
     public byte[] getMac() {
@@ -115,6 +125,9 @@ public class Friend {
     /** IP address of Friend. */
     private InetAddress ip;
 
+    /** port number to communicate to this friend */
+    private int port;
+
     /** MAC address of Friend. */
     private final byte[] mac;
 
@@ -135,7 +148,7 @@ public class Friend {
 
     @Override
     public String toString() {
-        return "Friend id:" + id + ",IP:" + ip.getHostAddress() + ",MAC:" + mac;
+        return "Friend id:" + id + ",IP:" + ip.getHostAddress() + ",port:" + port + ",MAC:" + mac;
     }
 }
 

@@ -169,6 +169,7 @@ public class FriendSqliteDao implements FriendDao {
     static final String ID_FIELD = "_id";
     static final String MAC_ADDR_FIELD = "mac_addr";
     static final String IP_FIELD = "ip";
+    static final String PORT_FIELD = "port";
     static final String NAME_FIELD = "name";
     static final String DESCRIPTION_FIELD = "description";
     static final String STATUS_FIELD = "status";
@@ -178,6 +179,7 @@ public class FriendSqliteDao implements FriendDao {
     static final String[] ALL_COLUMNS = {ID_FIELD,
                                          MAC_ADDR_FIELD,
                                          IP_FIELD,
+                                         PORT_FIELD,
                                          NAME_FIELD,
                                          DESCRIPTION_FIELD,
                                          STATUS_FIELD,
@@ -236,6 +238,7 @@ public class FriendSqliteDao implements FriendDao {
                     + ", rowId:" + id + " read from database.");
             return null;
         }
+        int port = c.getInt(c.getColumnIndex(FriendSqliteDao.PORT_FIELD));
         String name = c.getString(c.getColumnIndex(FriendSqliteDao.NAME_FIELD));
         String description = c.getString(c.getColumnIndex(FriendSqliteDao.DESCRIPTION_FIELD));
         Friend.FriendStatus status = null;
@@ -252,7 +255,7 @@ public class FriendSqliteDao implements FriendDao {
         String imagePath = c.getString(c.getColumnIndex(FriendSqliteDao.IMAGE_PATH_FIELD));
         boolean isFavourite = c.getInt(c.getColumnIndex(FriendSqliteDao.IS_FAVOURITE_FIELD)) == 0;
 
-        Friend f = new Friend(macAddr, ip);
+        Friend f = new Friend(macAddr, ip, port);
         f.setId(id);
         f.setName(name);
         f.setDescription(description);
@@ -264,6 +267,7 @@ public class FriendSqliteDao implements FriendDao {
                 +  " id:" + id
                 +  " macAddr:" + macAddr
                 +  " ip:" + ip.getAddress()
+                +  " port:" + port
                 +  " name:" + name
                 +  " description:" + description
                 +  " status:" + statusInt
