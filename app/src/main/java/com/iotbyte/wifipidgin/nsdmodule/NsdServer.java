@@ -24,7 +24,6 @@ public class NsdServer {
     public static boolean RegisterredServiceFlag = false;
     
     private static final String TAG = "NsdServer";
-    private static final String MAC_ATTRIBUTE = "mac";
     public static final String SERVICE_TYPE = "_http._tcp.";
 
     public String mServiceName = "WiFiPidginNsdService";
