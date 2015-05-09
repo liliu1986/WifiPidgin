@@ -1,11 +1,16 @@
 package com.iotbyte.wifipidgin.ui;
 
+import android.content.Context;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.ListFragment;
 
+import com.iotbyte.wifipidgin.dao.DaoFactory;
+import com.iotbyte.wifipidgin.dao.FriendDao;
+import com.iotbyte.wifipidgin.friend.Friend;
 import com.iotbyte.wifipidgin.user.User;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -14,13 +19,11 @@ import java.util.ArrayList;
 public class DiscoverManager {
     FragmentActivity mFragmentActivity;
     ListFragment mListFragment;
+    Context mContext;
 
-    ArrayList<User> tmpfriendlistItems = new ArrayList<User>(){{
-        add(new User("Sue"));
-        add(new User("Fifi"));
-        add(new User("QD"));
-        add(new User("Liang"));
-    }};
+    FriendDao fd;
+
+    List<Friend> tmpfriendlistItems = null;
 
     public DiscoverManager(FragmentActivity inActivity , ListFragment inFragment) {
         mFragmentActivity = inActivity;
@@ -29,6 +32,11 @@ public class DiscoverManager {
 
     public int InflateSettingView(){
         int err = 0;
+        if(tmpfriendlistItems == null) {
+            fd = DaoFactory.getInstance().getFriendDao(mFragmentActivity, DaoFactory.DaoType.SQLITE_DAO, null);
+            tmpfriendlistItems = fd.findAll();
+        }
+
         DiscoverAdapter adapter = new DiscoverAdapter(mFragmentActivity, tmpfriendlistItems);
         mListFragment.setListAdapter(adapter);
         return err;
