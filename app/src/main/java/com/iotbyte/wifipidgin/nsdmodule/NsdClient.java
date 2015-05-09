@@ -81,7 +81,7 @@ public class NsdClient {
                                 Log.d(TAG, "The ip for my current device is " + Utils.getIPAddress(true));
                                 if (!host.getHostAddress().equals(Utils.getIPAddress(true))){
 
-                                    Friend newFriend = new Friend(Utils.hexStringToByteArray("f0761c0a1778"), host);
+                                    Friend newFriend = new Friend(Utils.hexStringToByteArray("f0761c0a1778"), host, 0);
                                     newFriend.setIp(host);
 
                                     //mdb.addFriendToList(newFriend);

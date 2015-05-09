@@ -59,7 +59,7 @@ public class Message {
             InetAddress senderIp = InetAddress.getByName(ipFormater(sender.getString(MESSAGE_IP)));
             byte[] senderMac = macAddressHexStringToByte(sender.getString(MESSAGE_MAC));
 
-            Friend friend = new Friend(senderMac,senderIp);
+            Friend friend = new Friend(senderMac,senderIp,0);
             friend.setDescription(sender.optString(MESSAGE_DESCRIPTION));
             friend.setName(sender.optString(MESSAGE_NAME));
             this.sender = friend;
@@ -70,7 +70,7 @@ public class Message {
             InetAddress receiverIp = InetAddress.getByName(ipFormater(receiver.getString(MESSAGE_IP)));
             byte[] receiverMac = macAddressHexStringToByte(receiver.getString(MESSAGE_MAC));
 
-            Friend myself = new Friend(receiverMac,receiverIp);
+            Friend myself = new Friend(receiverMac,receiverIp,0);
             myself.setDescription(receiver.optString(MESSAGE_DESCRIPTION));
             myself.setName(receiver.optString(MESSAGE_NAME));
             this.receiver = myself;
@@ -107,7 +107,7 @@ public class Message {
             e.printStackTrace();
         }
         byte[] myMac = {0xf,0xc,0xa,0xa,0x1,0x4,0x7,0x9,0xa,0xe,0xb,0xf};//fc:aa:14:79:ae:bf
-        Friend myself = new Friend(myMac,myIp);
+        Friend myself = new Friend(myMac,myIp,0);
         myself.setName("myself");
         myself.setDescription("I am who I am");
         this.sender = myself;
