@@ -3,6 +3,7 @@ package com.iotbyte.wifipidgin.dao.sqlitedao;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
@@ -35,13 +36,18 @@ public class FriendSqliteDao implements FriendDao {
                    " ip:" + friend.getIp().getHostAddress());
         ContentValues values = friendToContentValues(friend);
         SQLiteDatabase db = sqliteHelper.getWritableDatabase();
-        long rowId = db.insert(FRIEND_TABLE, null, values);
-        if (rowId == -1) {
-            db.close();
+        try {
+            long rowId = db.insert(FRIEND_TABLE, null, values);
+            friend.setId(rowId);
+            if (rowId == -1) {
+                return DaoError.ERROR_SAVE;
+            }
+        } catch (SQLiteConstraintException e) {
+            Log.d(TAG, "Error insert into db:" + e);
             return DaoError.ERROR_SAVE;
+        } finally {
+            db.close();
         }
-        db.close();
-        friend.setId(rowId);
         return DaoError.NO_ERROR;
     }
 
@@ -49,15 +55,17 @@ public class FriendSqliteDao implements FriendDao {
     public DaoError delete(long id) {
         String[] whereArgs = {Long.toString(id)};
         SQLiteDatabase db = sqliteHelper.getWritableDatabase();
-        int rows = db.delete(FRIEND_TABLE, ID_FIELD + " = ?", whereArgs);
-        db.close();
-
-        if (rows == 0) {
-            //FIXME: delete violating foreign key will also cause rows == 0.
-            //       need to return a different error type here.
-            return DaoError.ERROR_NO_RECORD;
+        try {
+            int rows = db.delete(FRIEND_TABLE, ID_FIELD + " = ?", whereArgs);
+            if (rows == 0) {
+                return DaoError.ERROR_NO_RECORD;
+            }
+            assert rows == 1;
+        } catch (SQLiteConstraintException e) {
+            Log.d(TAG, "Constrain violation when deleting from db:" + e);
+        } finally {
+            db.close();
         }
-        assert rows == 1;
         return DaoError.NO_ERROR;
     }
 
@@ -71,13 +79,17 @@ public class FriendSqliteDao implements FriendDao {
         ContentValues values = friendToContentValues(friend);
         String[] whereArgs = {Long.toString(id)};
         SQLiteDatabase db = sqliteHelper.getWritableDatabase();
-        int rows = db.update(FRIEND_TABLE, values, ID_FIELD + " = ?", whereArgs);
-        db.close();
-
-        if (rows == 0) {
-            return DaoError.ERROR_NO_RECORD;
+        try {
+            int rows = db.update(FRIEND_TABLE, values, ID_FIELD + " = ?", whereArgs);
+            if (rows == 0) {
+                return DaoError.ERROR_NO_RECORD;
+            }
+            assert rows == 1;
+        } catch (SQLiteConstraintException e) {
+            Log.d(TAG, "Constrain violation when updating db:" + e);
+        } finally {
+            db.close();
         }
-        assert rows == 1;
         return DaoError.NO_ERROR;
     }
 
