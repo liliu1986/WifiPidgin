@@ -3,6 +3,8 @@ package com.iotbyte.wifipidgin.nsdmodule;
 import android.content.Context;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.util.Log;
 
@@ -22,6 +24,7 @@ public class NsdServer {
     public static boolean RegisterredServiceFlag = false;
     
     private static final String TAG = "NsdServer";
+    private static final String MAC_ATTRIBUTE = "mac";
     public static final String SERVICE_TYPE = "_http._tcp.";
 
     public String mServiceName = "WiFiPidginNsdService";
@@ -52,8 +55,8 @@ public class NsdServer {
                 setHostIP(NsdServiceInfo.getHost());
 
                 Log.d(TAG, "The service " + mServiceName + " has been registered successfully!");
-                Log.d(TAG, "My IP is " + NsdServiceInfo.getHost().toString());
-                Log.d(TAG, "My Port is " + NsdServiceInfo.getPort());
+                //Log.d(TAG, "My IP is " + NsdServiceInfo.getHost().toString());
+                //Log.d(TAG, "My Port is " + NsdServiceInfo.getPort());
 
             }
             
@@ -79,12 +82,20 @@ public class NsdServer {
     	
     	if(port==-1)
     		return;
-    	
+
+        // Embed mac address into service name
+        // Format is serviceName-macAddress
+        WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+        WifiInfo wInfo = wifiManager.getConnectionInfo();
+        String macString = wInfo.getMacAddress();
+        String serviceName = mServiceName + "-" + macString;
+        Log.d(TAG, "Service name is " + serviceName);
+
         NsdServiceInfo serviceInfo  = new NsdServiceInfo();
         serviceInfo.setPort(port);
-        serviceInfo.setServiceName(mServiceName);
+        serviceInfo.setServiceName(serviceName);
         serviceInfo.setServiceType(SERVICE_TYPE);
-        
+
         //Log.e(TAG, "The service name is about set to be " + mServiceName);
         //Log.e(TAG, "The service name is set to be " + serviceInfo.getServiceName());
         
