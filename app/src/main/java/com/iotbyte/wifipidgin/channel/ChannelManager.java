@@ -2,6 +2,7 @@ package com.iotbyte.wifipidgin.channel;
 
 
 import android.content.Context;
+import android.util.Log;
 
 import com.iotbyte.wifipidgin.dao.ChannelDao;
 import com.iotbyte.wifipidgin.dao.DaoFactory;
@@ -24,6 +25,8 @@ import java.util.List;
  */
 public class ChannelManager {
     private static ChannelManager instance = null;
+
+    final String CHANNEL_MANAGER_DEBUG = "Channel Manager Debug";
 
     private Context context;
 
@@ -55,7 +58,8 @@ public class ChannelManager {
         FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO,null);
         fd.add(xiaoMing);
         fd.add(xiaoPang);
-
+        Log.d(CHANNEL_MANAGER_DEBUG,"the id of xiaoMing is "+ xiaoMing.getId());
+        Log.d(CHANNEL_MANAGER_DEBUG, "the id of xiaoPang is " + xiaoPang.getId());
 
 
         List<Friend> mockList = new ArrayList<>();
@@ -65,6 +69,7 @@ public class ChannelManager {
         //save mocked channels;
         ChannelDao cd = DaoFactory.getInstance().getChannelDao(context,DaoFactory.DaoType.SQLITE_DAO,null);
         cd.add(mockChannel);
+        Log.d(CHANNEL_MANAGER_DEBUG,"the id of mockChannel is "+mockChannel.getId());
 
 
         //below is not mocked!!!!
