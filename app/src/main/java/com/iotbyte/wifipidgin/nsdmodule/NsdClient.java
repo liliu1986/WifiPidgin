@@ -39,9 +39,9 @@ public class NsdClient {
     private tempDb mdb;
 
     private boolean isDiscovering=false;
-    public NsdClient(Context context, NsdManager inNsdManager) {
+    public NsdClient(Context context) {
         mContext = context;
-        mNsdManager = inNsdManager;
+        mNsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
         ChannelList=new ArrayList<Channel>();
         //nearbyFriendList =new ArrayList<Friend>();
     }
@@ -72,7 +72,7 @@ public class NsdClient {
                             Log.e(TAG, "Resolve Succeeded. " + serviceInfo.getServiceName());
                             mService = serviceInfo;
                             if (serviceInfo.getServiceName().equals(mServiceName)) {
-                                Log.d(TAG, "Same Service Name." + mService.getHost().getHostAddress());
+                                Log.d(TAG, "Same Service Name " + mService.getServiceName());
                                 return;
                             }else if (serviceInfo.getServiceName().contains(mServiceName)){
                                 InetAddress host = mService.getHost();

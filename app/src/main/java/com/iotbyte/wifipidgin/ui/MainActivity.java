@@ -78,11 +78,11 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         }
 
         //Start NSD here
-        mNsdWrapper = new NsdWrapper(this);
+        //mNsdWrapper = new NsdWrapper(this);
         //Start DSN broadcasting
-        mNsdWrapper.Broadcast();
+        //mNsdWrapper.Broadcast();
         //Start DSN discovery
-        mNsdWrapper.discover();
+        //mNsdWrapper.discover();
     }
 
     @Override

@@ -18,4 +18,5 @@ public class CommModuleBroadcastReceiver extends BroadcastReceiver {
                         + "Data passed: " + datapassed,
                 Toast.LENGTH_LONG).show();
     }
+
 }

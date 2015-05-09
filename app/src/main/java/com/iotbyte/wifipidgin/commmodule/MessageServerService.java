@@ -34,7 +34,7 @@ public class MessageServerService extends Service {
     @Override
     public void onCreate() {
 
-        mMessageServer = new MessageServer();
+        mMessageServer = new MessageServer(getApplicationContext());
         mMessageServer.setMessageReceivingListener(new MessageReceivingListener(){
             @Override
             public void onMessageReceived(String msg){

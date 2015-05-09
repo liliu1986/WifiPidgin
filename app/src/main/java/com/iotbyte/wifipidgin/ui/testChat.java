@@ -18,6 +18,7 @@ import com.iotbyte.wifipidgin.commmodule.CommModuleBroadcastReceiver;
 import com.iotbyte.wifipidgin.commmodule.MessageClient;
 import com.iotbyte.wifipidgin.commmodule.MessageServer;
 import com.iotbyte.wifipidgin.commmodule.MessageServerService;
+import com.iotbyte.wifipidgin.nsdmodule.NsdClient;
 import com.iotbyte.wifipidgin.nsdmodule.NsdWrapper;
 
 import java.net.InetAddress;
@@ -55,9 +56,15 @@ public class testChat extends ActionBarActivity implements View.OnClickListener{
         intentFilter.addAction(MessageServerService.MY_ACTION);
         registerReceiver(myReceiver, intentFilter);
 
+        //Start message Server service and NSD Service
         Intent i= new Intent(getApplicationContext(), MessageServerService.class);
         i.putExtra("KEY1", "Value to be used by the service");
         context.startService(i);
+
+        //Start the service discovery
+        NsdClient mNsdClient = new NsdClient(this);
+        mNsdClient.initializeNsdClient();
+        mNsdClient.discoverServices();
 
         /*
         mUpdateHandler = new Handler() {
@@ -82,15 +89,6 @@ public class testChat extends ActionBarActivity implements View.OnClickListener{
         */
         //mMessageServer.startServer();
 
-
-        //Start NSD here
-        //mNsdWrapper = new NsdWrapper(this);
-        //Start DSN broadcasting
-        //mNsdWrapper.Broadcast();
-        //Start DSN discovery
-        //mNsdWrapper.discover();
-
-        //mMessageServer = new MessageServer();
 
     }
 
@@ -159,5 +157,11 @@ public class testChat extends ActionBarActivity implements View.OnClickListener{
                     Log.e(TAG, "The message client has not been initialized yet!!!");
                 }
         }
+    }
+    @Override
+    protected void onStop()
+    {
+        unregisterReceiver(myReceiver);
+        super.onStop();
     }
 }
