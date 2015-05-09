@@ -43,7 +43,7 @@ public class ChannelSqliteDao implements ChannelDao {
             if (rowId == -1) {
                 return DaoError.ERROR_SAVE;
             }
-
+            channel.setId(rowId);
             // now deal with friends that belongs to a channel
             List<Friend> friendList = channel.getFriendsList();
             for (Friend f : friendList) {

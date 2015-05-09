@@ -39,11 +39,10 @@ public class NsdClient {
     private tempDb mdb;
 
     private boolean isDiscovering=false;
-    public NsdClient(Context context, NsdManager inNsdManager, tempDb inDb) {
+    public NsdClient(Context context) {
         mContext = context;
-        mNsdManager = inNsdManager;
+        mNsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
         ChannelList=new ArrayList<Channel>();
-        mdb = inDb;
         //nearbyFriendList =new ArrayList<Friend>();
     }
     public void initializeNsdClient() {
@@ -59,7 +58,7 @@ public class NsdClient {
             }
 
             @Override
-            public void onServiceFound(NsdServiceInfo service) {
+            public void onServiceFound(final NsdServiceInfo service) {
 
                 Log.d(TAG, "Service found: "+ service);
                 if (service.getServiceType().equals(SERVICE_TYPE)){
@@ -72,49 +71,38 @@ public class NsdClient {
                         public void onServiceResolved(NsdServiceInfo serviceInfo) {
                             Log.e(TAG, "Resolve Succeeded. " + serviceInfo.getServiceName());
                             mService = serviceInfo;
-                            if (serviceInfo.getServiceName().equals(mServiceName)) {
-                                Log.d(TAG, "Same Service Name." + mService.getHost().getHostAddress());
-                                return;
-                            }else if (serviceInfo.getServiceName().contains(mServiceName)){
-                                InetAddress host = mService.getHost();
-                                Log.d(TAG, "The friend's ip is " + host.getHostAddress());
-                                Log.d(TAG, "The ip for my current device is " + Utils.getIPAddress(true));
-                                if (!host.getHostAddress().equals(Utils.getIPAddress(true))){
-
-
-                                    Friend newFriend = new Friend(Utils.hexStringToByteArray("f0761c0a1778"), host,55);
-
-                                    newFriend.setIp(host);
-
-                                    //mdb.addFriendToList(newFriend);
-                                    FriendDao fd = DaoFactory.getInstance()
-                                            .getFriendDao(mContext, DaoFactory.DaoType.SQLITE_DAO, null);
-
-                                    List <Friend> listFriend = fd.findAll();
-                                    Log.d(TAG, "Here comes the list of the friends in the db");
-                                    for (int i = 0; i < listFriend.size(); i++){
-                                        Log.d(TAG, "" + listFriend.get(i).getIp().getHostAddress().toString());
-                                    }
-                                    DaoError err = DaoError.NO_ERROR;
-                                    Log.d(TAG, "About to look for " + host.getHostAddress().toString());
-                                    if (fd.findByIp(host) == null) {
-                                        err = fd.add(newFriend);
-                                    } else {
-                                        Log.d(TAG, "Friend with IP:" + host.getHostAddress() + " already exist.");
-                                    }
-
-                                    if (err != DaoError.NO_ERROR){
-                                        Log.e(TAG, "wth, something wrong" + err.getValue());
-
-                                    }
-                                }else{
-                                    Log.d(TAG, "Same IP.");
-                                }
-
-                            }else{
+                            String serviceName = serviceInfo.getServiceName();
+                            if (!serviceName.startsWith(mServiceName + "-")) {
                                 Log.d(TAG, "Unknown App");
+                                return;
                             }
 
+                            InetAddress host = mService.getHost();
+                            Log.d(TAG, "The friend's ip is " + host.getHostAddress());
+                            Log.d(TAG, "The ip for my current device is " + Utils.getIPAddress(true));
+                            if (host.getHostAddress().equals(Utils.getIPAddress(true))) {
+                                Log.d(TAG, "Same IP.");
+                                return;
+                            }
+
+                            // Extract mac address from service name
+                            // Format is serviceName-macAddress
+                            Log.d(TAG, "Service name is " + serviceName);
+                            int macStart = mServiceName.length() + 1;
+                            int macEnd = macStart + 17;
+                            String macString = serviceName.substring(macStart, macEnd);
+                            Log.d(TAG, "The friend's mac address is " + macString);
+
+                            Friend newFriend = new Friend(Utils.hexStringToByteArray(macString.replaceAll(":", "")), host, 55);
+                            newFriend.setIp(host);
+
+                            //mdb.addFriendToList(newFriend);
+                            FriendDao fd = DaoFactory.getInstance()
+                                    .getFriendDao(mContext, DaoFactory.DaoType.SQLITE_DAO, null);
+                            DaoError err = fd.add(newFriend);
+                            if (err != DaoError.NO_ERROR) {
+                                Log.e(TAG, "wth, something wrong" + err.getValue());
+                            }
                         }
                     });
                 }

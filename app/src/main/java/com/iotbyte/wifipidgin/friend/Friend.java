@@ -15,6 +15,11 @@ public class Friend {
     public static final long NO_ID = -1;
 
     /**
+     * ID indicating this Friend is self.
+     */
+    public static final long SELF_ID = 0;
+
+    /**
      * Status a friend can be in
      */
     public enum FriendStatus {
@@ -54,28 +59,6 @@ public class Friend {
         this.isFavourite = false;
     }
 
-    /**
-     * Constructor
-     *
-     * This constructor is for sending FriendCreationRequest, which
-     * at the early stage of adding a friend to your list, host have
-     * no clue about the friend's MAC, only IP and port is offered by NSD
-     * But Message class constructor require a friend to construct.
-     *
-     * @param ip   IP address of the Friend.
-     * @param port Port number to communicate with the Friend.
-     */
-    public Friend(InetAddress ip, int port) {
-        this.id = NO_ID;
-        this.ip = ip;
-        this.port = port;
-        this.name = UNINIT_STRING;
-        this.description = UNINIT_STRING;
-        this.status = FriendStatus.UNINIT;
-        this.imagePath = UNINIT_STRING;
-        this.isFavourite = false;
-    }
-
     public long getId() {
         return id;
     }
@@ -103,11 +86,6 @@ public class Friend {
     public byte[] getMac() {
         return mac;
     }
-
-    public void setMac(byte[] mac) {
-        this.mac = mac;
-    }
-
 
     public String getName() {
         return name;
@@ -169,7 +147,7 @@ public class Friend {
     /**
      * MAC address of Friend.
      */
-    private byte[] mac;
+    final private byte[] mac;
 
     /**
      * Name of this Friend.
@@ -199,7 +177,7 @@ public class Friend {
 
     @Override
     public String toString() {
-        return "Friend id:" + id + ",IP:" + ip.getHostAddress() + ",port:" + port + ",MAC:" + mac;
+        return this.getName();
     }
 }
 

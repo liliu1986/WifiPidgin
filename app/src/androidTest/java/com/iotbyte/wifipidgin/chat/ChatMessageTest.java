@@ -1,15 +1,17 @@
 package com.iotbyte.wifipidgin.chat;
 
+import android.content.Context;
+import android.content.Intent;
+import android.test.AndroidTestCase;
 import android.util.Log;
 
+import com.iotbyte.wifipidgin.commmodule.MessageServerService;
 import com.iotbyte.wifipidgin.friend.Friend;
 import com.iotbyte.wifipidgin.message.ChatMessage;
 
-import junit.framework.TestCase;
-
 import java.net.InetAddress;
 
-public class ChatMessageTest extends TestCase {
+public class ChatMessageTest extends AndroidTestCase {
     public static final String MESSAGE_TEST = "ChatMessage Test";
 
     public void setUp() throws Exception {
@@ -164,5 +166,30 @@ public class ChatMessageTest extends TestCase {
         ChatMessage sameChatMessage = new ChatMessage(json);
 
         assertEquals("timestamp does not convert properly", chatMessage.getTimestamp().toString(), sameChatMessage.getTimestamp().toString());
+    }
+
+
+
+    public void testOverallWorkFlow1()throws Exception{
+
+
+         //Start message Server service and NSD Service
+        Context context = getContext();
+        Intent i= new Intent(context, MessageServerService.class);
+        i.putExtra("KEY1", "Value to be used by the service");
+        context.startService(i);
+
+        //Start the service discovery
+       // NsdClient mNsdClient = new NsdClient(context);
+        // mNsdClient.initializeNsdClient();
+        // mNsdClient.discoverServices();
+
+
+
+
+
+
+
+
     }
 }
