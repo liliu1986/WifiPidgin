@@ -4,14 +4,11 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.util.Log;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import com.iotbyte.wifipidgin.chat.ChatManager;
+
 import java.net.ServerSocket;
-import java.net.Socket;
 
 /**
  * Created by fire on 29/04/15.
@@ -39,6 +36,8 @@ public class MessageServerService extends Service {
             @Override
             public void onMessageReceived(String msg){
                 Log.d(MSG_SERVICE_TAG, "A message has been received: " + msg);
+
+                ChatManager.getInstance().enqueueIncomingMessageQueue(msg);
                 Intent intent = new Intent();
                 intent.setAction(MY_ACTION);
                 intent.putExtra("MSGREC", msg);

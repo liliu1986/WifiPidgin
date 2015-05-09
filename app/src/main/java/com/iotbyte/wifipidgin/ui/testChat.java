@@ -14,10 +14,13 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.iotbyte.wifipidgin.R;
+import com.iotbyte.wifipidgin.chat.ChatManager;
 import com.iotbyte.wifipidgin.commmodule.CommModuleBroadcastReceiver;
 import com.iotbyte.wifipidgin.commmodule.MessageClient;
 import com.iotbyte.wifipidgin.commmodule.MessageServer;
 import com.iotbyte.wifipidgin.commmodule.MessageServerService;
+import com.iotbyte.wifipidgin.friend.Friend;
+import com.iotbyte.wifipidgin.message.ChatMessage;
 import com.iotbyte.wifipidgin.nsdmodule.NsdClient;
 import com.iotbyte.wifipidgin.nsdmodule.NsdWrapper;
 
@@ -138,24 +141,37 @@ public class testChat extends ActionBarActivity implements View.OnClickListener{
                 port = Integer.parseInt(portTextView.getText().toString());
 
                 TextView msgTextView = (TextView) findViewById(R.id.msgField);
-                msg = msgTextView.getText().toString();
+
+
+               // msg = msgTextView.getText().toString();
                 try {
                     destIP = InetAddress.getByName(ipString);
+                    byte[] aMac = {0xf,0xc,0xa,0xa,0x1,0x4,0x7,0x9,0xa,0xe,0xb,0xd}; //fc:aa:14:79:ae:bd
+                    Friend aFriend = new Friend(aMac,destIP,port);
+
+                    ChatMessage chatmessage = new ChatMessage(aFriend,"e2qjseahfwo3i",msgTextView.getText().toString());
+
+                    ChatManager chatManager = ChatManager.getInstance();
+                    chatManager.enqueueOutGoingMessageQueue(chatmessage.convertMessageToJson());
+
+
+
                     Log.d(TAG, "Trying to connect to server at : " + destIP.toString() + ": " + port);
 
                     mMessageClient = new MessageClient();
 
+                    if (mMessageClient != null){
+                        Log.d(TAG, "Sending the msg Now!!!");
+                        mMessageClient.sendMsg(destIP, port, chatManager.dequeueOutGoingMessageQueue());
+                    } else {
+                        Log.e(TAG, "The message client has not been initialized yet!!!");
+                    }
 
                 } catch (UnknownHostException e) {
                     e.printStackTrace();
                 };
 
-                if (mMessageClient != null){
-                    Log.d(TAG, "Sending the msg Now!!!");
-                    mMessageClient.sendMsg(destIP, port, msg);
-                } else {
-                    Log.e(TAG, "The message client has not been initialized yet!!!");
-                }
+
         }
     }
     @Override
