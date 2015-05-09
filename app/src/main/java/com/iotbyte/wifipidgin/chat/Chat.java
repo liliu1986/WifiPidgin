@@ -1,11 +1,13 @@
 package com.iotbyte.wifipidgin.chat;
 
+import com.iotbyte.wifipidgin.message.ChatMessage;
+
 import java.util.LinkedList;
 import java.util.Queue;
 
 /**
  * Chat class is the core for chat UI backend. It links to it's corresponding channel by
- * channelIdentifier attribute. It maintains a queue of Message objects that is intend
+ * channelIdentifier attribute. It maintains a queue of ChatMessage objects that is intend
  * for this chat.
  * <p/>
  * Created by yefwen@iotbyte.com on 26/03/15.
@@ -13,7 +15,7 @@ import java.util.Queue;
 public class Chat {
 
     private final String channelIdentifier;
-    private Queue<Message> chatMessageQueue;
+    private Queue<ChatMessage> chatMessageQueue;
 
     /* this queue manage all messages with in the chat, include outgoing and incoming message */
     public Chat(String channelIdentifier) {
@@ -32,7 +34,7 @@ public class Chat {
         return channelIdentifier;
     }
 
-    public Message getMessage() {
+    public ChatMessage getMessage() {
         return chatMessageQueue.poll();
     }
 
@@ -45,7 +47,7 @@ public class Chat {
      * @param message the message object to be insert into the queue
      * @return true if insert successfully, false otherwise
      */
-    public boolean pushMessage(Message message) {
+    public boolean pushMessage(ChatMessage message) {
         return chatMessageQueue.offer(message);
     }
 
@@ -59,7 +61,7 @@ public class Chat {
      * @return true if send successfully, false otherwise
      */
 
-    public boolean sendMessage(Message message) {
+    public boolean sendMessage(ChatMessage message) {
         return ChatManager.getInstance().enqueueOutGoingMessageQueue(message.convertMessageToJson()) && this.pushMessage(message);
     }
 

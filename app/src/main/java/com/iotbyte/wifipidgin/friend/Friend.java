@@ -4,15 +4,19 @@ import java.net.InetAddress;
 
 /**
  * Data object to store information about a friend.
- *
+ * <p/>
  * A friend is any client who has been discovered by the NSD
  */
 public class Friend {
 
-    /** No id indicates this object has not been published to storage */
+    /**
+     * No id indicates this object has not been published to storage
+     */
     public static final long NO_ID = -1;
 
-    /** Status a friend can be in */
+    /**
+     * Status a friend can be in
+     */
     public enum FriendStatus {
         UNINIT(0),
         ONLINE(1),
@@ -32,13 +36,36 @@ public class Friend {
     }
 
     /**
-      * Constructor
-      * @param mac MAC address of the Friend.
-      * @param ip IP address of the Friend.
-      * @param port Port number to communicate with the Friend.
-      */
-	public Friend(byte[] mac, InetAddress ip, int port) {
+     * Constructor
+     *
+     * @param mac  MAC address of the Friend.
+     * @param ip   IP address of the Friend.
+     * @param port Port number to communicate with the Friend.
+     */
+    public Friend(byte[] mac, InetAddress ip, int port) {
         this.mac = mac;
+        this.id = NO_ID;
+        this.ip = ip;
+        this.port = port;
+        this.name = UNINIT_STRING;
+        this.description = UNINIT_STRING;
+        this.status = FriendStatus.UNINIT;
+        this.imagePath = UNINIT_STRING;
+        this.isFavourite = false;
+    }
+
+    /**
+     * Constructor
+     *
+     * This constructor is for sending FriendCreationRequest, which
+     * at the early stage of adding a friend to your list, host have
+     * no clue about the friend's MAC, only IP and port is offered by NSD
+     * But Message class constructor require a friend to construct.
+     *
+     * @param ip   IP address of the Friend.
+     * @param port Port number to communicate with the Friend.
+     */
+    public Friend(InetAddress ip, int port) {
         this.id = NO_ID;
         this.ip = ip;
         this.port = port;
@@ -68,7 +95,7 @@ public class Friend {
     public int getPort() {
         return port;
     }
-    
+
     public void setPort(int port) {
         this.port = port;
     }
@@ -76,6 +103,11 @@ public class Friend {
     public byte[] getMac() {
         return mac;
     }
+
+    public void setMac(byte[] mac) {
+        this.mac = mac;
+    }
+
 
     public String getName() {
         return name;
@@ -119,31 +151,50 @@ public class Friend {
 
     static private final String UNINIT_STRING = "Un-init";
 
-    /** id to identify friend in storage. */
+    /**
+     * id to identify friend in storage.
+     */
     private long id;
 
-    /** IP address of Friend. */
+    /**
+     * IP address of Friend.
+     */
     private InetAddress ip;
 
-    /** port number to communicate to this friend */
+    /**
+     * port number to communicate to this friend
+     */
     private int port;
 
-    /** MAC address of Friend. */
-    private final byte[] mac;
+    /**
+     * MAC address of Friend.
+     */
+    private byte[] mac;
 
-    /** Name of this Friend. */
+    /**
+     * Name of this Friend.
+     */
     private String name;
 
-    /** Description of this Friend. */
+
+    /**
+     * Description of this Friend.
+     */
     private String description;
 
-    /** Status of this Friend. */
+    /**
+     * Status of this Friend.
+     */
     private FriendStatus status;
 
-    /** Friend image path */
+    /**
+     * Friend image path
+     */
     private String imagePath;
 
-    /** Whether this Friend has is a favourite */
+    /**
+     * Whether this Friend has is a favourite
+     */
     private boolean isFavourite;
 
     @Override
