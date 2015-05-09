@@ -2,23 +2,13 @@ package com.iotbyte.wifipidgin.commmodule;
 
 import android.util.Log;
 
-import com.iotbyte.wifipidgin.channel.Channel;
-import com.iotbyte.wifipidgin.chat.Message;
-import com.iotbyte.wifipidgin.friend.Friend;
-
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 
 /**
  * Created by fire on 19/04/15.
