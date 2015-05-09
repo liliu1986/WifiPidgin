@@ -5,6 +5,7 @@ import android.content.Context;
 
 import com.iotbyte.wifipidgin.dao.ChannelDao;
 import com.iotbyte.wifipidgin.dao.DaoFactory;
+import com.iotbyte.wifipidgin.dao.FriendDao;
 import com.iotbyte.wifipidgin.friend.Friend;
 
 import java.net.InetAddress;
@@ -44,13 +45,18 @@ public class ChannelManager {
         xiaoMing.setDescription("wo shi huang xiao ming");
         xiaoMing.setName("HXM");
 
-
         InetAddress xiaoPangIP = InetAddress.getByName("192.168.1.179");
         byte[] xiaoPangMac = {0x5,0xc,0x0,0xa,0x5,0xb,0xa,0xa,0xc,0xa,0xc,0x5};
         int xiaoPangPort = 55;
         Friend xiaoPang = new Friend(xiaoPangMac,xiaoPangIP,xiaoPangPort);
         xiaoPang.setDescription("wo shi xiao pang");
         xiaoPang.setName("stackHeap");
+
+        FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO,null);
+        fd.add(xiaoMing);
+        fd.add(xiaoPang);
+
+
 
         List<Friend> mockList = new ArrayList<>();
         mockList.add(xiaoMing);
