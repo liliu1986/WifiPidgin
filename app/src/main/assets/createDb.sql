@@ -36,3 +36,7 @@ CREATE TABLE channel_friend_list
     -- cascade delete all friends-channel record when channel is deleted
     FOREIGN KEY(channel_id) REFERENCES channel(_id) ON DELETE CASCADE
 );
+
+-- Create self in database
+INSERT INTO friend (_id, mac_addr, ip, port, name, description, status, image_path)
+ VALUES (0, "", "127.0.0.1", 65535, "Self", "", 0, "");

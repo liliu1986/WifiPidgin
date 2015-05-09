@@ -15,6 +15,11 @@ public class Friend {
     public static final long NO_ID = -1;
 
     /**
+     * ID indicating this Friend is self.
+     */
+    public static final long SELF_ID = 0;
+
+    /**
      * Status a friend can be in
      */
     public enum FriendStatus {
