@@ -39,11 +39,10 @@ public class NsdClient {
     private tempDb mdb;
 
     private boolean isDiscovering=false;
-    public NsdClient(Context context, NsdManager inNsdManager, tempDb inDb) {
+    public NsdClient(Context context, NsdManager inNsdManager) {
         mContext = context;
         mNsdManager = inNsdManager;
         ChannelList=new ArrayList<Channel>();
-        mdb = inDb;
         //nearbyFriendList =new ArrayList<Friend>();
     }
     public void initializeNsdClient() {

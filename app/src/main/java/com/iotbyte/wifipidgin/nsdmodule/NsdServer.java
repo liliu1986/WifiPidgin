@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.util.Log;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 
 public class NsdServer {
@@ -29,7 +30,7 @@ public class NsdServer {
     private int mServerPort = -1;
 	private ServerSocket mServerSocket = null;
 	private ServerStarter mServerStarter;
-	
+    private InetAddress nsdHost;
     public NsdServer(Context context, Handler handler) {
         mContext = context;
         mNsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
@@ -47,8 +48,13 @@ public class NsdServer {
             public void onServiceRegistered(NsdServiceInfo NsdServiceInfo) {
             	RegisterredServiceFlag = true;
                 mServiceName = NsdServiceInfo.getServiceName();
+
+                setHostIP(NsdServiceInfo.getHost());
+
                 Log.d(TAG, "The service " + mServiceName + " has been registered successfully!");
-                Log.d(TAG, "Actual Service Name is " + mServiceName);
+                Log.d(TAG, "My IP is " + NsdServiceInfo.getHost().toString());
+                Log.d(TAG, "My Port is " + NsdServiceInfo.getPort());
+
             }
             
             @Override
@@ -79,8 +85,8 @@ public class NsdServer {
         serviceInfo.setServiceName(mServiceName);
         serviceInfo.setServiceType(SERVICE_TYPE);
         
-        Log.e(TAG, "The service name is about set to be " + mServiceName);
-        Log.e(TAG, "The service name is set to be " + serviceInfo.getServiceName());
+        //Log.e(TAG, "The service name is about set to be " + mServiceName);
+        //Log.e(TAG, "The service name is set to be " + serviceInfo.getServiceName());
         
         mNsdManager.registerService(
                 serviceInfo, NsdManager.PROTOCOL_DNS_SD, mRegistrationListener);
@@ -93,7 +99,9 @@ public class NsdServer {
     private void setServerPort(int port) {
     	mServerPort = port;
     }
-    
+    private void setHostIP(InetAddress inHost){
+        nsdHost = inHost;
+    }
     public class ServerStarter {
         
         Thread mThread = null;
