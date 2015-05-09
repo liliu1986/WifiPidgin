@@ -199,6 +199,7 @@ public class FriendSqliteDao implements FriendDao {
         values.put(MAC_ADDR_FIELD, Utils.bytesToHex(f.getMac()));
         values.put(IP_FIELD, f.getIp().getHostAddress());
         values.put(NAME_FIELD, f.getName());
+        values.put(PORT_FIELD, f.getPort());
         values.put(DESCRIPTION_FIELD, f.getDescription());
         values.put(STATUS_FIELD, f.getStatus().getValue());
         values.put(IMAGE_PATH_FIELD, f.getImagePath());
