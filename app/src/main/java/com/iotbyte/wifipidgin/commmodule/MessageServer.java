@@ -1,21 +1,13 @@
 package com.iotbyte.wifipidgin.commmodule;
 
-import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 
-import com.iotbyte.wifipidgin.channel.Channel;
-import com.iotbyte.wifipidgin.utils.Utils;
-
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -121,13 +113,13 @@ public class MessageServer   {
                 if(mMsgRecListenerForThread != null){
                     mMsgRecListenerForThread.onMessageReceived(msgRec.toString());
                 }else{
-                    Log.e(MSG_SERVER_TAG, "Message Receiving Listener is not set");
+                    Log.e(MSG_SERVER_TAG, "ChatMessage Receiving Listener is not set");
                 }
                 /*
                 Bundle messageBundle = new Bundle();
                 messageBundle.putString("msg", msgRec);
 
-                Message message = new Message();
+                ChatMessage message = new ChatMessage();
                 message.setData(messageBundle);
                 mUpdateHandler.sendMessage(message);
                 */

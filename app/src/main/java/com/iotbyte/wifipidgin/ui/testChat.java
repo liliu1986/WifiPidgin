@@ -3,28 +3,25 @@ package com.iotbyte.wifipidgin.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.iotbyte.wifipidgin.R;
 import com.iotbyte.wifipidgin.commmodule.CommModuleBroadcastReceiver;
 import com.iotbyte.wifipidgin.commmodule.MessageClient;
-import com.iotbyte.wifipidgin.commmodule.MessageReceivingListener;
 import com.iotbyte.wifipidgin.commmodule.MessageServer;
 import com.iotbyte.wifipidgin.commmodule.MessageServerService;
 import com.iotbyte.wifipidgin.nsdmodule.NsdWrapper;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import android.os.Message;
 
 
 /**
@@ -65,7 +62,7 @@ public class testChat extends ActionBarActivity implements View.OnClickListener{
         /*
         mUpdateHandler = new Handler() {
             @Override
-            public void handleMessage(Message msg) {
+            public void handleMessage(ChatMessage msg) {
                 String chatLine = msg.getData().getString("msg");
                 Log.d(TAG, "Got message !!! : " + chatLine);
             }
