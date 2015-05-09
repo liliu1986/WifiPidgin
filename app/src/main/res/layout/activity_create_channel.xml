@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@android:id/list"
+        android:layout_weight="85"
+        android:choiceMode="multipleChoice" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/enterChannelName"
+        android:layout_weight="5"
+        android:hint="@string/EnterChannelName" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/CreateChannelConfirm"
+        android:id="@+id/buttonCreateChannel"
+        android:layout_weight="5" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/Cancel"
+        android:id="@+id/buttonCancel"
+        android:layout_weight="5" />
+</LinearLayout>
