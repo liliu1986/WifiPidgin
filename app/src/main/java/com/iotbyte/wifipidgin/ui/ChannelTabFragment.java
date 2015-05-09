@@ -13,16 +13,15 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.iotbyte.wifipidgin.R;
+import com.iotbyte.wifipidgin.channel.Channel;
+import com.iotbyte.wifipidgin.channel.ChannelManager;
 
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 public class ChannelTabFragment extends Fragment {
 
-    ArrayList<String> values = new ArrayList<String>() {{
-        add("Sue Channel");
-        add("FiFi Channel");
-        add("DQ Channel");
-    }};
+    final String CHANNEL_TAB_FRAG = "Channel Tab Fragment";
 
     Intent i;
 
@@ -34,15 +33,20 @@ public class ChannelTabFragment extends Fragment {
         Button button = (Button) v.findViewById(R.id.buttonCreateChannel);
 
         // populate the list view
-        lv.setAdapter((new ArrayAdapter<String>(lv.getContext(),
-                android.R.layout.simple_list_item_1,
-                values)));
+        //FIXME: remove UnknownHostExceptions after remove mock code
+        try {
+            lv.setAdapter((new ArrayAdapter<Channel>(lv.getContext(),
+                    android.R.layout.simple_list_item_1,
+                    ChannelManager.getInstance(lv.getContext()).getChannelList())));
+        } catch (UnknownHostException ex) {
+            ex.printStackTrace();
+        }
 
         // listen to item click to enter a channel
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.i("FirstPage", "channel clicked");
+                Log.d(CHANNEL_TAB_FRAG, "channel clicked");
             }
         });
 
@@ -50,8 +54,8 @@ public class ChannelTabFragment extends Fragment {
         lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.i("FirstPage", "channel long clicked");
-                i=new Intent(getActivity(), DeleteChannelActivity.class);
+                Log.d(CHANNEL_TAB_FRAG, "channel long clicked");
+                i = new Intent(getActivity(), DeleteChannelActivity.class);
                 startActivity(i);
                 return false;
             }
@@ -61,8 +65,8 @@ public class ChannelTabFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("FirstPage", "create channel button clicked");
-                i=new Intent(getActivity(), CreateChannelActivity.class);
+                Log.d(CHANNEL_TAB_FRAG, "create channel button clicked");
+                i = new Intent(getActivity(), CreateChannelActivity.class);
                 startActivity(i);
             }
         });

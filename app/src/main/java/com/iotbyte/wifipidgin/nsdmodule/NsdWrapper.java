@@ -28,10 +28,10 @@ public class NsdWrapper {
         Log.d(TAG, "Gets Here 2");
         Log.d(TAG, "IP address of this device is: " + Utils.getIPAddress(true));
 
-        mNsdServer= new NsdServer(mContext, mUpdateHandler);
-        mNsdClient= new NsdClient(mContext, mNsdManager);
-        mNsdServer.initializeNsdServer();
-        mNsdClient.initializeNsdClient();
+        //mNsdServer= new NsdServer(mContext, mUpdateHandler);
+        //mNsdClient= new NsdClient(mContext, mNsdManager);
+        //mNsdServer.initializeNsdServer();
+        //mNsdClient.initializeNsdClient();
 
         //The user appears to be visible
 

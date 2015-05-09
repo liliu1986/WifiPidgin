@@ -33,10 +33,14 @@ public class NsdServer {
 	private ServerSocket mServerSocket = null;
 	private ServerStarter mServerStarter;
     private InetAddress nsdHost;
-    public NsdServer(Context context, Handler handler) {
+    //private ServerSocket mServerSocket;
+    public NsdServer(Context context, ServerSocket inServerSocket) {
         mContext = context;
+        mServerSocket = inServerSocket;
         mNsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
-        mServerStarter = new ServerStarter(handler);
+        
+        setServerPort(mServerSocket.getLocalPort());
+        //mServerStarter = new ServerStarter();
     }
     
     public void initializeNsdServer() {
@@ -116,7 +120,7 @@ public class NsdServer {
         
         Thread mThread = null;
 
-        public ServerStarter(Handler handler) {
+        public ServerStarter() {
             mThread = new Thread(new ServerThread());
             mThread.start();
         }
@@ -134,15 +138,14 @@ public class NsdServer {
 
             @Override
             public void run() {
+                setServerPort(mServerSocket.getLocalPort());
+                //try {
+                    //mServerSocket = new ServerSocket(0);
 
-                try {
-                    mServerSocket = new ServerSocket(0);
-                    setServerPort(mServerSocket.getLocalPort());
-
-                } catch (IOException e) {
-                    Log.e(TAG, "Error creating ServerSocket: ", e);
-                    e.printStackTrace();
-                }
+                //} catch (IOException e) {
+                //    Log.e(TAG, "Error creating ServerSocket: ", e);
+                //    e.printStackTrace();
+                //}
             }
         }
     }

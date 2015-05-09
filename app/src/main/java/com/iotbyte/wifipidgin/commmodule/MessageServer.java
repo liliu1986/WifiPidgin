@@ -1,7 +1,10 @@
 package com.iotbyte.wifipidgin.commmodule;
 
+import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
+
+import com.iotbyte.wifipidgin.nsdmodule.NsdServer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -17,11 +20,12 @@ import java.net.Socket;
 public class MessageServer   {
 
     private Handler mUpdateHandler;
-
+    private NsdServer mNsdServer;
     public MessageServer() {}
-    //public MessageServer(Handler handler) {
-    //    mUpdateHandler = handler;
-    //}
+    private Context mContext;
+    public MessageServer(Context inContext) {
+        mContext = inContext;
+    }
     /**
      * Sets the listener for receiving a msg on this server
      */
@@ -37,8 +41,13 @@ public class MessageServer   {
                 // Since discovery will happen via Nsd, we don't need to care which port is
                 // used.  Just grab an available one  and advertise it via Nsd.
                 mServerSocket = new ServerSocket(0);
-
                 setLocalPort(mServerSocket.getLocalPort());
+
+                //After the message server socket is created, broadcast it.
+                mNsdServer = new NsdServer(getServerContext(), mServerSocket);
+                mNsdServer.initializeNsdServer();
+                mNsdServer.broadcastService();
+
 
                 while (!Thread.currentThread().isInterrupted()) {
                     Log.d(MSG_SERVER_TAG, "ServerSocket Created, awaiting connection at port: "
@@ -72,7 +81,9 @@ public class MessageServer   {
             }
         }
     }
-
+    private Context getServerContext(){
+        return mContext;
+    }
     /**
      * Starts a thread to wait for the message from client.
      *
