@@ -1,6 +1,14 @@
 package com.iotbyte.wifipidgin.channel;
 
 
+import android.content.Context;
+
+import com.iotbyte.wifipidgin.dao.ChannelDao;
+import com.iotbyte.wifipidgin.dao.DaoFactory;
+import com.iotbyte.wifipidgin.friend.Friend;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,24 +24,62 @@ import java.util.List;
 public class ChannelManager {
     private static ChannelManager instance = null;
 
-    private HashMap<String, Channel> channelMap; // channelIdentifier and Channel pair
+    private Context context;
 
-    private ChannelManager() {
+    private HashMap<String, Channel> channelMap; // channelIdentifier and Channel pair
+    //FIXME:: remove UnknowHostExceptions after remove mock code
+    private ChannelManager(Context context) throws UnknownHostException{
+        this.context = context;
 
         //Calling database to grep existing channelList
         // or create a new channelList if there is nothing been retrieved
 
         //TODO: remove the mocked channelList
         //TODO: Adding channelList retrieval functionality from database
-        channelMap = new HashMap<>();
-    }
 
-    public static ChannelManager getInstance() {
+        InetAddress xiaoMingIP = InetAddress.getByName("192.168.1.2");
+        byte[] xiaoMingMac = {0x5,0xc,0x0,0xa,0x5,0xb,0x4,0x8,0x4,0x5,0x4,0x6};
+        int xiaoMingPort = 55;
+        Friend xiaoMing = new Friend(xiaoMingMac,xiaoMingIP,xiaoMingPort);
+        xiaoMing.setDescription("wo shi huang xiao ming");
+        xiaoMing.setName("HXM");
+
+
+        InetAddress xiaoPangIP = InetAddress.getByName("192.168.1.179");
+        byte[] xiaoPangMac = {0x5,0xc,0x0,0xa,0x5,0xb,0xa,0xa,0xc,0xa,0xc,0x5};
+        int xiaoPangPort = 55;
+        Friend xiaoPang = new Friend(xiaoPangMac,xiaoPangIP,xiaoPangPort);
+        xiaoPang.setDescription("wo shi xiao pang");
+        xiaoPang.setName("stackHeap");
+
+        List<Friend> mockList = new ArrayList<>();
+        mockList.add(xiaoMing);
+        mockList.add(xiaoPang);
+        Channel mockChannel = new Channel(mockList,"xiao channel","heiheihei");
+        //save mocked channels;
+        ChannelDao cd = DaoFactory.getInstance().getChannelDao(context,DaoFactory.DaoType.SQLITE_DAO,null);
+        cd.add(mockChannel);
+
+
+        //below is not mocked!!!!
+        channelMap = new HashMap<>();
+
+
+        List<Channel> channelList =
+            DaoFactory.getInstance().getChannelDao(context, DaoFactory.DaoType.SQLITE_DAO, null).findAll();
+
+        for (Channel aChannel:channelList){
+            channelMap.put(aChannel.getChannelIdentifier(),aChannel);
+        }
+
+    }
+    //FixME: remove unknowHostException
+    public static ChannelManager getInstance(Context context) throws UnknownHostException{
         if (instance == null) {
             //Thread Safe with synchronized block
             synchronized (ChannelManager.class) {
                 if (instance == null) {
-                    instance = new ChannelManager();
+                    instance = new ChannelManager(context);
                 }
             }
         }
