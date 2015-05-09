@@ -199,7 +199,7 @@ public class Friend {
 
     @Override
     public String toString() {
-        return "Friend id:" + id + ",IP:" + ip.getHostAddress() + ",port:" + port + ",MAC:" + mac;
+        return this.getName();
     }
 }
 
