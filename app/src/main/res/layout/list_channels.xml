@@ -7,7 +7,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@android:id/list"
-        android:layout_weight="95"/>
+        android:layout_weight="95"
+        android:longClickable="true" />
 
     <Button
         android:layout_width="match_parent"
