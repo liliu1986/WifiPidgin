@@ -5,11 +5,8 @@ import android.net.nsd.NsdManager;
 import android.os.Handler;
 import android.util.Log;
 
-import com.iotbyte.wifipidgin.friend.Friend;
-import com.iotbyte.wifipidgin.utils.Utils;
 import com.iotbyte.wifipidgin.ui.tempDb;
-
-import java.util.List;
+import com.iotbyte.wifipidgin.utils.Utils;
 
 public class NsdWrapper {
 
@@ -31,10 +28,10 @@ public class NsdWrapper {
         Log.d(TAG, "Gets Here 2");
         Log.d(TAG, "IP address of this device is: " + Utils.getIPAddress(true));
 
-        mNsdServer= new NsdServer(mContext, mUpdateHandler);
-        mNsdClient= new NsdClient(mContext, mNsdManager, db);
-        mNsdServer.initializeNsdServer();
-        mNsdClient.initializeNsdClient();
+        //mNsdServer= new NsdServer(mContext, mUpdateHandler);
+        //mNsdClient= new NsdClient(mContext, mNsdManager);
+        //mNsdServer.initializeNsdServer();
+        //mNsdClient.initializeNsdClient();
 
         //The user appears to be visible
 

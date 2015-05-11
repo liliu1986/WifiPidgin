@@ -1,12 +1,14 @@
 
 package com.iotbyte.wifipidgin.ui;
 
+import android.content.Context;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.ListFragment;
 
-import com.iotbyte.wifipidgin.user.User;
-
-import java.util.ArrayList;
+import com.iotbyte.wifipidgin.dao.DaoFactory;
+import com.iotbyte.wifipidgin.dao.FriendDao;
+import com.iotbyte.wifipidgin.friend.Friend;
+import java.util.List;
 
 
 /**
@@ -15,12 +17,14 @@ import java.util.ArrayList;
 public class FriendListManager {
     FragmentActivity mFragmentActivity;
     ListFragment mListFragment;
+    Context mContext;
+    boolean isFavourite = true;
 
-    ArrayList<User> tmpfriendlistItems = new ArrayList<User>(){{
-        add(new User("Sue"));
-        add(new User("Fifi"));
-    }};
+    FriendDao fd;
 
+
+    List<Friend> tmpfriendlistItems = null;
+    
     public FriendListManager(FragmentActivity inActivity , ListFragment inFragment) {
         mFragmentActivity = inActivity;
         mListFragment = inFragment;
@@ -28,6 +32,10 @@ public class FriendListManager {
 
     public int InflateSettingView(){
         int err = 0;
+        if(tmpfriendlistItems == null) {
+            fd = DaoFactory.getInstance().getFriendDao(mFragmentActivity, DaoFactory.DaoType.SQLITE_DAO, null);
+            tmpfriendlistItems = fd.findByIsFavourite(isFavourite);
+        }
         FriendListAdapter adapter = new FriendListAdapter(mFragmentActivity, tmpfriendlistItems);
         mListFragment.setListAdapter(adapter);
         return err;

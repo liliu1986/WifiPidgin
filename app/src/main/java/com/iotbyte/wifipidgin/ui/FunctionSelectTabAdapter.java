@@ -19,16 +19,21 @@ class FunctionSelectTabAdapter extends FragmentPagerAdapter {
 
     private static final String TAG = "FunctionSelectTab";
 
-    private static final String[] CONTENT = new String[] { "Chats", "Contacts", "Discover"};
+    private static final String[] CONTENT = new String[]{"Chats", "Contacts", "Discover"};
 
     @Override
     public Fragment getItem(int position) {
 
         Log.d(TAG, "position: " + position);
 
-        return TabIconFragment.newInstance(CONTENT[position % CONTENT.length],
-                (position % CONTENT.length),
-                FunctionSelectResources.getOnClickTab(position % CONTENT.length));
+        switch (position) {
+            case 0:
+                return ChannelTabFragment.newInstance();
+            default:
+                return TabIconFragment.newInstance(CONTENT[position % CONTENT.length],
+                        (position % CONTENT.length),
+                        FunctionSelectResources.getOnClickTab(position % CONTENT.length));
+        }
     }
 
     @Override

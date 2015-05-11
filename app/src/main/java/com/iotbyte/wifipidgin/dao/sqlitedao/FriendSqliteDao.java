@@ -3,6 +3,7 @@ package com.iotbyte.wifipidgin.dao.sqlitedao;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
@@ -35,13 +36,18 @@ public class FriendSqliteDao implements FriendDao {
                    " ip:" + friend.getIp().getHostAddress());
         ContentValues values = friendToContentValues(friend);
         SQLiteDatabase db = sqliteHelper.getWritableDatabase();
-        long rowId = db.insert(FRIEND_TABLE, null, values);
-        if (rowId == -1) {
-            db.close();
+        try {
+            long rowId = db.insert(FRIEND_TABLE, null, values);
+            friend.setId(rowId);
+            if (rowId == -1) {
+                return DaoError.ERROR_SAVE;
+            }
+        } catch (SQLiteConstraintException e) {
+            Log.d(TAG, "Error insert into db:" + e);
             return DaoError.ERROR_SAVE;
+        } finally {
+            db.close();
         }
-        db.close();
-        friend.setId(rowId);
         return DaoError.NO_ERROR;
     }
 
@@ -49,15 +55,17 @@ public class FriendSqliteDao implements FriendDao {
     public DaoError delete(long id) {
         String[] whereArgs = {Long.toString(id)};
         SQLiteDatabase db = sqliteHelper.getWritableDatabase();
-        int rows = db.delete(FRIEND_TABLE, ID_FIELD + " = ?", whereArgs);
-        db.close();
-
-        if (rows == 0) {
-            //FIXME: delete violating foreign key will also cause rows == 0.
-            //       need to return a different error type here.
-            return DaoError.ERROR_NO_RECORD;
+        try {
+            int rows = db.delete(FRIEND_TABLE, ID_FIELD + " = ?", whereArgs);
+            if (rows == 0) {
+                return DaoError.ERROR_NO_RECORD;
+            }
+            assert rows == 1;
+        } catch (SQLiteConstraintException e) {
+            Log.d(TAG, "Constrain violation when deleting from db:" + e);
+        } finally {
+            db.close();
         }
-        assert rows == 1;
         return DaoError.NO_ERROR;
     }
 
@@ -71,13 +79,17 @@ public class FriendSqliteDao implements FriendDao {
         ContentValues values = friendToContentValues(friend);
         String[] whereArgs = {Long.toString(id)};
         SQLiteDatabase db = sqliteHelper.getWritableDatabase();
-        int rows = db.update(FRIEND_TABLE, values, ID_FIELD + " = ?", whereArgs);
-        db.close();
-
-        if (rows == 0) {
-            return DaoError.ERROR_NO_RECORD;
+        try {
+            int rows = db.update(FRIEND_TABLE, values, ID_FIELD + " = ?", whereArgs);
+            if (rows == 0) {
+                return DaoError.ERROR_NO_RECORD;
+            }
+            assert rows == 1;
+        } catch (SQLiteConstraintException e) {
+            Log.d(TAG, "Constrain violation when updating db:" + e);
+        } finally {
+            db.close();
         }
-        assert rows == 1;
         return DaoError.NO_ERROR;
     }
 
@@ -169,6 +181,7 @@ public class FriendSqliteDao implements FriendDao {
     static final String ID_FIELD = "_id";
     static final String MAC_ADDR_FIELD = "mac_addr";
     static final String IP_FIELD = "ip";
+    static final String PORT_FIELD = "port";
     static final String NAME_FIELD = "name";
     static final String DESCRIPTION_FIELD = "description";
     static final String STATUS_FIELD = "status";
@@ -178,6 +191,7 @@ public class FriendSqliteDao implements FriendDao {
     static final String[] ALL_COLUMNS = {ID_FIELD,
                                          MAC_ADDR_FIELD,
                                          IP_FIELD,
+                                         PORT_FIELD,
                                          NAME_FIELD,
                                          DESCRIPTION_FIELD,
                                          STATUS_FIELD,
@@ -197,6 +211,7 @@ public class FriendSqliteDao implements FriendDao {
         values.put(MAC_ADDR_FIELD, Utils.bytesToHex(f.getMac()));
         values.put(IP_FIELD, f.getIp().getHostAddress());
         values.put(NAME_FIELD, f.getName());
+        values.put(PORT_FIELD, f.getPort());
         values.put(DESCRIPTION_FIELD, f.getDescription());
         values.put(STATUS_FIELD, f.getStatus().getValue());
         values.put(IMAGE_PATH_FIELD, f.getImagePath());
@@ -236,6 +251,7 @@ public class FriendSqliteDao implements FriendDao {
                     + ", rowId:" + id + " read from database.");
             return null;
         }
+        int port = c.getInt(c.getColumnIndex(FriendSqliteDao.PORT_FIELD));
         String name = c.getString(c.getColumnIndex(FriendSqliteDao.NAME_FIELD));
         String description = c.getString(c.getColumnIndex(FriendSqliteDao.DESCRIPTION_FIELD));
         Friend.FriendStatus status = null;
@@ -252,7 +268,7 @@ public class FriendSqliteDao implements FriendDao {
         String imagePath = c.getString(c.getColumnIndex(FriendSqliteDao.IMAGE_PATH_FIELD));
         boolean isFavourite = c.getInt(c.getColumnIndex(FriendSqliteDao.IS_FAVOURITE_FIELD)) == 0;
 
-        Friend f = new Friend(macAddr, ip);
+        Friend f = new Friend(macAddr, ip, port);
         f.setId(id);
         f.setName(name);
         f.setDescription(description);
@@ -264,6 +280,7 @@ public class FriendSqliteDao implements FriendDao {
                 +  " id:" + id
                 +  " macAddr:" + macAddr
                 +  " ip:" + ip.getAddress()
+                +  " port:" + port
                 +  " name:" + name
                 +  " description:" + description
                 +  " status:" + statusInt

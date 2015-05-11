@@ -10,6 +10,7 @@ CREATE TABLE friend
     mac_addr    TEXT NOT NULL UNIQUE,
     -- IP stored as string (InetAddress.getHostAddress())
     ip          TEXT NOT NULL UNIQUE,
+    port        INTEGER NOT NULL,
     name        TEXT,
     description TEXT,
     status      INTEGER,
@@ -35,3 +36,7 @@ CREATE TABLE channel_friend_list
     -- cascade delete all friends-channel record when channel is deleted
     FOREIGN KEY(channel_id) REFERENCES channel(_id) ON DELETE CASCADE
 );
+
+-- Create self in database
+INSERT INTO friend (_id, mac_addr, ip, port, name, description, status, image_path)
+ VALUES (0, "", "127.0.0.1", 65535, "Self", "", 0, "");

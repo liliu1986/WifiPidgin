@@ -1,5 +1,10 @@
 package com.iotbyte.wifipidgin.chat;
 
+import com.iotbyte.wifipidgin.message.ChatMessage;
+import com.iotbyte.wifipidgin.message.Message;
+import com.iotbyte.wifipidgin.message.MessageFactory;
+import com.iotbyte.wifipidgin.message.MessageType;
+
 import org.json.JSONException;
 
 import java.net.UnknownHostException;
@@ -69,7 +74,7 @@ public class ChatManager {
     //TODO:: require exception handling here for corrupted json string
     public boolean enqueueIncomingMessageQueue(String jsonString) {
         try {
-            return incomingMessageQueue.offer(new Message(jsonString));
+            return incomingMessageQueue.offer(MessageFactory.buildMessageByJson(jsonString));
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (UnknownHostException e) {
@@ -81,26 +86,32 @@ public class ChatManager {
     /**
      * dequeueIncomingMessageQueue()
      * <p/>
-     * A message is removed from incomingMessageQueue and move to it's corresponding
-     * chat's chatMessageQueue
+     * A message is removed from incomingMessageQueue and handle by it's corresponding type
      *
-     * @return true if dequeue and insert into chat's chatMessageQueue successfully.
+     * @return true if dequeue and handles successfully.
      */
 
     // Note the logic here, a chat has to exist under ChatManager before it can store
     // any message into.
     public boolean dequeueIncomingMessageQueue() {
         Message message = incomingMessageQueue.poll();
-        if (null == message) {
+        if (null == message || message.getType() == MessageType.ERROR){
             return false;
-        } else {
-            if (!chatMap.containsKey(message.getChannelIdentifier())) {
-                return false;
-            } else {
-                Chat chat = getChatByChannelIdentifier(message.getChannelIdentifier());
-                return chat.pushMessage(message);
-            }
         }
+
+        switch (message.getType()){
+            case CHAT_MESSAGE:{
+                if (!chatMap.containsKey(((ChatMessage)message).getChannelIdentifier())) {
+                    return false;
+                } else {
+                    Chat chat = getChatByChannelIdentifier(((ChatMessage)message).getChannelIdentifier());
+                    return chat.pushMessage((ChatMessage)message);
+                }
+            }
+            default:
+                return false;
+        }
+
     }
 
     public Chat getChatByChannelIdentifier(String channelIdentifier) {

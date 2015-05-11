@@ -4,15 +4,24 @@ import java.net.InetAddress;
 
 /**
  * Data object to store information about a friend.
- *
+ * <p/>
  * A friend is any client who has been discovered by the NSD
  */
 public class Friend {
 
-    /** No id indicates this object has not been published to storage */
+    /**
+     * No id indicates this object has not been published to storage
+     */
     public static final long NO_ID = -1;
 
-    /** Status a friend can be in */
+    /**
+     * ID indicating this Friend is self.
+     */
+    public static final long SELF_ID = 0;
+
+    /**
+     * Status a friend can be in
+     */
     public enum FriendStatus {
         UNINIT(0),
         ONLINE(1),
@@ -32,14 +41,17 @@ public class Friend {
     }
 
     /**
-      * Constructor
-      * @param mac MAC address of the Friend.
-      * @param ip IP address of the Friend.
-      */
-	public Friend(byte[] mac, InetAddress ip) {
+     * Constructor
+     *
+     * @param mac  MAC address of the Friend.
+     * @param ip   IP address of the Friend.
+     * @param port Port number to communicate with the Friend.
+     */
+    public Friend(byte[] mac, InetAddress ip, int port) {
         this.mac = mac;
         this.id = NO_ID;
         this.ip = ip;
+        this.port = port;
         this.name = UNINIT_STRING;
         this.description = UNINIT_STRING;
         this.status = FriendStatus.UNINIT;
@@ -61,6 +73,14 @@ public class Friend {
 
     public void setIp(InetAddress ip) {
         this.ip = ip;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 
     public byte[] getMac() {
@@ -109,33 +129,55 @@ public class Friend {
 
     static private final String UNINIT_STRING = "Un-init";
 
-    /** id to identify friend in storage. */
+    /**
+     * id to identify friend in storage.
+     */
     private long id;
 
-    /** IP address of Friend. */
+    /**
+     * IP address of Friend.
+     */
     private InetAddress ip;
 
-    /** MAC address of Friend. */
-    private final byte[] mac;
+    /**
+     * port number to communicate to this friend
+     */
+    private int port;
 
-    /** Name of this Friend. */
+    /**
+     * MAC address of Friend.
+     */
+    final private byte[] mac;
+
+    /**
+     * Name of this Friend.
+     */
     private String name;
 
-    /** Description of this Friend. */
+
+    /**
+     * Description of this Friend.
+     */
     private String description;
 
-    /** Status of this Friend. */
+    /**
+     * Status of this Friend.
+     */
     private FriendStatus status;
 
-    /** Friend image path */
+    /**
+     * Friend image path
+     */
     private String imagePath;
 
-    /** Whether this Friend has is a favourite */
+    /**
+     * Whether this Friend has is a favourite
+     */
     private boolean isFavourite;
 
     @Override
     public String toString() {
-        return "Friend id:" + id + ",IP:" + ip.getHostAddress() + ",MAC:" + mac;
+        return this.getName();
     }
 }
 
