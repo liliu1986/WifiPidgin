@@ -2,6 +2,8 @@ package com.iotbyte.wifipidgin.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -16,19 +18,25 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.iotbyte.wifipidgin.R;
+import com.iotbyte.wifipidgin.dao.DaoFactory;
+import com.iotbyte.wifipidgin.dao.FriendDao;
+import com.iotbyte.wifipidgin.friend.Friend;
+import com.iotbyte.wifipidgin.utils.Utils;
+
+import java.io.File;
 
 public class DisplayNamecardActivity extends ActionBarActivity implements View.OnClickListener {
 
     public final static String EXTRA_MESSAGE = "com.iotbyte.wifipidgin.NAMECARD";
+
+    FriendDao fd;
+    String userName = "Default User Name";
+    String userDescription = "Default User Description";
     boolean userSaved = false;
 
     boolean userOnline = true;
 
-    String user_description = "伊利丹是玛法里奥·怒风的孪生兄弟，和他的哥哥一样，兄弟俩与女祭司泰兰德·语风在上" +
-            "古之战前几千年青梅竹马一起长大。与兄长玛法里奥不同的是，尽管兄弟俩都师从于半神塞纳留斯，伊利丹对于" +
-            "德鲁伊教义的学习毫无耐心。";
-
-    private static final String TAG = "DisplayNamecard";
+    private static final String TAG = "DisplayNameCard";
 
 
 
@@ -46,43 +54,60 @@ public class DisplayNamecardActivity extends ActionBarActivity implements View.O
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         //Get the user name from the intent
-        String userName = intent.getStringExtra(EXTRA_MESSAGE);
-        //Display the user name card title
-        actionBar.setTitle("Name Card: [" + userName +"]");
+        String userMac = intent.getStringExtra(EXTRA_MESSAGE);
+        fd = DaoFactory.getInstance().getFriendDao(this.getApplicationContext(), DaoFactory.DaoType.SQLITE_DAO, null);
+        Log.d(TAG, "Use MAC: "+ userMac);
+        Friend inFriend = fd.findByMacAddress(Utils.macAddressHexStringToByte(userMac));
 
-        //Display the user name
-        TextView userNameTestView = (TextView) findViewById(R.id.user_name);
-        userNameTestView.setText(userName);
+        if (inFriend != null) {
+            userName = inFriend.getName();
+            //Display the user name card title
+            actionBar.setTitle("Name Card: [" + userName +"]");
 
-        //Display the user image
-        ImageView userImageView = (ImageView) findViewById(R.id.user_image);
-        userImageView.setImageResource(R.drawable.default_user_image);
+            userDescription = inFriend.getDescription();
+            //Set the user image
+            File imgFile = new  File(inFriend.getImagePath());
+            ImageView myImage = (ImageView) findViewById(R.id.user_image);
+            if(imgFile.exists()){
+                Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                myImage.setImageBitmap(myBitmap);
+            }else{
+                myImage.setImageResource(R.drawable.default_user_image);
+            }
 
-        ImageButton savedUserImageView = (ImageButton) findViewById(R.id.user_saved);
-        savedUserImageView.setOnClickListener(this);
+            ImageButton savedUserImageView = (ImageButton) findViewById(R.id.user_saved);
+            savedUserImageView.setOnClickListener(this);
 
-        Button startChatButton = (Button) findViewById(R.id.startChatButton);
-        startChatButton.setText("Start Chat with "+ userName);
-        startChatButton.setOnClickListener(this);
+            //Indicator for if use is saved as fav already
+            if(inFriend.isFavourite()){
+                savedUserImageView.setImageResource(R.drawable.saved_user);
+            }else{
+                savedUserImageView.setImageResource(R.drawable.unsaved_user);
+            }
+            Button startChatButton = (Button) findViewById(R.id.startChatButton);
+            startChatButton.setText("Start Chat with "+ userName);
+            startChatButton.setOnClickListener(this);
 
+            //Indicator for if use is online
+            ImageView onlineUserImageView = (ImageView) findViewById(R.id.user_online);
+            if(userOnline){
+                onlineUserImageView.setImageResource(R.drawable.user_visible);
+            }else{
+                onlineUserImageView.setImageResource(R.drawable.user_invisible);
+            }
 
-        if(userSaved){
-            savedUserImageView.setImageResource(R.drawable.saved_user);
+            //Set the description in textView
+            TextView userDescriptionTextView = (TextView) findViewById(R.id.user_description);
+            userDescriptionTextView.setText(userDescription);
+
         }else{
-            savedUserImageView.setImageResource(R.drawable.unsaved_user);
+            Log.e(TAG, "Couldn't find the user");
         }
 
-        ImageView onlimeUserImageView = (ImageView) findViewById(R.id.user_online);
 
-        if(userOnline){
-            onlimeUserImageView.setImageResource(R.drawable.user_visible);
-        }else{
-            onlimeUserImageView.setImageResource(R.drawable.user_invisible);
-        }
 
-        //Set the description in testview
-        TextView userDescriptionTextView = (TextView) findViewById(R.id.user_description);
-        userDescriptionTextView.setText(user_description);
+
+
     }
 
 

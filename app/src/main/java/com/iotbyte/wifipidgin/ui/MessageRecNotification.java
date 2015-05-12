@@ -9,7 +9,7 @@ import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
 import com.iotbyte.wifipidgin.R;
-import com.iotbyte.wifipidgin.chat.Message;
+import com.iotbyte.wifipidgin.chat.ChatManager;
 
 /**
  * Created by fire on 05/05/15.
@@ -21,7 +21,7 @@ public class MessageRecNotification {
         mContext = context;
     }
 
-    public void sendNotification(Message inMessage) {
+    public void sendNotification(ChatManager inMessage) {
 
         /** Create an intent that will be fired when the user clicks the notification.
          * The intent needs to be packaged into a {@link android.app.PendingIntent} so that the
@@ -57,8 +57,8 @@ public class MessageRecNotification {
 
 
         builder.setContentTitle("A message has been received in WiFiPidgin");
-        builder.setContentText(inMessage.getSender().getName()+ " says: ");
-        builder.setSubText(inMessage.getMessageBody());
+        //builder.setContentText(inMessagegetSender().getName()+ " says: ");
+        //builder.setSubText(inMessage.getMessageBody());
 
         /**
          * Send the notification. This will immediately display the notification icon in the
