@@ -30,7 +30,6 @@ public class DaoFactory {
                 FriendSqliteDao fd = new FriendSqliteDao(context);
                 fd.setDiscoverListChangedListener(mDiscoverChangeListener);
                 fd.setFriendListChangedListener(mFriendListChangedListener);
-                fd.setChannelListChangedListener(mChannelListChangedListener);
                 return fd;
         }
         // Should not get here.
@@ -48,7 +47,9 @@ public class DaoFactory {
     public ChannelDao getChannelDao(Context context, DaoType type, String resource) {
         switch (type) {
             case SQLITE_DAO:
-                return new ChannelSqliteDao(context);
+                ChannelSqliteDao cd = new ChannelSqliteDao(context);
+                cd.setChannelListChangedListener(mChannelListChangedListener);
+                return cd;
         }
         // Should not get here.
         assert false;

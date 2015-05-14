@@ -90,10 +90,12 @@ public interface FriendDao {
      */
     public List<Friend> findAll();
     /**
-     * Get the databaseChangeListener
-     * @return A list of all friends in storage.
+     * set the discoverChangeListener
      */
     public void setDiscoverListChangedListener(DiscoverListChangedListener discoverChangeListener);
+
+    /**
+     * set the friendChangeListener
+     */
     public void setFriendListChangedListener(FriendListChangedListener friendChangeListener);
-    public void setChannelListChangedListener(ChannelListChangedListener channelChangeListener);
 }

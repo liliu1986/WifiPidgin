@@ -79,4 +79,9 @@ public interface ChannelDao {
      */
     public List<Channel> findAll();
 
+    /**
+     * set the channelChangeListener
+     */
+    public void setChannelListChangedListener(ChannelListChangedListener channelChangeListener);
+
 }
