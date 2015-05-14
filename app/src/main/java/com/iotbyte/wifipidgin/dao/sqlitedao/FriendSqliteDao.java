@@ -7,8 +7,11 @@ import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.iotbyte.wifipidgin.dao.ChannelListChangedListener;
 import com.iotbyte.wifipidgin.dao.DaoError;
+import com.iotbyte.wifipidgin.dao.DiscoverListChangedListener;
 import com.iotbyte.wifipidgin.dao.FriendDao;
+import com.iotbyte.wifipidgin.dao.FriendListChangedListener;
 import com.iotbyte.wifipidgin.datasource.sqlite.WifiPidginSqliteHelper;
 import com.iotbyte.wifipidgin.friend.Friend;
 import com.iotbyte.wifipidgin.utils.Utils;
@@ -31,6 +34,16 @@ public class FriendSqliteDao implements FriendDao {
     }
 
     @Override
+    public void setDiscoverListChangedListener(DiscoverListChangedListener discoverChangeListener){
+        Log.d(TAG, "Setting DiscoverChangeListener!");
+        mDiscoverChangeListener = discoverChangeListener;
+    }
+
+    public void setFriendListChangedListener(FriendListChangedListener friendChangeListener) {
+        mFriendListChangedListener = friendChangeListener;
+    }
+
+    @Override
     public DaoError add(Friend friend) {
         Log.d(TAG, "About to add friend. mac:" + friend.getMac().toString() +
                    " ip:" + friend.getIp().getHostAddress());
@@ -42,7 +55,17 @@ public class FriendSqliteDao implements FriendDao {
             if (rowId == -1) {
                 return DaoError.ERROR_SAVE;
             }
-        } catch (SQLiteConstraintException e) {
+            /** If the friend list is changed, notify the UI **/
+            if (mDiscoverChangeListener != null){
+                Log.d(TAG, "Calling onDiscoverListChanged");
+                mDiscoverChangeListener.onDiscoverListChanged();
+            }
+            /** If the friend is in favorite list, also notify the
+             * corresponding UI**/
+            if (friend.isFavourite() && mFriendListChangedListener != null){
+                mFriendListChangedListener.onFriendListChanged();
+            }
+         } catch (SQLiteConstraintException e) {
             Log.d(TAG, "Error insert into db:" + e);
             return DaoError.ERROR_SAVE;
         } finally {
@@ -56,9 +79,21 @@ public class FriendSqliteDao implements FriendDao {
         String[] whereArgs = {Long.toString(id)};
         SQLiteDatabase db = sqliteHelper.getWritableDatabase();
         try {
+            Friend deletingFriend = findById(id);
+
             int rows = db.delete(FRIEND_TABLE, ID_FIELD + " = ?", whereArgs);
             if (rows == 0) {
                 return DaoError.ERROR_NO_RECORD;
+            }
+            /** If the friend list is changed, notify the UI **/
+            if (mDiscoverChangeListener != null){
+                Log.d(TAG, "Calling onDiscoverListChanged");
+                mDiscoverChangeListener.onDiscoverListChanged();
+            }
+            /** If the friend is in favorite list, also notify the
+             * corresponding UI**/
+            if (deletingFriend.isFavourite() && mFriendListChangedListener != null){
+                mFriendListChangedListener.onFriendListChanged();
             }
             assert rows == 1;
         } catch (SQLiteConstraintException e) {
@@ -84,6 +119,17 @@ public class FriendSqliteDao implements FriendDao {
             if (rows == 0) {
                 return DaoError.ERROR_NO_RECORD;
             }
+            /** If the friend list is changed, notify the UI **/
+            if (mDiscoverChangeListener != null){
+                Log.d(TAG, "Calling onDiscoverListChanged");
+                mDiscoverChangeListener.onDiscoverListChanged();
+            }
+            /** If the friend is in favorite list, also notify the
+             * corresponding UI**/
+            if (friend.isFavourite() && mFriendListChangedListener != null){
+                mFriendListChangedListener.onFriendListChanged();
+            }
+
             assert rows == 1;
         } catch (SQLiteConstraintException e) {
             Log.d(TAG, "Constrain violation when updating db:" + e);
@@ -202,6 +248,10 @@ public class FriendSqliteDao implements FriendDao {
     /** Database helper for db operation */
     private WifiPidginSqliteHelper sqliteHelper;
 
+    /** Database Listeners **/
+    private DiscoverListChangedListener mDiscoverChangeListener = null;
+    private FriendListChangedListener mFriendListChangedListener;
+
     /**
      * Helper method to turn Friend object into ContentValues for writing to database.
      * @param f Friend object to be turned into ContentValues
@@ -250,6 +300,9 @@ public class FriendSqliteDao implements FriendDao {
             Log.e(TAG, "Unknown ip:" + ipHost
                     + ", rowId:" + id + " read from database.");
             return null;
+        } catch (android.os.NetworkOnMainThreadException e){
+            // Avoiding the application from crashing TODO -- have a better handling
+            Log.e(TAG, "NetworkOnMainThreadException");
         }
         int port = c.getInt(c.getColumnIndex(FriendSqliteDao.PORT_FIELD));
         String name = c.getString(c.getColumnIndex(FriendSqliteDao.NAME_FIELD));
