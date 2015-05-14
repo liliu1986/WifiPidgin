@@ -27,7 +27,10 @@ public class DaoFactory {
     public FriendDao getFriendDao(Context context, DaoType type, String resource) {
         switch (type) {
             case SQLITE_DAO:
-                return new FriendSqliteDao(context);
+                FriendSqliteDao fd = new FriendSqliteDao(context);
+                fd.setDiscoverListChangedListener(mDiscoverChangeListener);
+                fd.setFriendListChangedListener(mFriendListChangedListener);
+                return fd;
         }
         // Should not get here.
         assert false;
@@ -44,7 +47,9 @@ public class DaoFactory {
     public ChannelDao getChannelDao(Context context, DaoType type, String resource) {
         switch (type) {
             case SQLITE_DAO:
-                return new ChannelSqliteDao(context);
+                ChannelSqliteDao cd = new ChannelSqliteDao(context);
+                cd.setChannelListChangedListener(mChannelListChangedListener);
+                return cd;
         }
         // Should not get here.
         assert false;
@@ -58,7 +63,21 @@ public class DaoFactory {
         return instance;
     }
 
+    public static synchronized void setDiscoverListChangedListener(DiscoverListChangedListener discoverChangeListener) {
+        mDiscoverChangeListener = discoverChangeListener;
+    }
+    public static synchronized void setFriendListChangedListener(FriendListChangedListener friendChangeListener) {
+        mFriendListChangedListener = friendChangeListener;
+    }
+    public static synchronized void setChannelListChangedListener(ChannelListChangedListener channelChangeListener) {
+        mChannelListChangedListener = channelChangeListener;
+    }
     private DaoFactory() {}
 
     private static DaoFactory instance = null;
+    private static DiscoverListChangedListener mDiscoverChangeListener = null;
+    private static FriendListChangedListener mFriendListChangedListener = null;
+    private static ChannelListChangedListener mChannelListChangedListener = null;
+
+
 }

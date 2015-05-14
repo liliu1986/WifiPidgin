@@ -89,4 +89,13 @@ public interface FriendDao {
      * @return A list of all friends in storage.
      */
     public List<Friend> findAll();
+    /**
+     * set the discoverChangeListener
+     */
+    public void setDiscoverListChangedListener(DiscoverListChangedListener discoverChangeListener);
+
+    /**
+     * set the friendChangeListener
+     */
+    public void setFriendListChangedListener(FriendListChangedListener friendChangeListener);
 }

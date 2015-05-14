@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.iotbyte.wifipidgin.channel.Channel;
 import com.iotbyte.wifipidgin.dao.ChannelDao;
+import com.iotbyte.wifipidgin.dao.ChannelListChangedListener;
 import com.iotbyte.wifipidgin.dao.DaoError;
 import com.iotbyte.wifipidgin.dao.DaoFactory;
 import com.iotbyte.wifipidgin.datasource.sqlite.WifiPidginSqliteHelper;
@@ -28,6 +29,11 @@ public class ChannelSqliteDao implements ChannelDao {
     public ChannelSqliteDao(Context context) {
         this.context = context;
         this.sqliteHelper = new WifiPidginSqliteHelper(context);
+    }
+
+    @Override
+    public void setChannelListChangedListener(ChannelListChangedListener channelChangeListener) {
+        mChannelListChangedListener = channelChangeListener;
     }
 
     @Override
@@ -57,6 +63,11 @@ public class ChannelSqliteDao implements ChannelDao {
                 }
             }
             db.setTransactionSuccessful();
+            /** If the channel list is changed, notify the UI **/
+            if (mChannelListChangedListener != null){
+                Log.d(TAG, "Calling onChannelListChanged");
+                mChannelListChangedListener.onChannelListChanged();
+            }
         } catch (SQLiteConstraintException e) {
             Log.d(TAG, "Constrain violation when insert into db:" + e);
             return DaoError.ERROR_SAVE;
@@ -77,6 +88,11 @@ public class ChannelSqliteDao implements ChannelDao {
             int rows = db.delete(CHANNEL_TABLE, ID_FIELD + " = ?", whereArgs);
             if (rows == 0) {
                 return DaoError.ERROR_NO_RECORD;
+            }
+            /** If the channel list is changed, notify the UI **/
+            if (mChannelListChangedListener != null){
+                Log.d(TAG, "Calling onChannelListChanged");
+                mChannelListChangedListener.onChannelListChanged();
             }
             assert rows == 1;
         } catch (SQLiteConstraintException e) {
@@ -160,7 +176,12 @@ public class ChannelSqliteDao implements ChannelDao {
                     }
                 }
             }
-
+            
+            /** If the channel list is changed, notify the UI **/
+            if (mChannelListChangedListener != null){
+                Log.d(TAG, "Calling onChannelListChanged");
+                mChannelListChangedListener.onChannelListChanged();
+            }
         } catch (SQLiteConstraintException e) {
             Log.d(TAG, "Constrain violation when updating db:" + e);
         } finally {
@@ -257,6 +278,9 @@ public class ChannelSqliteDao implements ChannelDao {
     private Context context;
     /** Database helper for db operation */
     private WifiPidginSqliteHelper sqliteHelper;
+
+    /** Database Listener **/
+    private ChannelListChangedListener mChannelListChangedListener;
 
     /**
      * Helper method to turn Channel object into ContentValues for writing to database.
