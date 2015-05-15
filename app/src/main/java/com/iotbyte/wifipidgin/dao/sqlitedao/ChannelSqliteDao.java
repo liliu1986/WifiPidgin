@@ -3,7 +3,6 @@ package com.iotbyte.wifipidgin.dao.sqlitedao;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
@@ -57,9 +56,6 @@ public class ChannelSqliteDao implements ChannelDao {
                 }
             }
             db.setTransactionSuccessful();
-        } catch (SQLiteConstraintException e) {
-            Log.d(TAG, "Constrain violation when insert into db:" + e);
-            return DaoError.ERROR_SAVE;
         } finally {
             db.endTransaction();
             db.close();
@@ -79,9 +75,6 @@ public class ChannelSqliteDao implements ChannelDao {
                 return DaoError.ERROR_NO_RECORD;
             }
             assert rows == 1;
-        } catch (SQLiteConstraintException e) {
-            Log.d(TAG, "Constrain violation when deleting from db:" + e);
-            return DaoError.ERROR_SAVE;
         } finally {
             db.close();
         }
@@ -161,8 +154,6 @@ public class ChannelSqliteDao implements ChannelDao {
                 }
             }
 
-        } catch (SQLiteConstraintException e) {
-            Log.d(TAG, "Constrain violation when updating db:" + e);
         } finally {
             db.endTransaction();
             db.close();
