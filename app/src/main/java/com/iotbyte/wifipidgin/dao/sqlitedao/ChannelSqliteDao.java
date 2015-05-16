@@ -18,7 +18,6 @@ import com.iotbyte.wifipidgin.friend.Friend;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * SQLite implementation of ChannelDao
@@ -243,6 +242,13 @@ public class ChannelSqliteDao implements ChannelDao, DaoEventPublisher {
     }
 
     @Override
+    public void notifySubscribers(DaoEvent event) {
+        for (DaoEventSubscriber subscriber : daoEventSubscribers) {
+            subscriber.onEvent(event);
+        }
+    }
+
+    @Override
     public DaoEventPublisher getDaoEventPublisher() {
         return this;
     }
@@ -385,15 +391,5 @@ public class ChannelSqliteDao implements ChannelDao, DaoEventPublisher {
             }
         } while (c.moveToNext());
         return channelList;
-    }
-
-    /** Helper to notify all subscribers about an event
-     *
-     * @param event event to be notified
-     */
-    private void notifySubscribers(DaoEvent event) {
-        for (DaoEventSubscriber subscriber : daoEventSubscribers) {
-            subscriber.notifyEvent(event);
-        }
     }
 }

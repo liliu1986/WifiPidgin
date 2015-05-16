@@ -10,4 +10,10 @@ public interface DaoEventPublisher {
      * @param subscriber subscriber to be registered.
      */
     void registerEventSubscriber(DaoEventSubscriber subscriber);
+
+    /** notify all subscribers about an event
+     *
+     * @param event event to be notified
+    */
+    void notifySubscribers(DaoEvent event);
 }

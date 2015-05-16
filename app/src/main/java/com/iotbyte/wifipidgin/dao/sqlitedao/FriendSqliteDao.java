@@ -205,6 +205,13 @@ public class FriendSqliteDao implements FriendDao, DaoEventPublisher {
         return this;
     }
 
+    @Override
+    public void notifySubscribers(DaoEvent event) {
+        for (DaoEventSubscriber subscriber : daoEventSubscribers) {
+            subscriber.onEvent(event);
+        }
+    }
+
     static final String FRIEND_TABLE = "friend";
 
     static final String ID_FIELD = "_id";
@@ -343,15 +350,5 @@ public class FriendSqliteDao implements FriendDao, DaoEventPublisher {
             }
         } while (c.moveToNext());
         return friendList;
-    }
-
-    /** Helper to notify all subscribers about an event
-     *
-     * @param event event to be notified
-     */
-    private void notifySubscribers(DaoEvent event) {
-        for (DaoEventSubscriber subscriber : daoEventSubscribers) {
-            subscriber.notifyEvent(event);
-        }
     }
 }
