@@ -3,11 +3,11 @@ package com.iotbyte.wifipidgin.friend;
 import java.net.InetAddress;
 
 /**
- * Created by fire on 14/05/15.
+ * Myself is a special Friend with ID = 0
  */
 public class Myself extends Friend {
 
-    public static final long SELF_ID = 1;
+    public static final long SELF_ID = 0;
 
     /**
      * Constructor
