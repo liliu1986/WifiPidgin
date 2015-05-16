@@ -8,6 +8,9 @@ import android.util.Log;
 
 import com.iotbyte.wifipidgin.dao.DaoError;
 import com.iotbyte.wifipidgin.dao.FriendDao;
+import com.iotbyte.wifipidgin.dao.event.DaoEvent;
+import com.iotbyte.wifipidgin.dao.event.DaoEventPublisher;
+import com.iotbyte.wifipidgin.dao.event.DaoEventSubscriber;
 import com.iotbyte.wifipidgin.datasource.sqlite.WifiPidginSqliteHelper;
 import com.iotbyte.wifipidgin.friend.Friend;
 import com.iotbyte.wifipidgin.utils.Utils;
@@ -20,7 +23,7 @@ import java.util.List;
 /**
  * SQLite implementation of FriendDao
  */
-public class FriendSqliteDao implements FriendDao {
+public class FriendSqliteDao implements FriendDao, DaoEventPublisher {
     /**
      * Constructor
      * @param context Context
@@ -41,6 +44,10 @@ public class FriendSqliteDao implements FriendDao {
             if (rowId == -1) {
                 return DaoError.ERROR_SAVE;
             }
+            notifySubscribers(DaoEvent.FRIEND_LIST_CHANGED);
+            if (friend.isFavourite()) {
+                notifySubscribers(DaoEvent.FRIEND_FAVOURITE_CHANGED);
+            }
         } finally {
             db.close();
         }
@@ -49,6 +56,11 @@ public class FriendSqliteDao implements FriendDao {
 
     @Override
     public DaoError delete(long id) {
+        Friend deletingFriend = findById(id);
+        if (deletingFriend == null) {
+            return DaoError.ERROR_NO_RECORD;
+        }
+
         String[] whereArgs = {Long.toString(id)};
         SQLiteDatabase db = sqliteHelper.getWritableDatabase();
         try {
@@ -57,6 +69,10 @@ public class FriendSqliteDao implements FriendDao {
                 return DaoError.ERROR_NO_RECORD;
             }
             assert rows == 1;
+            notifySubscribers(DaoEvent.FRIEND_LIST_CHANGED);
+            if (deletingFriend.isFavourite()) {
+                notifySubscribers(DaoEvent.FRIEND_FAVOURITE_CHANGED);
+            }
         } finally {
             db.close();
         }
@@ -69,6 +85,10 @@ public class FriendSqliteDao implements FriendDao {
         if (id == Friend.NO_ID) {
             return DaoError.ERROR_RECORD_NEVER_SAVED;
         }
+        Friend updatingFriend = findById(id);
+        if (updatingFriend == null) {
+            return DaoError.ERROR_NO_RECORD;
+        }
 
         ContentValues values = friendToContentValues(friend);
         String[] whereArgs = {Long.toString(id)};
@@ -79,6 +99,12 @@ public class FriendSqliteDao implements FriendDao {
                 return DaoError.ERROR_NO_RECORD;
             }
             assert rows == 1;
+            notifySubscribers(DaoEvent.FRIEND_LIST_CHANGED);
+            // Notify subscriber on favourite changed if the new record's favor
+            // status isn't the same as the old one.
+            if (friend.isFavourite() != updatingFriend.isFavourite()) {
+                notifySubscribers(DaoEvent.FRIEND_FAVOURITE_CHANGED);
+            }
         } finally {
             db.close();
         }
@@ -168,6 +194,17 @@ public class FriendSqliteDao implements FriendDao {
         }
     }
 
+    @Override
+    public void registerEventSubscriber(DaoEventSubscriber subscriber) {
+        assert subscriber != null;
+        daoEventSubscribers.add(subscriber);
+    }
+
+    @Override
+    public DaoEventPublisher getDaoEventPublisher() {
+        return this;
+    }
+
     static final String FRIEND_TABLE = "friend";
 
     static final String ID_FIELD = "_id";
@@ -193,6 +230,8 @@ public class FriendSqliteDao implements FriendDao {
 
     /** Database helper for db operation */
     private WifiPidginSqliteHelper sqliteHelper;
+    /** List of subscribers to be notified about Dao events */
+    private List<DaoEventSubscriber> daoEventSubscribers;
 
     /**
      * Helper method to turn Friend object into ContentValues for writing to database.
@@ -304,5 +343,15 @@ public class FriendSqliteDao implements FriendDao {
             }
         } while (c.moveToNext());
         return friendList;
+    }
+
+    /** Helper to notify all subscribers about an event
+     *
+     * @param event event to be notified
+     */
+    private void notifySubscribers(DaoEvent event) {
+        for (DaoEventSubscriber subscriber : daoEventSubscribers) {
+            subscriber.notifyEvent(event);
+        }
     }
 }

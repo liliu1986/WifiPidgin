@@ -1,6 +1,7 @@
 package com.iotbyte.wifipidgin.dao;
 
 import com.iotbyte.wifipidgin.channel.Channel;
+import com.iotbyte.wifipidgin.dao.event.DaoEventPublisher;
 
 import java.util.List;
 
@@ -79,4 +80,6 @@ public interface ChannelDao {
      */
     public List<Channel> findAll();
 
+    /** @return Dao event publisher for this Dao. Null if Dao does not support event publish. */
+    public DaoEventPublisher getDaoEventPublisher();
 }
