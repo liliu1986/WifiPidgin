@@ -7,7 +7,9 @@ import android.util.Log;
 
 import com.iotbyte.wifipidgin.commmodule.MessageServerService;
 import com.iotbyte.wifipidgin.friend.Friend;
+import com.iotbyte.wifipidgin.friend.Myself;
 import com.iotbyte.wifipidgin.message.ChatMessage;
+import com.iotbyte.wifipidgin.utils.Utils;
 
 import java.net.InetAddress;
 
@@ -40,7 +42,7 @@ public class ChatMessageTest extends AndroidTestCase {
             "channelidentifier": "abs13443"
         }*/
 
-      //  ChatMessage multipleVariableMessage = new message ();
+        //  ChatMessage multipleVariableMessage = new message ();
 
     }
 
@@ -51,16 +53,16 @@ public class ChatMessageTest extends AndroidTestCase {
     public void testConvertMessageToJson() throws Exception {
         //the following construct a chatMessage to be send out
         InetAddress aIp = InetAddress.getByName("www.google.com");
-        byte[] aMac = {0xf,0xc,0xa,0xa,0x1,0x4,0x7,0x9,0xa,0xe,0xb,0xd}; //fc:aa:14:79:ae:bd
+        byte[] aMac = {0xf, 0xc, 0xa, 0xa, 0x1, 0x4, 0x7, 0x9, 0xa, 0xe, 0xb, 0xd}; //fc:aa:14:79:ae:bd
         int aPort = 55;
-        Friend aFriend = new Friend(aMac,aIp,aPort);
+        Friend aFriend = new Friend(aMac, aIp, aPort);
 
         InetAddress bIp = InetAddress.getByName("localhost");
-        byte[] bMac = {0xf,0xc,0xa,0xa,0x1,0x4,0x7,0x9,0xa,0xe,0xb,0xf};//fc:aa:14:79:ae:bf
+        byte[] bMac = {0xf, 0xc, 0xa, 0xa, 0x1, 0x4, 0x7, 0x9, 0xa, 0xe, 0xb, 0xf};//fc:aa:14:79:ae:bf
         int bPort = 57;
-        Friend bFriend = new Friend(bMac,bIp,bPort);
+        Friend bFriend = new Friend(bMac, bIp, bPort);
 
-        ChatMessage chatMessage = new ChatMessage(aFriend,"12345","hahaha");
+        ChatMessage chatMessage = new ChatMessage(aFriend, "12345", "hahaha");
         Log.v(MESSAGE_TEST, chatMessage.convertMessageToJson());
 
         /*
@@ -109,22 +111,22 @@ public class ChatMessageTest extends AndroidTestCase {
 
     public void testGetMessageBody() throws Exception {
         InetAddress aIp = InetAddress.getByName("www.google.com");
-        byte[] aMac = {0xf,0xc,0xa,0xa,0x1,0x4,0x7,0x9,0xa,0xe,0xb,0xd}; //fc:aa:14:79:ae:bd
+        byte[] aMac = {0xf, 0xc, 0xa, 0xa, 0x1, 0x4, 0x7, 0x9, 0xa, 0xe, 0xb, 0xd}; //fc:aa:14:79:ae:bd
         int aPort = 55;
-        Friend aFriend = new Friend(aMac,aIp,aPort);
+        Friend aFriend = new Friend(aMac, aIp, aPort);
 
-        ChatMessage chatMessage = new ChatMessage(aFriend,"12345","hahaha");
-        assertEquals("Can't get proper chatMessage body","hahaha", chatMessage.getMessageBody());
+        ChatMessage chatMessage = new ChatMessage(aFriend, "12345", "hahaha");
+        assertEquals("Can't get proper chatMessage body", "hahaha", chatMessage.getMessageBody());
 
     }
 
     public void testSetMessageBody() throws Exception {
         InetAddress aIp = InetAddress.getByName("www.google.com");
-        byte[] aMac = {0xf,0xc,0xa,0xa,0x1,0x4,0x7,0x9,0xa,0xe,0xb,0xd}; //fc:aa:14:79:ae:bd
+        byte[] aMac = {0xf, 0xc, 0xa, 0xa, 0x1, 0x4, 0x7, 0x9, 0xa, 0xe, 0xb, 0xd}; //fc:aa:14:79:ae:bd
         int aPort = 55;
-        Friend aFriend = new Friend(aMac,aIp,aPort);
+        Friend aFriend = new Friend(aMac, aIp, aPort);
 
-        ChatMessage chatMessage = new ChatMessage(aFriend,"12345","hahaha");
+        ChatMessage chatMessage = new ChatMessage(aFriend, "12345", "hahaha");
         chatMessage.setMessageBody("this is insane!");
         assertEquals("Can't set chatMessage body properly", "this is insane!", chatMessage.getMessageBody());
 
@@ -133,34 +135,34 @@ public class ChatMessageTest extends AndroidTestCase {
     public void testGetChannelIdentifier() throws Exception {
         //the following construct a chatMessage to be send out
         InetAddress aIp = InetAddress.getByName("www.google.com");
-        byte[] aMac = {0xf,0xc,0xa,0xa,0x1,0x4,0x7,0x9,0xa,0xe,0xb,0xd}; //fc:aa:14:79:ae:bd
+        byte[] aMac = {0xf, 0xc, 0xa, 0xa, 0x1, 0x4, 0x7, 0x9, 0xa, 0xe, 0xb, 0xd}; //fc:aa:14:79:ae:bd
         int aPort = 55;
-        Friend aFriend = new Friend(aMac,aIp,aPort);
+        Friend aFriend = new Friend(aMac, aIp, aPort);
 
-        ChatMessage chatMessage = new ChatMessage(aFriend,"12345","hahaha");
+        ChatMessage chatMessage = new ChatMessage(aFriend, "12345", "hahaha");
 
-        assertEquals("channelIdentifier not match","12345", chatMessage.getChannelIdentifier());
+        assertEquals("channelIdentifier not match", "12345", chatMessage.getChannelIdentifier());
     }
 
     public void testGetTimestamp() throws Exception {
         InetAddress aIp = InetAddress.getByName("www.google.com");
-        byte[] aMac = {0xf,0xc,0xa,0xa,0x1,0x4,0x7,0x9,0xa,0xe,0xb,0xd}; //fc:aa:14:79:ae:bd
+        byte[] aMac = {0xf, 0xc, 0xa, 0xa, 0x1, 0x4, 0x7, 0x9, 0xa, 0xe, 0xb, 0xd}; //fc:aa:14:79:ae:bd
         int aPort = 55;
-        Friend aFriend = new Friend(aMac,aIp,aPort);
+        Friend aFriend = new Friend(aMac, aIp, aPort);
 
-        ChatMessage chatMessage = new ChatMessage(aFriend,"12345","hahaha");
+        ChatMessage chatMessage = new ChatMessage(aFriend, "12345", "hahaha");
         assertTrue(chatMessage.getTimestamp().toString().matches("^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d{3}(?: [AP]M)?(?: [+-]\\d{4})?$"));
     }
 
     public void testConstructor() throws Exception {
         InetAddress aIp = InetAddress.getByName("192.168.0.2");
-        byte[] aMac = {0xf,0xc,0xa,0xa,0x1,0x4,0x7,0x9,0xa,0xe,0xb,0xd}; //fc:aa:14:79:ae:bd
+        byte[] aMac = {0xf, 0xc, 0xa, 0xa, 0x1, 0x4, 0x7, 0x9, 0xa, 0xe, 0xb, 0xd}; //fc:aa:14:79:ae:bd
         int aPort = 55;
-        Friend aFriend = new Friend(aMac,aIp,aPort);
+        Friend aFriend = new Friend(aMac, aIp, aPort);
 
-        ChatMessage chatMessage = new ChatMessage(aFriend,"12345","hahaha");
+        ChatMessage chatMessage = new ChatMessage(aFriend, "12345", "hahaha");
         String json = chatMessage.convertMessageToJson();
-        Log.v(MESSAGE_TEST,json);
+        Log.v(MESSAGE_TEST, json);
 
 
         ChatMessage sameChatMessage = new ChatMessage(json);
@@ -169,26 +171,33 @@ public class ChatMessageTest extends AndroidTestCase {
     }
 
 
+    public void testOverallWorkFlow1() throws Exception {
 
-    public void testOverallWorkFlow1()throws Exception{
 
-
-         //Start message Server service and NSD Service
+        //Start message Server service and NSD Service
         Context context = getContext();
-        Intent i= new Intent(context, MessageServerService.class);
+        Intent i = new Intent(context, MessageServerService.class);
         i.putExtra("KEY1", "Value to be used by the service");
         context.startService(i);
 
         //Start the service discovery
-       // NsdClient mNsdClient = new NsdClient(context);
+        // NsdClient mNsdClient = new NsdClient(context);
         // mNsdClient.initializeNsdClient();
         // mNsdClient.discoverServices();
 
 
+    }
 
+    public void MySelfClassTest() throws Exception {
+        InetAddress aIp = InetAddress.getByName("192.168.0.2");
+        byte[] aMac = {0xf, 0xc, 0xa, 0xa, 0x1, 0x4, 0x7, 0x9, 0xa, 0xe, 0xb, 0xd}; //fc:aa:14:79:ae:bd
+        byte[] bMac = {0xe, 0xc, 0xa, 0xa, 0x1, 0x4, 0x7, 0x9, 0xa, 0xe, 0xb, 0xd}; //fc:aa:14:79:ae:bd
 
-
-
+        int aPort = 55;
+        Myself m = new Myself(aMac, aIp, aPort);
+        Log.d(MESSAGE_TEST, m.getIp().toString());
+        m.setMac(bMac);
+        Log.d(MESSAGE_TEST, Utils.macAddressByteToHexString(m.getMac()));
 
 
     }
