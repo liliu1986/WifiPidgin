@@ -10,5 +10,5 @@ public interface DaoEventSubscriber {
      *
      * @param event event to be notified
      */
-    public void notifyEvent(DaoEvent event);
+    public void onEvent(DaoEvent event);
 }
