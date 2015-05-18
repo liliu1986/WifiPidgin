@@ -158,5 +158,27 @@ public class ChatManager {
         }
     }
 
+    /**
+     * isIncomingMessageQueueEmpty()
+     *
+     * check if the incomingMessageQueue is empty or not
+     * @return true if empty otherwise false
+     */
+    public boolean isIncomingMessageQueueEmpty()
+    {
+        return incomingMessageQueue.isEmpty();
+    }
+
+    /**
+     * peekIncomingMessageQueue()
+     *
+     * As name implies, it peek the queue, use as safe guard
+     *
+     * @return Message from top of the queue without remove it.
+     */
+
+    public Message peekIncomingMessageQueue(){
+        return incomingMessageQueue.peek();
+    }
 
 }
