@@ -238,7 +238,7 @@ public class FriendSqliteDao implements FriendDao, DaoEventPublisher {
     /** Database helper for db operation */
     private WifiPidginSqliteHelper sqliteHelper;
     /** List of subscribers to be notified about Dao events */
-    private List<DaoEventSubscriber> daoEventSubscribers;
+    private List<DaoEventSubscriber> daoEventSubscribers = new ArrayList<DaoEventSubscriber>();
 
     /**
      * Helper method to turn Friend object into ContentValues for writing to database.
