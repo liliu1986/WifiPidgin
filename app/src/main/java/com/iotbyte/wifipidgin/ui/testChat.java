@@ -15,13 +15,13 @@ import android.widget.TextView;
 
 import com.iotbyte.wifipidgin.R;
 import com.iotbyte.wifipidgin.chat.ChatManager;
+import com.iotbyte.wifipidgin.chat.IncomingMessageHandlingService;
 import com.iotbyte.wifipidgin.commmodule.CommModuleBroadcastReceiver;
 import com.iotbyte.wifipidgin.commmodule.MessageClient;
 import com.iotbyte.wifipidgin.commmodule.MessageServer;
 import com.iotbyte.wifipidgin.commmodule.MessageServerService;
 import com.iotbyte.wifipidgin.friend.Friend;
 import com.iotbyte.wifipidgin.message.ChatMessage;
-import com.iotbyte.wifipidgin.nsdmodule.NsdClient;
 import com.iotbyte.wifipidgin.nsdmodule.NsdWrapper;
 
 import java.net.InetAddress;
@@ -64,10 +64,16 @@ public class testChat extends ActionBarActivity implements View.OnClickListener{
         i.putExtra("KEY1", "Value to be used by the service");
         context.startService(i);
 
+        //Start message Server service and NSD Service
+        Intent incomingMessageHandlingServicesIntent= new Intent(getApplicationContext(), IncomingMessageHandlingService.class);
+       // incomingMessageHandlingServicesIntent.putExtra("KEY1", "Value to be used by the service");
+        context.startService(incomingMessageHandlingServicesIntent);
+
+
         //Start the service discovery
-        NsdClient mNsdClient = new NsdClient(this);
-        mNsdClient.initializeNsdClient();
-        mNsdClient.discoverServices();
+        //NsdClient mNsdClient = new NsdClient(this);
+        //mNsdClient.initializeNsdClient();
+        //mNsdClient.discoverServices();
 
         /*
         mUpdateHandler = new Handler() {

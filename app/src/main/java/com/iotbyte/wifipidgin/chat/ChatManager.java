@@ -1,5 +1,7 @@
 package com.iotbyte.wifipidgin.chat;
 
+import android.util.Log;
+
 import com.iotbyte.wifipidgin.message.ChatMessage;
 import com.iotbyte.wifipidgin.message.Message;
 import com.iotbyte.wifipidgin.message.MessageFactory;
@@ -98,7 +100,7 @@ public class ChatManager {
         if (null == message || message.getType() == MessageType.ERROR){
             return false;
         }
-
+        Log.v("test chat", "successfully handled!!!");
         switch (message.getType()){
             case CHAT_MESSAGE:{
                 if (!chatMap.containsKey(((ChatMessage)message).getChannelIdentifier())) {

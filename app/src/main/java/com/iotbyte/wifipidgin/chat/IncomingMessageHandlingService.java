@@ -3,6 +3,7 @@ package com.iotbyte.wifipidgin.chat;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.util.Log;
 
 /**
  * Created by yefwen@iotbyte.com on 09/05/15.
@@ -12,7 +13,7 @@ import android.os.IBinder;
 public class IncomingMessageHandlingService extends Service {
 
     private IncomingMessageHandler incomingMessageHandler;
-    private final String INCOMING_MESSAGE_HANDLING_SERVICE = "incoming message handling service";
+    private final String INCOMING_MESSAGE_HANDLING_SERVICE = "inc msg serv";
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -31,6 +32,8 @@ public class IncomingMessageHandlingService extends Service {
         super.onStartCommand(intent, flags, startId);
 
         incomingMessageHandler.startHandler();
+
+        Log.d(INCOMING_MESSAGE_HANDLING_SERVICE,"the incoming message handler Service Starts");
 
         return Service.START_STICKY;
     }
