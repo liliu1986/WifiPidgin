@@ -66,6 +66,9 @@ public class DaoFactory {
 
     private static DaoFactory instance = null;
 
-    /** Cached event board where all dao events go to. */
+    /** Cached event board where all dao events go to. There should only be 
+     *  one event board ever existed. This ensures that all events are posted 
+     *  to one place, and all subscribers register to the correct event board.
+     */
     private final DaoEventBoard eventBoard;
 }
