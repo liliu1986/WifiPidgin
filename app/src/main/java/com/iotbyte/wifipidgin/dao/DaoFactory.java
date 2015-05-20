@@ -2,6 +2,8 @@ package com.iotbyte.wifipidgin.dao;
 
 import android.content.Context;
 
+import com.iotbyte.wifipidgin.dao.event.DaoEventBoard;
+import com.iotbyte.wifipidgin.dao.event.DaoEventBoardImpl;
 import com.iotbyte.wifipidgin.dao.sqlitedao.ChannelSqliteDao;
 import com.iotbyte.wifipidgin.dao.sqlitedao.FriendSqliteDao;
 
@@ -27,7 +29,7 @@ public class DaoFactory {
     public FriendDao getFriendDao(Context context, DaoType type, String resource) {
         switch (type) {
             case SQLITE_DAO:
-                return new FriendSqliteDao(context);
+                return new FriendSqliteDao(context, eventBoard);
         }
         // Should not get here.
         assert false;
@@ -44,7 +46,7 @@ public class DaoFactory {
     public ChannelDao getChannelDao(Context context, DaoType type, String resource) {
         switch (type) {
             case SQLITE_DAO:
-                return new ChannelSqliteDao(context);
+                return new ChannelSqliteDao(context, eventBoard);
         }
         // Should not get here.
         assert false;
@@ -58,7 +60,12 @@ public class DaoFactory {
         return instance;
     }
 
-    private DaoFactory() {}
+    private DaoFactory() {
+        this.eventBoard = new DaoEventBoardImpl();
+    }
 
     private static DaoFactory instance = null;
+
+    /** Cached event board where all dao events go to. */
+    private DaoEventBoard eventBoard;
 }
