@@ -67,5 +67,5 @@ public class DaoFactory {
     private static DaoFactory instance = null;
 
     /** Cached event board where all dao events go to. */
-    private DaoEventBoard eventBoard;
+    private final DaoEventBoard eventBoard;
 }
