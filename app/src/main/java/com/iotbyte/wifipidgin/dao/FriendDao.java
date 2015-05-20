@@ -1,6 +1,6 @@
 package com.iotbyte.wifipidgin.dao;
 
-import com.iotbyte.wifipidgin.dao.event.DaoEventPublisher;
+import com.iotbyte.wifipidgin.dao.event.DaoEventBoard;
 import com.iotbyte.wifipidgin.friend.Friend;
 
 import java.net.InetAddress;
@@ -91,6 +91,6 @@ public interface FriendDao {
      */
     public List<Friend> findAll();
 
-    /** @return Dao event publisher for this Dao. Null if Dao does not support event publish. */
-    public DaoEventPublisher getDaoEventPublisher();
+    /** @return Dao event board for this Dao. Null if Dao does not support event publish. */
+    public DaoEventBoard getDaoEventBoard();
 }
