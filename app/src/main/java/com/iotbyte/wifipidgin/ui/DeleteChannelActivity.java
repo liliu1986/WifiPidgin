@@ -15,9 +15,6 @@ import com.iotbyte.wifipidgin.R;
 import com.iotbyte.wifipidgin.channel.Channel;
 import com.iotbyte.wifipidgin.channel.ChannelManager;
 
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-
 
 public class DeleteChannelActivity extends Activity {
 
@@ -33,14 +30,11 @@ public class DeleteChannelActivity extends Activity {
         Button buttonCancel = (Button) findViewById(R.id.buttonCancel);
 
         // populate list view
-        //FIXME: remove UnknownHostExceptions after remove mock code
-        try {
+
             ArrayAdapter<Channel> aa = (new ArrayAdapter<Channel>(this, android.R.layout.simple_list_item_multiple_choice, ChannelManager.getInstance(context).getChannelList()));
             ListView lv = (ListView) findViewById(android.R.id.list);
             lv.setAdapter(aa);
-        } catch (UnknownHostException ex) {
-            ex.printStackTrace();
-        }
+
 
         // listen to button click to delete channel
         buttonDeleteChannel.setOnClickListener(new View.OnClickListener() {

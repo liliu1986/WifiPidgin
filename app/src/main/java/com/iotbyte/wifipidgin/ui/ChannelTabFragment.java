@@ -16,9 +16,6 @@ import com.iotbyte.wifipidgin.R;
 import com.iotbyte.wifipidgin.channel.Channel;
 import com.iotbyte.wifipidgin.channel.ChannelManager;
 
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-
 public class ChannelTabFragment extends Fragment {
 
     final String CHANNEL_TAB_FRAG = "Channel Tab Fragment";
@@ -33,14 +30,10 @@ public class ChannelTabFragment extends Fragment {
         Button button = (Button) v.findViewById(R.id.buttonCreateChannel);
 
         // populate the list view
-        //FIXME: remove UnknownHostExceptions after remove mock code
-        try {
+
             lv.setAdapter((new ArrayAdapter<Channel>(lv.getContext(),
                     android.R.layout.simple_list_item_1,
                     ChannelManager.getInstance(lv.getContext()).getChannelList())));
-        } catch (UnknownHostException ex) {
-            ex.printStackTrace();
-        }
 
         // listen to item click to enter a channel
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
