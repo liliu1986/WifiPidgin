@@ -162,9 +162,10 @@ public class ChannelManager {
 
     public boolean updateChannelInfoFromDatabase() {
         ChannelDao cd = DaoFactory.getInstance().getChannelDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
+        if (null == cd) return false;
         List<Channel> channelList = cd.findAll();
 
-        if (null == channelList) return false;
+
         for (Channel aChannel : channelList) {
             channelMap.put(aChannel.getChannelIdentifier(), aChannel);
         }
