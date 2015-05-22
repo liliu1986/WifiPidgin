@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -14,6 +15,9 @@ import android.widget.ListView;
 import com.iotbyte.wifipidgin.R;
 import com.iotbyte.wifipidgin.channel.Channel;
 import com.iotbyte.wifipidgin.channel.ChannelManager;
+import com.iotbyte.wifipidgin.dao.ChannelDao;
+import com.iotbyte.wifipidgin.dao.DaoFactory;
+import com.iotbyte.wifipidgin.friend.Friend;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -23,6 +27,7 @@ public class DeleteChannelActivity extends Activity {
 
     final String DELETE_CHANNEL_ACT = "Delete Channel Activity";
     final Context context = this;
+    ListView lv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +41,7 @@ public class DeleteChannelActivity extends Activity {
         //FIXME: remove UnknownHostExceptions after remove mock code
         try {
             ArrayAdapter<Channel> aa = (new ArrayAdapter<Channel>(this, android.R.layout.simple_list_item_multiple_choice, ChannelManager.getInstance(context).getChannelList()));
-            ListView lv = (ListView) findViewById(android.R.id.list);
+            lv = (ListView) findViewById(android.R.id.list);
             lv.setAdapter(aa);
         } catch (UnknownHostException ex) {
             ex.printStackTrace();
@@ -53,7 +58,19 @@ public class DeleteChannelActivity extends Activity {
                 builder.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
 
-                        // To Do: Add code to delete the selected channels
+                        Channel currentChannel;
+                        SparseBooleanArray selectedChannels = lv.getCheckedItemPositions();
+                        ChannelDao cd = DaoFactory.getInstance().getChannelDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
+
+                        if (selectedChannels.size() != 0) {
+                            for (int i = 0; i < selectedChannels.size(); i++) {
+                                if (selectedChannels.valueAt(i)) {
+                                    currentChannel = (Channel) lv.getAdapter().getItem(selectedChannels.keyAt(i));
+                                    Log.d(DELETE_CHANNEL_ACT, currentChannel.toString() + " was selected");
+                                    cd.delete(currentChannel.getId());
+                                }
+                            }
+                        }
 
                         finish();
                     }
