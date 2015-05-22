@@ -183,4 +183,14 @@ public class ChatManager {
         return incomingMessageQueue.peek();
     }
 
+    /**
+     *isOutGoingMessageQueueEmpty()
+     *
+     * check if the outGoingMessageQueue is empty or not
+     * @return true if empty otherwise false
+     */
+    public boolean isOutGoingMessageQueueEmpty(){
+        return outGoingMessageQueue.isEmpty();
+    }
+
 }
