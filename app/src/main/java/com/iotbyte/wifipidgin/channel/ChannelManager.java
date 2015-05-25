@@ -38,11 +38,12 @@ public class ChannelManager {
         // or create a new channelList if there is nothing been retrieved
         channelMap = new HashMap<>();
 
+        updateChannelInfoFromDatabase();
         //TODO: remove the mocked channelList
         mockChannelInfo();
 
-        //below is not mocked!!!!
-        updateChannelInfoFromDatabase();
+
+
     }
 
     public static ChannelManager getInstance(Context context)  {
@@ -218,31 +219,46 @@ public class ChannelManager {
      * some mocked channel Info
      */
     private void mockChannelInfo() {
-        try {
-            InetAddress xiaoMingIP = InetAddress.getByName("192.168.1.2");
-            byte[] xiaoMingMac = {0x5, 0xc, 0x0, 0xa, 0x5, 0xb, 0x4, 0x8, 0x4, 0x5, 0x4, 0x6};
-            int xiaoMingPort = 55;
-            Friend xiaoMing = new Friend(xiaoMingMac, xiaoMingIP, xiaoMingPort);
-            xiaoMing.setDescription("wo shi huang xiao ming");
-            xiaoMing.setName("HXM");
+        FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
+        if ( 1 == fd.findAll().size()) {
 
-            InetAddress xiaoPangIP = InetAddress.getByName("192.168.1.179");
-            byte[] xiaoPangMac = {0x5, 0xc, 0x0, 0xa, 0x5, 0xb, 0xa, 0xa, 0xc, 0xa, 0xc, 0x5};
-            int xiaoPangPort = 55;
-            Friend xiaoPang = new Friend(xiaoPangMac, xiaoPangIP, xiaoPangPort);
-            xiaoPang.setDescription("wo shi xiao pang");
-            xiaoPang.setName("stackHeap");
-            List<Friend> mockList = new ArrayList<>();
-            mockList.add(xiaoMing);
-            mockList.add(xiaoPang);
-            Channel mockChannel = new Channel(mockList, "xiao channel", "heiheihei");
-            this.addChannel(mockChannel);
-        } catch (UnknownHostException ex) {
-            ex.printStackTrace();
+            try {
+                InetAddress xiaoMingIP = InetAddress.getByName("192.168.1.2");
+                byte[] xiaoMingMac = {0x5, 0xc, 0x0, 0xa, 0x5, 0xb, 0x4, 0x8, 0x4, 0x5, 0x4, 0x6};
+                int xiaoMingPort = 55;
+                Friend xiaoMing = new Friend(xiaoMingMac, xiaoMingIP, xiaoMingPort);
+                xiaoMing.setDescription("wo shi huang xiao ming");
+                xiaoMing.setName("HXM");
+
+                InetAddress xiaoPangIP = InetAddress.getByName("192.168.1.179");
+                byte[] xiaoPangMac = {0x5, 0xc, 0x0, 0xa, 0x5, 0xb, 0xa, 0xa, 0xc, 0xa, 0xc, 0x5};
+                int xiaoPangPort = 55;
+                Friend xiaoPang = new Friend(xiaoPangMac, xiaoPangIP, xiaoPangPort);
+                xiaoPang.setDescription("wo shi xiao pang");
+                xiaoPang.setName("stackHeap");
+                List<Friend> mockList = new ArrayList<>();
+                mockList.add(xiaoMing);
+                mockList.add(xiaoPang);
+                String channelName = "xiao channel";
+                Channel mockChannel = new Channel(mockList, channelName, "heiheihei");
+                //just a work around for mock data:
+           /* boolean existFlag = false;
+            for(Channel channel : DaoFactory.getInstance().getChannelDao(context, DaoFactory.DaoType.SQLITE_DAO, null).findAll()){
+                if (0 == channel.getName().compareTo(channelName)){
+                    existFlag = true;
+                    break;
+                }
+            }
+            if (!existFlag){
+                this.addChannel(mockChannel);
+            }*/
+                this.addChannel(mockChannel);
+            } catch (UnknownHostException ex) {
+                ex.printStackTrace();
+            }
+
+            saveChannelInfoToDataBase();
         }
-
-        saveChannelInfoToDataBase();
-
     }
 
 }
