@@ -17,4 +17,5 @@
     <string name="Cancel">Cancel</string>
     <string name="OK">OK</string>
     <string name="DeleteChannel">Delete Selected Channels</string>
+    <string name="incoming_message_handler_service">Incoming Message Handler Service</string>
 </resources>

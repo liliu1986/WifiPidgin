@@ -10,6 +10,8 @@ import android.widget.ListView;
 import android.widget.ArrayAdapter;
 
 import com.iotbyte.wifipidgin.R;
+import com.iotbyte.wifipidgin.ui.discoverlist.DiscoverListManager;
+import com.iotbyte.wifipidgin.ui.friendlist.FriendListManager;
 
 import java.util.ArrayList;
 
@@ -24,7 +26,7 @@ public final class TabIconFragment extends ListFragment {
 
     private FriendListManager fm;
 
-    private DiscoverManager dm;
+    private DiscoverListManager dm;
 
 
     ArrayList<String> values = new ArrayList<String>() {{
@@ -104,7 +106,7 @@ public final class TabIconFragment extends ListFragment {
                 break;
             //Discover Tab
             case 2:
-                dm = new DiscoverManager(getActivity(), this);
+                dm = new DiscoverListManager(getActivity(), this);
                 dm.InflateSettingView();
                 break;
             //Setting Tab
