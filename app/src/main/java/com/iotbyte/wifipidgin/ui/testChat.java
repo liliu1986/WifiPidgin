@@ -71,9 +71,9 @@ public class testChat extends ActionBarActivity implements View.OnClickListener{
 
 
         //Start the service discovery
-        //NsdClient mNsdClient = new NsdClient(this);
-        //mNsdClient.initializeNsdClient();
-        //mNsdClient.discoverServices();
+        NsdClient mNsdClient = NsdClient.getInstance(this);
+        mNsdClient.initializeNsdClient();
+        mNsdClient.discoverServices();
 
         /*
         mUpdateHandler = new Handler() {

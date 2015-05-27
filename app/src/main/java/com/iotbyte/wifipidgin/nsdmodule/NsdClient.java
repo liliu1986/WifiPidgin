@@ -15,7 +15,9 @@ import com.iotbyte.wifipidgin.ui.tempDb;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 public class NsdClient {
 
@@ -32,23 +34,38 @@ public class NsdClient {
 
     NsdServiceInfo mService;
 
-    //The list of channels that is alive
-    private List<Channel> ChannelList;
-    //The list of users showing themselves as visible within the same lan network
-    //private List<Friend> nearbyFriendList;
-    private tempDb mdb;
+
+    private Queue<Friend> friendCreationQueue = new LinkedList<Friend>();
+
+    private static NsdClient instance = null;
 
     private boolean isDiscovering=false;
-    public NsdClient(Context context) {
+
+    private NsdClient(Context context) {
         mContext = context;
         mNsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
-        ChannelList=new ArrayList<Channel>();
         //nearbyFriendList =new ArrayList<Friend>();
     }
+
+    /**
+     ** NsdClient is a singleton
+     **/
+    public static NsdClient getInstance(Context context) {
+        if (instance == null){
+            synchronized (NsdClient.class) {
+                if (instance == null) {
+                    instance = new NsdClient(context);
+                }
+            }
+        }
+        return instance;
+    }
+
     public void initializeNsdClient() {
         initializeDiscoveryListener();
         initializeResolveListener();
     }
+
     public void initializeDiscoveryListener() {
         mDiscoveryListener = new NsdManager.DiscoveryListener() {
 
@@ -175,13 +192,26 @@ public class NsdClient {
     public NsdServiceInfo getChosenServiceInfo() {
         return mService;
     }
-    public List<Channel> getChannelList(){
-        return ChannelList;
+
+
+    private boolean enqueueFriendCreationQueue(Friend inFriend) {
+        return friendCreationQueue.offer(inFriend);
     }
 
-    //public List<Friend> getNearbyFriendList(){
-    //	return nearbyFriendList;
-    //}
+    protected Friend dequeueFriendCreationQueue() {
+        return friendCreationQueue.poll();
+    }
+
+    protected boolean isInFriendCreationQueue(Friend inFriend){
+        return friendCreationQueue.contains(inFriend);
+    }
+
+    protected boolean isEmptyFriendCreationQueue(){
+        if (friendCreationQueue.size() == 0){
+            return true;
+        }
+        return false;
+    }
 
     //Returns if currently the discovery is on going.
     public boolean getIsDiscovering(){
