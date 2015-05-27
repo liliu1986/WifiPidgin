@@ -6,6 +6,8 @@ import android.content.Context;
 import com.iotbyte.wifipidgin.dao.ChannelDao;
 import com.iotbyte.wifipidgin.dao.DaoFactory;
 import com.iotbyte.wifipidgin.dao.FriendDao;
+import com.iotbyte.wifipidgin.dao.event.DaoEvent;
+import com.iotbyte.wifipidgin.dao.event.DaoEventSubscriber;
 import com.iotbyte.wifipidgin.friend.Friend;
 
 import java.net.InetAddress;
@@ -31,8 +33,25 @@ public class ChannelManager {
 
     private HashMap<String, Channel> channelMap; // channelIdentifier and Channel pair
 
-    private ChannelManager(Context context)  {
+    private ChannelDatabaseChangeListener channelDatabaseChangeListener;
+
+    private ChannelManager(Context context) {
         this.context = context;
+
+        ChannelDao channelDao  = DaoFactory.getInstance().getChannelDao(this.context,DaoFactory.DaoType.SQLITE_DAO, null);
+
+        /* In the event that some where else update the Channel Information in database, update the Channel Information
+        from database, and notify the UI to update (notify UI require UI side to registrant this listener */
+        channelDao.getDaoEventBoard().registerEventSubscriber(new DaoEventSubscriber() {
+            @Override
+            public void onEvent(DaoEvent event) {
+                updateChannelInfoFromDatabase();
+                if (null != channelDatabaseChangeListener) {
+                    channelDatabaseChangeListener.onChannelDatabaseChange();
+                }
+            }
+        });
+
 
         //Calling database to grep existing channelList
         // or create a new channelList if there is nothing been retrieved
@@ -43,10 +62,9 @@ public class ChannelManager {
         mockChannelInfo();
 
 
-
     }
 
-    public static ChannelManager getInstance(Context context)  {
+    public static ChannelManager getInstance(Context context) {
         if (instance == null) {
             //Thread Safe with synchronized block
             synchronized (ChannelManager.class) {
@@ -56,20 +74,6 @@ public class ChannelManager {
             }
         }
         return instance;
-    }
-
-    /**
-     * saveChannelsInfoIntoDatabase()
-     * <p/>
-     * It will save all information back to the database, this should be called
-     * properly to retain all channel information
-     *
-     * @return true if all channel information is saved successfully, false otherwise.
-     */
-
-    //TODO: adding implementation to add all channels back to database
-    public boolean saveChannelsInfoIntoDatabase() {
-        return true;
     }
 
     /**
@@ -220,7 +224,7 @@ public class ChannelManager {
      */
     private void mockChannelInfo() {
         FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
-        if ( 1 == fd.findAll().size()) {
+        if (1 == fd.findAll().size()) {
 
             try {
                 InetAddress xiaoMingIP = InetAddress.getByName("192.168.1.2");
@@ -261,4 +265,7 @@ public class ChannelManager {
         }
     }
 
+    public void setChannelDatabaseChangeListener(ChannelDatabaseChangeListener listener){
+        this.channelDatabaseChangeListener = listener;
+    }
 }
