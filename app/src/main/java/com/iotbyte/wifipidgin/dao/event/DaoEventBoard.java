@@ -3,7 +3,7 @@ package com.iotbyte.wifipidgin.dao.event;
 /**
  * Dao event publisher interface.
  */
-public interface DaoEventPublisher {
+public interface DaoEventBoard {
     /**
      * Register an event subscriber. When any DaoEvent occurs, all
      * registered subscribers are notified.
@@ -11,9 +11,9 @@ public interface DaoEventPublisher {
      */
     void registerEventSubscriber(DaoEventSubscriber subscriber);
 
-    /** notify all subscribers about an event
+    /** post an event to event board, all subscribers will be notified about the event
      *
-     * @param event event to be notified
-    */
-    void notifySubscribers(DaoEvent event);
+     * @param event event to be posted
+     */
+    void postEvent(DaoEvent event);
 }

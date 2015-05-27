@@ -35,6 +35,7 @@ public class WifiPidginSqliteHelper extends SQLiteOpenHelper {
         if (!db.isReadOnly()) {
             db.setForeignKeyConstraintsEnabled(true);
         }
+        db.enableWriteAheadLogging();
     }
 
     @Override
