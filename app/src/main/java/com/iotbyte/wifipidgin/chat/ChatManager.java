@@ -2,6 +2,8 @@ package com.iotbyte.wifipidgin.chat;
 
 import android.util.Log;
 
+import com.iotbyte.wifipidgin.commmodule.MessageClient;
+import com.iotbyte.wifipidgin.friend.Friend;
 import com.iotbyte.wifipidgin.message.ChatMessage;
 import com.iotbyte.wifipidgin.message.Message;
 import com.iotbyte.wifipidgin.message.MessageFactory;
@@ -18,7 +20,7 @@ import java.util.Queue;
  * ChatManager is the singleton to manage all chat .
  * The current design is not to persist all chat information
  * All chat items are lost when close off the app.
- *
+ * <p/>
  * The ChatManager also maintains two queues to manage message sending and
  * receiving.
  * Created by yefwen@iotbyte.com on 26/03/15.
@@ -32,10 +34,13 @@ public class ChatManager {
 
     private HashMap<String, Chat> chatMap; // map channelIdentifier with Chat object
 
+    private MessageClient messageClient;
+
     private ChatManager() {
         outGoingMessageQueue = new LinkedList<>();
         incomingMessageQueue = new LinkedList<>();
         chatMap = new HashMap<>();
+        messageClient = new MessageClient();
     }
 
     public static ChatManager getInstance() {
@@ -64,13 +69,32 @@ public class ChatManager {
 
     /**
      * dequeueOutGoingMessageQueue()
-     * <p/>
-     * Remove head of the queue and return it
      *
-     * @return the head or null if empty
+     * It remove the message from the outgoingMessageQueue and send it via messageClient.
+     *
+     * @return true if the message is dequeue properly from outgoingMessageQueue and send via messageClient,
+     * return false otherwise
      */
-    public String dequeueOutGoingMessageQueue() {
-        return outGoingMessageQueue.poll();
+    public boolean dequeueOutGoingMessageQueue() {
+        if (null == messageClient) {
+            return false;
+        }
+        String message = outGoingMessageQueue.poll();
+
+        if (null == message) {
+            return false;
+        }
+        try {
+            Friend receiver = MessageFactory.buildMessageByJson(message).getReceiver();
+            messageClient.sendMsg(receiver.getIp(),receiver.getPort() , message);
+            return true;
+        } catch (JSONException ex) {  //FIXME:: require better exception handle!!!
+            ex.printStackTrace();
+        }catch (UnknownHostException ex){
+            ex.printStackTrace();
+        }
+
+        return false;
     }
 
     //TODO:: require exception handling here for corrupted json string
@@ -97,17 +121,17 @@ public class ChatManager {
     // any message into.
     public boolean dequeueIncomingMessageQueue() {
         Message message = incomingMessageQueue.poll();
-        if (null == message || message.getType() == MessageType.ERROR){
+        if (null == message || message.getType() == MessageType.ERROR) {
             return false;
         }
         Log.v("test chat", "successfully handled!!!");
-        switch (message.getType()){
-            case CHAT_MESSAGE:{
-                if (!chatMap.containsKey(((ChatMessage)message).getChannelIdentifier())) {
+        switch (message.getType()) {
+            case CHAT_MESSAGE: {
+                if (!chatMap.containsKey(((ChatMessage) message).getChannelIdentifier())) {
                     return false;
                 } else {
-                    Chat chat = getChatByChannelIdentifier(((ChatMessage)message).getChannelIdentifier());
-                    return chat.pushMessage((ChatMessage)message);
+                    Chat chat = getChatByChannelIdentifier(((ChatMessage) message).getChannelIdentifier());
+                    return chat.pushMessage((ChatMessage) message);
                 }
             }
             default:
@@ -162,34 +186,35 @@ public class ChatManager {
 
     /**
      * isIncomingMessageQueueEmpty()
-     *
+     * <p/>
      * check if the incomingMessageQueue is empty or not
+     *
      * @return true if empty otherwise false
      */
-    public boolean isIncomingMessageQueueEmpty()
-    {
+    public boolean isIncomingMessageQueueEmpty() {
         return incomingMessageQueue.isEmpty();
     }
 
     /**
      * peekIncomingMessageQueue()
-     *
+     * <p/>
      * As name implies, it peek the queue, use as safe guard
      *
      * @return Message from top of the queue without remove it.
      */
 
-    public Message peekIncomingMessageQueue(){
+    public Message peekIncomingMessageQueue() {
         return incomingMessageQueue.peek();
     }
 
     /**
-     *isOutGoingMessageQueueEmpty()
-     *
+     * isOutGoingMessageQueueEmpty()
+     * <p/>
      * check if the outGoingMessageQueue is empty or not
+     *
      * @return true if empty otherwise false
      */
-    public boolean isOutGoingMessageQueueEmpty(){
+    public boolean isOutGoingMessageQueueEmpty() {
         return outGoingMessageQueue.isEmpty();
     }
 

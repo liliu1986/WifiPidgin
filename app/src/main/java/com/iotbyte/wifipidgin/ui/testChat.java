@@ -22,6 +22,7 @@ import com.iotbyte.wifipidgin.commmodule.MessageServer;
 import com.iotbyte.wifipidgin.commmodule.MessageServerService;
 import com.iotbyte.wifipidgin.friend.Friend;
 import com.iotbyte.wifipidgin.message.ChatMessage;
+import com.iotbyte.wifipidgin.nsdmodule.NsdClient;
 import com.iotbyte.wifipidgin.nsdmodule.NsdWrapper;
 
 import java.net.InetAddress;
@@ -168,7 +169,7 @@ public class testChat extends ActionBarActivity implements View.OnClickListener{
 
                     if (mMessageClient != null){
                         Log.d(TAG, "Sending the msg Now!!!");
-                        mMessageClient.sendMsg(destIP, port, chatManager.dequeueOutGoingMessageQueue());
+                       // mMessageClient.sendMsg(destIP, port, chatManager.dequeueOutGoingMessageQueue());
                     } else {
                         Log.e(TAG, "The message client has not been initialized yet!!!");
                     }

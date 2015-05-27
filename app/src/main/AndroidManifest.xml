@@ -63,6 +63,10 @@
             android:name=".chat.IncomingMessageHandlingService"
             android:icon="@drawable/ic_launcher"
             android:label="@string/incoming_message_handler_service"></service>
+        <service
+            android:name=".chat.OutgoingMessageHandlingService"
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/outgoing_message_handling_service"></service>
     </application>
 
 </manifest>
