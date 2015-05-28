@@ -13,8 +13,8 @@ import org.json.JSONException;
 
 import java.net.UnknownHostException;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * ChatManager is the singleton to manage all chat .
@@ -37,8 +37,8 @@ public class ChatManager {
     private MessageClient messageClient;
 
     private ChatManager() {
-        outGoingMessageQueue = new LinkedList<>();
-        incomingMessageQueue = new LinkedList<>();
+        outGoingMessageQueue = new ConcurrentLinkedQueue<>();
+        incomingMessageQueue = new ConcurrentLinkedQueue<>();
         chatMap = new HashMap<>();
         messageClient = new MessageClient();
     }
