@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.iotbyte.wifipidgin.chat.ChatManager;
 import com.iotbyte.wifipidgin.friend.Friend;
+import com.iotbyte.wifipidgin.message.FriendCreationRequest;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -49,6 +51,10 @@ public class FriendCreationService extends Service  {
                         TimeUnit.MILLISECONDS.sleep(delayInterval);
                         Friend creatingFriend = nsdClientInstance.dequeueFriendCreationQueue();
                         Log.d(TAG, "Creating friend " + creatingFriend.getMac().toString());
+                        FriendCreationRequest CreationRequest = new FriendCreationRequest(creatingFriend);
+                        ChatManager chatManager = ChatManager.getInstance();
+                        chatManager.enqueueOutGoingMessageQueue(CreationRequest.convertMessageToJson());
+                        
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
