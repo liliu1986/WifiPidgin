@@ -5,6 +5,7 @@ import android.util.Log;
 import com.iotbyte.wifipidgin.commmodule.MessageClient;
 import com.iotbyte.wifipidgin.friend.Friend;
 import com.iotbyte.wifipidgin.message.ChatMessage;
+import com.iotbyte.wifipidgin.message.FriendCreationResponse;
 import com.iotbyte.wifipidgin.message.Message;
 import com.iotbyte.wifipidgin.message.MessageFactory;
 import com.iotbyte.wifipidgin.message.MessageType;
@@ -133,6 +134,22 @@ public class ChatManager {
                     Chat chat = getChatByChannelIdentifier(((ChatMessage) message).getChannelIdentifier());
                     return chat.pushMessage((ChatMessage) message);
                 }
+            }
+            case FRIEND_CREATION_REQUEST:{
+                /*
+                When a friend creation request is processed, it should create a friend creation response and push it to
+                the outgoingQueue.
+                 */
+
+                //TODO:: try to use MessageFactory here later
+                FriendCreationResponse friendCreationResponse = new FriendCreationResponse(message.getSender());
+
+                if (null == friendCreationResponse){
+                    return false;
+                } else {
+                    return this.enqueueOutGoingMessageQueue(friendCreationResponse.convertMessageToJson());
+                }
+
             }
             default:
                 return false;
