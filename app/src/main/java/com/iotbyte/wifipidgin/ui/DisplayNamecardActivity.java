@@ -71,7 +71,7 @@ public class DisplayNamecardActivity extends ActionBarActivity implements View.O
             //Set the user image
             File imgFile = new  File(inFriend.getImagePath());
             ImageView myImage = (ImageView) findViewById(R.id.user_image);
-            myImage.setOnClickListener(this);
+            //myImage.setOnClickListener(this);
 
 
             if(imgFile.exists()){
@@ -181,65 +181,8 @@ public class DisplayNamecardActivity extends ActionBarActivity implements View.O
 
                 //@TODO Start activity to chat
 
-            case R.id.user_image :
-                Log.d(TAG, "The path is " + getExternalFilesDir(null).toString());
-                showFileChooser();
-
         }
     }
 
-    private static final int FILE_SELECT_CODE = 0;
-
-    private void showFileChooser() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("*/*");
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-
-        try {
-            startActivityForResult(
-                    Intent.createChooser(intent, "Select a image to represent yourself"),
-                    FILE_SELECT_CODE);
-        } catch (android.content.ActivityNotFoundException ex) {
-            // Potentially direct the user to the Market with a Dialog
-            Toast.makeText(this, "Please install a File Manager.",
-                    Toast.LENGTH_SHORT).show();
-        }
-    }
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case FILE_SELECT_CODE:
-                if (resultCode == RESULT_OK) {
-                    // Get the Uri of the selected file
-                    Uri uri = data.getData();
-                    Log.d(TAG, "File Uri: " + uri.toString());
-                    // Get the path
-                    String path = null;
-
-                    path = Utils.getRealPathFromURI(this, uri);
-                    Log.d(TAG, "File Path: " + path);
-                    //
-                    File imgFile = new File(path);
-                    if (imgFile.exists()) {
-                        //Save the path for the current user
-                        inFriend.setImagePath(path);
-                        fd.update(inFriend);
-
-                        Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                        ImageView myImage = (ImageView) findViewById(R.id.user_image);
-                        myImage.setImageBitmap(myBitmap);
-                    } else {
-                        Log.d(TAG, "File Not Found!! ");
-                    }
-
-
-                    // Get the file instance
-                    // File file = new File(path);
-                    // Initiate the upload
-                }
-                break;
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-    }
 
 }
