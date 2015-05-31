@@ -111,7 +111,8 @@ public class ChannelManager {
     /**
      * addChannel()
      * <p/>
-     * Add a channel to the ChannelManager
+     * Add a channel to the ChannelManager and also add to the database by
+     * calling saveAChannelToDataBase()
      * Require update the UI when return true
      *
      * @param channel the channel to be added
@@ -121,8 +122,11 @@ public class ChannelManager {
         if (channelMap.containsKey(channel)) {
             return false;
         } else {
-            channelMap.put(channel.getChannelIdentifier(), channel);
-            return true;
+            if (saveAChannelToDataBase(channel)){
+                channelMap.put(channel.getChannelIdentifier(), channel);
+                return true;
+            }
+           return false;
         }
     }
 
