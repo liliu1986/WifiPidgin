@@ -9,7 +9,7 @@ import android.util.Log;
 import com.iotbyte.wifipidgin.dao.DaoError;
 import com.iotbyte.wifipidgin.dao.FriendDao;
 import com.iotbyte.wifipidgin.dao.event.DaoEvent;
-import com.iotbyte.wifipidgin.dao.event.DaoEventPublisher;
+import com.iotbyte.wifipidgin.dao.event.DaoEventBoard;
 import com.iotbyte.wifipidgin.dao.event.DaoEventSubscriber;
 import com.iotbyte.wifipidgin.datasource.sqlite.WifiPidginSqliteHelper;
 import com.iotbyte.wifipidgin.friend.Friend;
@@ -23,13 +23,15 @@ import java.util.List;
 /**
  * SQLite implementation of FriendDao
  */
-public class FriendSqliteDao implements FriendDao, DaoEventPublisher {
+public class FriendSqliteDao implements FriendDao {
     /**
      * Constructor
      * @param context Context
+     * @param eventBoard event board to post Dao events to.
      */
-    public FriendSqliteDao(Context context) {
+    public FriendSqliteDao(Context context, DaoEventBoard eventBoard) {
         this.sqliteHelper = new WifiPidginSqliteHelper(context);
+        this.eventBoard = eventBoard;
     }
 
     @Override
@@ -44,9 +46,9 @@ public class FriendSqliteDao implements FriendDao, DaoEventPublisher {
             if (rowId == -1) {
                 return DaoError.ERROR_SAVE;
             }
-            notifySubscribers(DaoEvent.FRIEND_LIST_CHANGED);
+            eventBoard.postEvent(DaoEvent.FRIEND_LIST_CHANGED);
             if (friend.isFavourite()) {
-                notifySubscribers(DaoEvent.FRIEND_FAVOURITE_CHANGED);
+                eventBoard.postEvent(DaoEvent.FRIEND_FAVOURITE_CHANGED);
             }
         } finally {
             db.close();
@@ -69,9 +71,9 @@ public class FriendSqliteDao implements FriendDao, DaoEventPublisher {
                 return DaoError.ERROR_NO_RECORD;
             }
             assert rows == 1;
-            notifySubscribers(DaoEvent.FRIEND_LIST_CHANGED);
+            eventBoard.postEvent(DaoEvent.FRIEND_LIST_CHANGED);
             if (deletingFriend.isFavourite()) {
-                notifySubscribers(DaoEvent.FRIEND_FAVOURITE_CHANGED);
+                eventBoard.postEvent(DaoEvent.FRIEND_FAVOURITE_CHANGED);
             }
         } finally {
             db.close();
@@ -99,11 +101,11 @@ public class FriendSqliteDao implements FriendDao, DaoEventPublisher {
                 return DaoError.ERROR_NO_RECORD;
             }
             assert rows == 1;
-            notifySubscribers(DaoEvent.FRIEND_LIST_CHANGED);
+            eventBoard.postEvent(DaoEvent.FRIEND_LIST_CHANGED);
             // Notify subscriber on favourite changed if the new record's favor
             // status isn't the same as the old one.
             if (friend.isFavourite() != updatingFriend.isFavourite()) {
-                notifySubscribers(DaoEvent.FRIEND_FAVOURITE_CHANGED);
+                eventBoard.postEvent(DaoEvent.FRIEND_FAVOURITE_CHANGED);
             }
         } finally {
             db.close();
@@ -195,21 +197,8 @@ public class FriendSqliteDao implements FriendDao, DaoEventPublisher {
     }
 
     @Override
-    public void registerEventSubscriber(DaoEventSubscriber subscriber) {
-        assert subscriber != null;
-        daoEventSubscribers.add(subscriber);
-    }
-
-    @Override
-    public DaoEventPublisher getDaoEventPublisher() {
-        return this;
-    }
-
-    @Override
-    public void notifySubscribers(DaoEvent event) {
-        for (DaoEventSubscriber subscriber : daoEventSubscribers) {
-            subscriber.onEvent(event);
-        }
+    public DaoEventBoard getDaoEventBoard() {
+        return eventBoard;
     }
 
     static final String FRIEND_TABLE = "friend";
@@ -237,8 +226,8 @@ public class FriendSqliteDao implements FriendDao, DaoEventPublisher {
 
     /** Database helper for db operation */
     private WifiPidginSqliteHelper sqliteHelper;
-    /** List of subscribers to be notified about Dao events */
-    private List<DaoEventSubscriber> daoEventSubscribers = new ArrayList<DaoEventSubscriber>();
+    /** Dao event board to post events to */
+    private final DaoEventBoard eventBoard;
 
     /**
      * Helper method to turn Friend object into ContentValues for writing to database.

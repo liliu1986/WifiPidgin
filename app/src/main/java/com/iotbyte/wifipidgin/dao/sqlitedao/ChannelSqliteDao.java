@@ -11,7 +11,7 @@ import com.iotbyte.wifipidgin.dao.ChannelDao;
 import com.iotbyte.wifipidgin.dao.DaoError;
 import com.iotbyte.wifipidgin.dao.DaoFactory;
 import com.iotbyte.wifipidgin.dao.event.DaoEvent;
-import com.iotbyte.wifipidgin.dao.event.DaoEventPublisher;
+import com.iotbyte.wifipidgin.dao.event.DaoEventBoard;
 import com.iotbyte.wifipidgin.dao.event.DaoEventSubscriber;
 import com.iotbyte.wifipidgin.datasource.sqlite.WifiPidginSqliteHelper;
 import com.iotbyte.wifipidgin.friend.Friend;
@@ -22,15 +22,15 @@ import java.util.List;
 /**
  * SQLite implementation of ChannelDao
  */
-public class ChannelSqliteDao implements ChannelDao, DaoEventPublisher {
+public class ChannelSqliteDao implements ChannelDao {
     /**
      * Constructor
      * @param context Context
      */
-    public ChannelSqliteDao(Context context) {
+    public ChannelSqliteDao(Context context, DaoEventBoard eventBoard) {
         this.context = context;
         this.sqliteHelper = new WifiPidginSqliteHelper(context);
-        this.daoEventSubscribers = new ArrayList<>();
+        this.eventBoard = eventBoard;
     }
 
     @Override
@@ -60,7 +60,7 @@ public class ChannelSqliteDao implements ChannelDao, DaoEventPublisher {
                 }
             }
             db.setTransactionSuccessful();
-            notifySubscribers(DaoEvent.CHANNEL_LIST_CHANGED);
+            eventBoard.postEvent(DaoEvent.CHANNEL_LIST_CHANGED);
         } finally {
             db.endTransaction();
             db.close();
@@ -80,7 +80,7 @@ public class ChannelSqliteDao implements ChannelDao, DaoEventPublisher {
                 return DaoError.ERROR_NO_RECORD;
             }
             assert rows == 1;
-            notifySubscribers(DaoEvent.CHANNEL_LIST_CHANGED);
+            eventBoard.postEvent(DaoEvent.CHANNEL_LIST_CHANGED);
         } finally {
             db.close();
         }
@@ -160,7 +160,7 @@ public class ChannelSqliteDao implements ChannelDao, DaoEventPublisher {
                 }
             }
             db.setTransactionSuccessful();
-            notifySubscribers(DaoEvent.CHANNEL_LIST_CHANGED);
+            eventBoard.postEvent(DaoEvent.CHANNEL_LIST_CHANGED);
         } finally {
             db.endTransaction();
             db.close();
@@ -236,21 +236,8 @@ public class ChannelSqliteDao implements ChannelDao, DaoEventPublisher {
     }
 
     @Override
-    public void registerEventSubscriber(DaoEventSubscriber subscriber) {
-        assert subscriber != null;
-        daoEventSubscribers.add(subscriber);
-    }
-
-    @Override
-    public void notifySubscribers(DaoEvent event) {
-        for (DaoEventSubscriber subscriber : daoEventSubscribers) {
-            subscriber.onEvent(event);
-        }
-    }
-
-    @Override
-    public DaoEventPublisher getDaoEventPublisher() {
-        return this;
+    public DaoEventBoard getDaoEventBoard() {
+        return eventBoard;
     }
 
     static final String CHANNEL_TABLE = "channel";
@@ -273,8 +260,8 @@ public class ChannelSqliteDao implements ChannelDao, DaoEventPublisher {
     private Context context;
     /** Database helper for db operation */
     private WifiPidginSqliteHelper sqliteHelper;
-    /** List of subscribers to be notified about Dao events */
-    private List<DaoEventSubscriber> daoEventSubscribers;
+    /** Dao event board to post events to */
+    private final DaoEventBoard eventBoard;
 
     /**
      * Helper method to turn Channel object into ContentValues for writing to database.

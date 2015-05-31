@@ -2,11 +2,12 @@ package com.iotbyte.wifipidgin.channel;
 
 
 import android.content.Context;
-import android.util.Log;
 
 import com.iotbyte.wifipidgin.dao.ChannelDao;
 import com.iotbyte.wifipidgin.dao.DaoFactory;
 import com.iotbyte.wifipidgin.dao.FriendDao;
+import com.iotbyte.wifipidgin.dao.event.DaoEvent;
+import com.iotbyte.wifipidgin.dao.event.DaoEventSubscriber;
 import com.iotbyte.wifipidgin.friend.Friend;
 
 import java.net.InetAddress;
@@ -31,61 +32,39 @@ public class ChannelManager {
     private Context context;
 
     private HashMap<String, Channel> channelMap; // channelIdentifier and Channel pair
-    //FIXME:: remove UnknowHostExceptions after remove mock code
-    private ChannelManager(Context context) throws UnknownHostException{
+
+    private ChannelDatabaseChangeListener channelDatabaseChangeListener;
+
+    private ChannelManager(Context context) {
         this.context = context;
+
+        ChannelDao channelDao  = DaoFactory.getInstance().getChannelDao(this.context,DaoFactory.DaoType.SQLITE_DAO, null);
+
+        /* In the event that some where else update the Channel Information in database, update the Channel Information
+        from database, and notify the UI to update (notify UI require UI side to registrant this listener */
+        channelDao.getDaoEventBoard().registerEventSubscriber(new DaoEventSubscriber() {
+            @Override
+            public void onEvent(DaoEvent event) {
+                updateChannelInfoFromDatabase();
+                if (null != channelDatabaseChangeListener) {
+                    channelDatabaseChangeListener.onChannelDatabaseChange();
+                }
+            }
+        });
+
 
         //Calling database to grep existing channelList
         // or create a new channelList if there is nothing been retrieved
-
-        //TODO: remove the mocked channelList
-        //TODO: Adding channelList retrieval functionality from database
-
-        InetAddress xiaoMingIP = InetAddress.getByName("192.168.1.2");
-        byte[] xiaoMingMac = {0x5,0xc,0x0,0xa,0x5,0xb,0x4,0x8,0x4,0x5,0x4,0x6};
-        int xiaoMingPort = 55;
-        Friend xiaoMing = new Friend(xiaoMingMac,xiaoMingIP,xiaoMingPort);
-        xiaoMing.setDescription("wo shi huang xiao ming");
-        xiaoMing.setName("HXM");
-
-        InetAddress xiaoPangIP = InetAddress.getByName("192.168.1.179");
-        byte[] xiaoPangMac = {0x5,0xc,0x0,0xa,0x5,0xb,0xa,0xa,0xc,0xa,0xc,0x5};
-        int xiaoPangPort = 55;
-        Friend xiaoPang = new Friend(xiaoPangMac,xiaoPangIP,xiaoPangPort);
-        xiaoPang.setDescription("wo shi xiao pang");
-        xiaoPang.setName("stackHeap");
-
-        FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO,null);
-        fd.add(xiaoMing);
-        fd.add(xiaoPang);
-        Log.d(CHANNEL_MANAGER_DEBUG,"the id of xiaoMing is "+ xiaoMing.getId());
-        Log.d(CHANNEL_MANAGER_DEBUG, "the id of xiaoPang is " + xiaoPang.getId());
-
-
-        List<Friend> mockList = new ArrayList<>();
-        mockList.add(xiaoMing);
-        mockList.add(xiaoPang);
-        Channel mockChannel = new Channel(mockList,"xiao channel","heiheihei");
-        //save mocked channels;
-        ChannelDao cd = DaoFactory.getInstance().getChannelDao(context,DaoFactory.DaoType.SQLITE_DAO,null);
-        cd.add(mockChannel);
-        Log.d(CHANNEL_MANAGER_DEBUG,"the id of mockChannel is "+mockChannel.getId());
-
-
-        //below is not mocked!!!!
         channelMap = new HashMap<>();
 
+        updateChannelInfoFromDatabase();
+        //TODO: remove the mocked channelList
+        mockChannelInfo();
 
-        List<Channel> channelList =
-            DaoFactory.getInstance().getChannelDao(context, DaoFactory.DaoType.SQLITE_DAO, null).findAll();
-
-        for (Channel aChannel:channelList){
-            channelMap.put(aChannel.getChannelIdentifier(),aChannel);
-        }
 
     }
-    //FixME: remove unknowHostException
-    public static ChannelManager getInstance(Context context) throws UnknownHostException{
+
+    public static ChannelManager getInstance(Context context) {
         if (instance == null) {
             //Thread Safe with synchronized block
             synchronized (ChannelManager.class) {
@@ -95,20 +74,6 @@ public class ChannelManager {
             }
         }
         return instance;
-    }
-
-    /**
-     * saveChannelsInfoIntoDatabase()
-     * <p/>
-     * It will save all information back to the database, this should be called
-     * properly to retain all channel information
-     *
-     * @return true if all channel information is saved successfully, false otherwise.
-     */
-
-    //TODO: adding implementation to add all channels back to database
-    public boolean saveChannelsInfoIntoDatabase() {
-        return true;
     }
 
     /**
@@ -192,5 +157,115 @@ public class ChannelManager {
         return result;
     }
 
+    /**
+     * updateChannelInfoFromDatabase()
+     * <p/>
+     * Update the channel information by retrieves all Channels from database
+     *
+     * @return true if success, false otherwise
+     */
 
+    public boolean updateChannelInfoFromDatabase() {
+        ChannelDao cd = DaoFactory.getInstance().getChannelDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
+        if (null == cd) return false;
+        List<Channel> channelList = cd.findAll();
+
+
+        for (Channel aChannel : channelList) {
+            channelMap.put(aChannel.getChannelIdentifier(), aChannel);
+        }
+
+        return true;
+    }
+
+    /**
+     * saveChannelInfoToDataBase()
+     * <p/>
+     * save all existing channel information back to the database. Use as front-end activity life cycle
+     * management API
+     *
+     * @return true if success, false otherwise
+     */
+
+    //TODO: where friend information should be updated? I mean the ip changes
+    public boolean saveChannelInfoToDataBase() {
+
+        ChannelDao cd = DaoFactory.getInstance().getChannelDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
+        FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
+
+        if (null == cd || null == fd) {
+            return false;
+        }
+
+        List<Channel> channels = getChannelList();
+
+        //TODO:: require optimization, as O^2 is not acceptable!
+        for (Channel channel : channels) {
+            for (Friend friend : channel.getFriendsList()) {
+                if (friend.NO_ID == friend.getId()) {
+                    fd.add(friend);
+                } else {
+                    fd.update(friend); //TODO:: might need to change this depends on how to handles friend update
+                }
+            }
+            if (channel.NO_ID == channel.getId()) {
+                cd.add(channel);
+            } else {
+                cd.update(channel);   //TODO:: might need to change this depends on how to handles channel update
+            }
+        }
+        return true;
+    }
+
+    /**
+     * mockChannelInfo()
+     * <p/>
+     * some mocked channel Info
+     */
+    private void mockChannelInfo() {
+        FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
+        if (1 == fd.findAll().size()) {
+
+            try {
+                InetAddress xiaoMingIP = InetAddress.getByName("192.168.1.2");
+                byte[] xiaoMingMac = {0x5, 0xc, 0x0, 0xa, 0x5, 0xb, 0x4, 0x8, 0x4, 0x5, 0x4, 0x6};
+                int xiaoMingPort = 55;
+                Friend xiaoMing = new Friend(xiaoMingMac, xiaoMingIP, xiaoMingPort);
+                xiaoMing.setDescription("wo shi huang xiao ming");
+                xiaoMing.setName("HXM");
+
+                InetAddress xiaoPangIP = InetAddress.getByName("192.168.1.179");
+                byte[] xiaoPangMac = {0x5, 0xc, 0x0, 0xa, 0x5, 0xb, 0xa, 0xa, 0xc, 0xa, 0xc, 0x5};
+                int xiaoPangPort = 55;
+                Friend xiaoPang = new Friend(xiaoPangMac, xiaoPangIP, xiaoPangPort);
+                xiaoPang.setDescription("wo shi xiao pang");
+                xiaoPang.setName("stackHeap");
+                List<Friend> mockList = new ArrayList<>();
+                mockList.add(xiaoMing);
+                mockList.add(xiaoPang);
+                String channelName = "xiao channel";
+                Channel mockChannel = new Channel(mockList, channelName, "heiheihei");
+                //just a work around for mock data:
+           /* boolean existFlag = false;
+            for(Channel channel : DaoFactory.getInstance().getChannelDao(context, DaoFactory.DaoType.SQLITE_DAO, null).findAll()){
+                if (0 == channel.getName().compareTo(channelName)){
+                    existFlag = true;
+                    break;
+                }
+            }
+            if (!existFlag){
+                this.addChannel(mockChannel);
+            }*/
+                this.addChannel(mockChannel);
+            } catch (UnknownHostException ex) {
+                ex.printStackTrace();
+            }
+
+            saveChannelInfoToDataBase();
+        }
+    }
+
+    public void setChannelDatabaseChangeListener(ChannelDatabaseChangeListener listener){
+        this.channelDatabaseChangeListener = listener;
+    }
 }
