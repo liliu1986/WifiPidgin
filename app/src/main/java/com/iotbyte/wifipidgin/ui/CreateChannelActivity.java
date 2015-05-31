@@ -28,11 +28,14 @@ public class CreateChannelActivity extends Activity {
     final Context context = this;
     ListView lv;
     TextView tv;
+    ChannelManager channelManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_channel);
+
+        channelManager = ChannelManager.getInstance(context);
 
         Button buttonCreateChannel = (Button) findViewById(R.id.buttonCreateChannel);
         Button buttonCancel = (Button) findViewById(R.id.buttonCancel);
@@ -70,7 +73,7 @@ public class CreateChannelActivity extends Activity {
 
                 Channel newChannel = new Channel(channelFriendList, channelName, channelName);
                 //save new channel;
-                ChannelManager.getInstance(lv.getContext()).addChannel(newChannel);
+                channelManager.addChannel(newChannel);
 
                 finish();
             }

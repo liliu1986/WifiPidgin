@@ -64,9 +64,6 @@ public class DeleteChannelActivity extends Activity {
                                     currentChannel = (Channel) lv.getAdapter().getItem(selectedChannels.keyAt(i));
                                     Log.d(DELETE_CHANNEL_ACT, currentChannel.toString() + " was selected");
                                     channelManager.deleteChannel(currentChannel);
-
-                                    //TODO: Remove after channel manager implements single database delete
-                                    cd.delete(currentChannel.getId());
                                 }
                             }
                         }
