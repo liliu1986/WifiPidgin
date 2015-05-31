@@ -4,6 +4,7 @@ package com.iotbyte.wifipidgin.channel;
 import android.content.Context;
 
 import com.iotbyte.wifipidgin.dao.ChannelDao;
+import com.iotbyte.wifipidgin.dao.DaoError;
 import com.iotbyte.wifipidgin.dao.DaoFactory;
 import com.iotbyte.wifipidgin.dao.FriendDao;
 import com.iotbyte.wifipidgin.dao.event.DaoEvent;
@@ -129,7 +130,7 @@ public class ChannelManager {
      * deleteChannel()
      * <p/>
      * Remove a channel from ChannelManager
-     * Require update the UI when return true
+     * Require update the UI when return true, the channel is also removed from database
      *
      * @param channel the channel to be deleted
      * @return true for successfully delete or false for channel does not exist previously.
@@ -138,8 +139,13 @@ public class ChannelManager {
         if (!channelMap.containsKey(channel)) {
             return false;
         } else {
-            channelMap.remove(channel.getChannelIdentifier());
-            return true;
+            ChannelDao cd = DaoFactory.getInstance().getChannelDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
+            DaoError error = cd.delete(channel.getId());
+            if (DaoError.NO_ERROR == error){
+                channelMap.remove(channel.getChannelIdentifier());
+                return true;
+            }
+            return false;
         }
     }
 
@@ -214,6 +220,38 @@ public class ChannelManager {
                 cd.update(channel);   //TODO:: might need to change this depends on how to handles channel update
             }
         }
+        return true;
+    }
+
+    /**
+     * saveAChannelToDataBase()
+     *
+     * Save a specific channel into the database
+     *
+     * @param channel: a channel to be saved
+     * @return true if the channel is saved successfully
+     */
+    public boolean saveAChannelToDataBase(Channel channel){
+        ChannelDao cd = DaoFactory.getInstance().getChannelDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
+        FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
+
+        if (null == cd || null == fd) {
+            return false;
+        }
+
+        for (Friend friend : channel.getFriendsList()){
+            if (friend.NO_ID == friend.getId()) {
+                fd.add(friend);
+            } else {
+                fd.update(friend); //TODO:: might need to change this depends on how to handles friend update
+            }
+        }
+        if (channel.NO_ID == channel.getId()) {
+            cd.add(channel);
+        } else {
+            cd.update(channel);   //TODO:: might need to change this depends on how to handles channel update
+        }
+
         return true;
     }
 
