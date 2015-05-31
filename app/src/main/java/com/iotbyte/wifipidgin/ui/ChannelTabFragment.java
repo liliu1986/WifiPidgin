@@ -90,7 +90,6 @@ public class ChannelTabFragment extends Fragment {
 
     public void refreshChannelList() {
         adapter.clear();
-        Log.i("test", "refreshed list");
         adapter.addAll(channelManager.getChannelList());
         adapter.notifyDataSetChanged();
     }

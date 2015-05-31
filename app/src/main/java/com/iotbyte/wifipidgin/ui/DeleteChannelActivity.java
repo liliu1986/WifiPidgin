@@ -63,7 +63,9 @@ public class DeleteChannelActivity extends Activity {
                                 if (selectedChannels.valueAt(i)) {
                                     currentChannel = (Channel) lv.getAdapter().getItem(selectedChannels.keyAt(i));
                                     Log.d(DELETE_CHANNEL_ACT, currentChannel.toString() + " was selected");
-                                    channelManager.deleteChannel(currentChannel);
+                                    if (!channelManager.deleteChannel(currentChannel)) {
+                                        Log.e(DELETE_CHANNEL_ACT, "Error occurred during deleting Channel" + currentChannel.toString());
+                                    }
                                 }
                             }
                         }
