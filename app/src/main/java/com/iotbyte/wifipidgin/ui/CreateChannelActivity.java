@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 import com.iotbyte.wifipidgin.R;
 import com.iotbyte.wifipidgin.channel.Channel;
-import com.iotbyte.wifipidgin.dao.ChannelDao;
+import com.iotbyte.wifipidgin.channel.ChannelManager;
 import com.iotbyte.wifipidgin.dao.DaoFactory;
 import com.iotbyte.wifipidgin.friend.Friend;
 
@@ -39,7 +39,7 @@ public class CreateChannelActivity extends Activity {
 
         tv = (TextView) findViewById(R.id.enterChannelName);
         // populate list view
-        ArrayAdapter<Friend> aa = (new ArrayAdapter<Friend>(this, android.R.layout.simple_list_item_multiple_choice, DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null).findAll()));
+        ArrayAdapter<Friend> aa = (new ArrayAdapter<>(this, android.R.layout.simple_list_item_multiple_choice, DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null).findAll()));
         lv = (ListView) findViewById(android.R.id.list);
         lv.setAdapter(aa);
 
@@ -70,8 +70,7 @@ public class CreateChannelActivity extends Activity {
 
                 Channel newChannel = new Channel(channelFriendList, channelName, channelName);
                 //save new channel;
-                ChannelDao cd = DaoFactory.getInstance().getChannelDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
-                cd.add(newChannel);
+                ChannelManager.getInstance(lv.getContext()).addChannel(newChannel);
 
                 finish();
             }

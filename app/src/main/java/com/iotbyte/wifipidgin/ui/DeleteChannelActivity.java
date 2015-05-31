@@ -17,7 +17,6 @@ import com.iotbyte.wifipidgin.channel.Channel;
 import com.iotbyte.wifipidgin.channel.ChannelManager;
 import com.iotbyte.wifipidgin.dao.ChannelDao;
 import com.iotbyte.wifipidgin.dao.DaoFactory;
-import com.iotbyte.wifipidgin.friend.Friend;
 
 
 public class DeleteChannelActivity extends Activity {
@@ -25,20 +24,23 @@ public class DeleteChannelActivity extends Activity {
     final String DELETE_CHANNEL_ACT = "Delete Channel Activity";
     final Context context = this;
     ListView lv;
+    ChannelManager channelManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_delete_channel);
 
+        channelManager = ChannelManager.getInstance(context);
+
         Button buttonDeleteChannel = (Button) findViewById(R.id.buttonDeleteChannel);
         Button buttonCancel = (Button) findViewById(R.id.buttonCancel);
 
         // populate list view
 
-            ArrayAdapter<Channel> aa = (new ArrayAdapter<Channel>(this, android.R.layout.simple_list_item_multiple_choice, ChannelManager.getInstance(context).getChannelList()));
-            lv = (ListView) findViewById(android.R.id.list);
-            lv.setAdapter(aa);
+        ArrayAdapter<Channel> aa = (new ArrayAdapter<>(this, android.R.layout.simple_list_item_multiple_choice, channelManager.getChannelList()));
+        lv = (ListView) findViewById(android.R.id.list);
+        lv.setAdapter(aa);
 
 
         // listen to button click to delete channel
@@ -61,6 +63,9 @@ public class DeleteChannelActivity extends Activity {
                                 if (selectedChannels.valueAt(i)) {
                                     currentChannel = (Channel) lv.getAdapter().getItem(selectedChannels.keyAt(i));
                                     Log.d(DELETE_CHANNEL_ACT, currentChannel.toString() + " was selected");
+                                    channelManager.deleteChannel(currentChannel);
+
+                                    //TODO: Remove after channel manager implements single database delete
                                     cd.delete(currentChannel.getId());
                                 }
                             }
