@@ -5,6 +5,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.MANAGE_DOCUMENTS" />
+
 
     <application
         android:allowBackup="true"
@@ -41,6 +43,17 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.EditUserProfileActivity"
+            android:label="@string/title_edit_user_profile"
+            android:theme="@style/Theme.AppCompat.Light">
+            <intent-filter>
+                <action android:name=".ui.EditUserProfileActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".ui.SettingsActivity"
             android:label="@string/title_activity_settings"></activity>
@@ -59,6 +72,7 @@
             android:name=".commmodule.MessageServerService"
             android:icon="@drawable/ic_launcher"
             android:label="@string/message_server_service_name"></service>
+
     </application>
 
 </manifest>
