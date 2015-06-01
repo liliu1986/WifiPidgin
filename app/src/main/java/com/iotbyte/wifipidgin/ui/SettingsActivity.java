@@ -68,7 +68,7 @@ public class SettingsActivity extends PreferenceActivity {
         // Bind the summaries of EditText/List/Dialog/Ringtone preferences to
         // their values. When their values change, their summaries are updated
         // to reflect the new value, per the Android Design guidelines.
-        bindPreferenceSummaryToValue(findPreference("user_display_name"));
+        //bindPreferenceSummaryToValue(findPreference("user_display_name"));
         bindPreferenceSummaryToValue(findPreference("visibility_checkbox"));
 
     }
@@ -162,12 +162,7 @@ public class SettingsActivity extends PreferenceActivity {
         // Trigger the listener immediately with the preference's
         // current value.
 
-        if (preference.getKey().equals("user_display_name")){
-            sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
-                    PreferenceManager
-                            .getDefaultSharedPreferences(preference.getContext())
-                            .getString(preference.getKey(), ""));
-        } else if (preference.getKey().equals("visibility_checkbox")){
+        if (preference.getKey().equals("visibility_checkbox")){
             sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
                     PreferenceManager.getDefaultSharedPreferences(preference.getContext()).getBoolean(preference.getKey(), false));
         }
@@ -189,7 +184,7 @@ public class SettingsActivity extends PreferenceActivity {
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(findPreference("user_display_name"));
+            //bindPreferenceSummaryToValue(findPreference("user_display_name"));
             bindPreferenceSummaryToValue(findPreference("visibility_checkbox"));
         }
     }

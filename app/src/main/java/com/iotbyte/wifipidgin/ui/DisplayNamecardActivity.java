@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -24,10 +25,12 @@ import com.iotbyte.wifipidgin.friend.Friend;
 import com.iotbyte.wifipidgin.utils.Utils;
 
 import java.io.File;
+import java.net.URISyntaxException;
 
 public class DisplayNamecardActivity extends ActionBarActivity implements View.OnClickListener {
 
     public final static String EXTRA_MESSAGE = "com.iotbyte.wifipidgin.NAMECARD";
+    public final static String EXTRA_MESSAGE_USERMAC = "com.iotbyte.wifipidgin.NAMECARD.USERMAC";
 
     FriendDao fd;
     String userName = "Default User Name";
@@ -38,8 +41,8 @@ public class DisplayNamecardActivity extends ActionBarActivity implements View.O
 
     private static final String TAG = "DisplayNameCard";
 
-
-
+    private String userMac = null;
+    private Friend inFriend = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -54,10 +57,10 @@ public class DisplayNamecardActivity extends ActionBarActivity implements View.O
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         //Get the user name from the intent
-        String userMac = intent.getStringExtra(EXTRA_MESSAGE);
+        userMac = intent.getStringExtra(EXTRA_MESSAGE);
         fd = DaoFactory.getInstance().getFriendDao(this.getApplicationContext(), DaoFactory.DaoType.SQLITE_DAO, null);
         Log.d(TAG, "Use MAC: "+ userMac);
-        Friend inFriend = fd.findByMacAddress(Utils.hexStringToByteArray(userMac));
+        inFriend = fd.findByMacAddress(Utils.hexStringToByteArray(userMac));
 
         if (inFriend != null) {
             userName = inFriend.getName();
@@ -68,6 +71,9 @@ public class DisplayNamecardActivity extends ActionBarActivity implements View.O
             //Set the user image
             File imgFile = new  File(inFriend.getImagePath());
             ImageView myImage = (ImageView) findViewById(R.id.user_image);
+            //myImage.setOnClickListener(this);
+
+
             if(imgFile.exists()){
                 Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
                 myImage.setImageBitmap(myBitmap);
@@ -177,5 +183,6 @@ public class DisplayNamecardActivity extends ActionBarActivity implements View.O
 
         }
     }
+
 
 }

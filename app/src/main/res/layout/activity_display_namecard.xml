@@ -24,7 +24,8 @@
         android:adjustViewBounds="true"
         android:scaleType="centerInside"
         android:layout_below="@+id/user_name"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:clickable="true" />
 
     <ImageButton
         android:layout_width="wrap_content"
