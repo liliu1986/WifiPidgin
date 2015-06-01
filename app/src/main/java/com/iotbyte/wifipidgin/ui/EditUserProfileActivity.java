@@ -13,7 +13,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,9 +21,12 @@ import com.iotbyte.wifipidgin.R;
 import com.iotbyte.wifipidgin.dao.DaoFactory;
 import com.iotbyte.wifipidgin.dao.FriendDao;
 import com.iotbyte.wifipidgin.friend.Friend;
-import com.iotbyte.wifipidgin.utils.Utils;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class EditUserProfileActivity extends ActionBarActivity implements View.OnClickListener {
 
@@ -35,7 +37,6 @@ public class EditUserProfileActivity extends ActionBarActivity implements View.O
     String userName = "Default User Name";
     String userDescription = "Default User Description";
     boolean userSaved = false;
-
     boolean userOnline = true;
 
     private static final String TAG = "EditUserProfile";
@@ -70,13 +71,18 @@ public class EditUserProfileActivity extends ActionBarActivity implements View.O
             ImageView myImage = (ImageView) findViewById(R.id.user_image);
             myImage.setOnClickListener(this);
 
-
+            //if image file exist, present it in the convertView.
             if(imgFile.exists()){
                 Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                myImage = (ImageView) findViewById(R.id.user_image);
                 myImage.setImageBitmap(myBitmap);
-            }else{
+
+            } else {
+                //if image file doesn't exist, present the default image.
                 myImage.setImageResource(R.drawable.default_user_image);
             }
+
+
             //Set the description in textView
             TextView userDescriptionTextView = (TextView) findViewById(R.id.user_description);
             if (null == userDescription){
@@ -192,24 +198,31 @@ public class EditUserProfileActivity extends ActionBarActivity implements View.O
                     Uri uri = data.getData();
                     Log.d(TAG, "File Uri: " + uri.toString());
                     // Get the path
-                    String path = null;
 
-                    path = Utils.getRealPathFromURI(this, uri);
-                    Log.d(TAG, "File Path: " + path);
-                    //
-                    File imgFile = new File(path);
-                    if (imgFile.exists()) {
-                        //Save the path for the current user
+                    String path = getExternalFilesDir(null).toString()+ File.separator+"myImage";
+                    File destFile = new File(path);
+                    saveFile(uri, destFile);
+
+                    File destFile2 = new File(path);
+
+                    if (destFile2.exists()){
+                        Log.d(TAG, "GOOD");
+                    } else {
+                        Log.d(TAG, "BAD");
+                    }
+
+                    //path = Utils.getRealPathFromURI(this, uri);
+                    Log.d(TAG, "File Path: " + uri.toString());
+
+                    //find friend's image by the ImagePath from DB.
+                    File imgFile = new  File(path);
+                    //if image file exist, present it in the convertView.
+                    if(imgFile.exists()){
                         inFriend.setImagePath(path);
-
-
                         Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
                         ImageView myImage = (ImageView) findViewById(R.id.user_image);
                         myImage.setImageBitmap(myBitmap);
-                    } else {
-                        Log.d(TAG, "File Not Found!! ");
                     }
-
 
                     // Get the file instance
                     // File file = new File(path);
@@ -219,5 +232,29 @@ public class EditUserProfileActivity extends ActionBarActivity implements View.O
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
+    private void saveFile(Uri sourceUri, File destination){
 
+        BufferedOutputStream bos = null;
+        InputStream imgFile = null;
+        try {
+            imgFile = getContentResolver().openInputStream(sourceUri);
+            bos = new BufferedOutputStream(new FileOutputStream(destination));
+
+            byte[] buf = new byte[1024];
+            imgFile.read(buf);
+            do {
+                bos.write(buf);
+            } while(imgFile.read(buf) != -1);
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }finally {
+            try {
+                if (imgFile != null) imgFile.close();
+                if (bos != null) bos.close();
+            } catch (IOException e) {
+
+            }
+        }
+    }
 }
