@@ -16,11 +16,14 @@ public class Chat {
 
     private final String channelIdentifier;
     private Queue<ChatMessage> chatMessageQueue;
+    private ChatMessageQueueChangeListener chatMessageQueueChangeListener;
 
     /* this queue manage all messages with in the chat, include outgoing and incoming message */
     public Chat(String channelIdentifier) {
         this.channelIdentifier = channelIdentifier;
         chatMessageQueue = new LinkedList<>();
+
+
     }
 
     /**
@@ -34,6 +37,14 @@ public class Chat {
         return channelIdentifier;
     }
 
+    /**
+     * getMessage()
+     *
+     * get a message from the chatMessageQueue, this should be called when the
+     * chatMessageQueueChangeListener fires a onChatMessageQueueNotEmpty() event;
+     *
+     * @return the chatMessage from the head of the queue
+     */
     public ChatMessage getMessage() {
         return chatMessageQueue.poll();
     }
@@ -48,6 +59,9 @@ public class Chat {
      * @return true if insert successfully, false otherwise
      */
     public boolean pushMessage(ChatMessage message) {
+        if (null != chatMessageQueueChangeListener){
+            chatMessageQueueChangeListener.onChatMessageQueueNotEmpty();
+        }
         return chatMessageQueue.offer(message);
     }
 
@@ -65,5 +79,14 @@ public class Chat {
         return ChatManager.getInstance().enqueueOutGoingMessageQueue(message.convertMessageToJson()) && this.pushMessage(message);
     }
 
-
+    /**
+     * setChatMessageQueueChangeListener()
+     *
+     * A setter method for ChatMessageQueueChangeListener
+     *
+     * @param chatMessageQueueChangeListener the listener to be set
+     */
+    public void setChatMessageQueueChangeListener(ChatMessageQueueChangeListener chatMessageQueueChangeListener) {
+        this.chatMessageQueueChangeListener = chatMessageQueueChangeListener;
+    }
 }
