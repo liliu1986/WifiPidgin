@@ -9,11 +9,6 @@ import com.iotbyte.wifipidgin.chat.ChatManager;
 import com.iotbyte.wifipidgin.friend.Friend;
 import com.iotbyte.wifipidgin.message.FriendCreationRequest;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -52,7 +47,7 @@ public class FriendCreationService extends Service  {
                         Friend creatingFriend = nsdClientInstance.dequeueFriendCreationQueue();
                         Log.d(TAG, "Creating friend " + creatingFriend.getMac().toString());
                         FriendCreationRequest CreationRequest = new FriendCreationRequest(creatingFriend);
-                        ChatManager chatManager = ChatManager.getInstance();
+                        ChatManager chatManager = ChatManager.getInstance(getApplicationContext());
                         chatManager.enqueueOutGoingMessageQueue(CreationRequest.convertMessageToJson());
                         
                     } catch (InterruptedException e) {

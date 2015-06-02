@@ -1,8 +1,10 @@
 package com.iotbyte.wifipidgin.chat;
 
-import android.util.Log;
+import android.content.Context;
 
 import com.iotbyte.wifipidgin.commmodule.MessageClient;
+import com.iotbyte.wifipidgin.dao.DaoFactory;
+import com.iotbyte.wifipidgin.dao.FriendDao;
 import com.iotbyte.wifipidgin.friend.Friend;
 import com.iotbyte.wifipidgin.message.ChatMessage;
 import com.iotbyte.wifipidgin.message.FriendCreationResponse;
@@ -37,19 +39,22 @@ public class ChatManager {
 
     private MessageClient messageClient;
 
-    private ChatManager() {
+    private Context context;
+
+    private ChatManager(Context context) {
+        this.context = context;
         outGoingMessageQueue = new ConcurrentLinkedQueue<>();
         incomingMessageQueue = new ConcurrentLinkedQueue<>();
         chatMap = new HashMap<>();
         messageClient = new MessageClient();
     }
 
-    public static ChatManager getInstance() {
+    public static ChatManager getInstance(Context context) {
         if (instance == null) {
             //Thread Safe with synchronized block
             synchronized (ChatManager.class) {
                 if (instance == null) {
-                    instance = new ChatManager();
+                    instance = new ChatManager(context);
                 }
             }
         }
@@ -70,7 +75,7 @@ public class ChatManager {
 
     /**
      * dequeueOutGoingMessageQueue()
-     *
+     * <p/>
      * It remove the message from the outgoingMessageQueue and send it via messageClient.
      *
      * @return true if the message is dequeue properly from outgoingMessageQueue and send via messageClient,
@@ -87,11 +92,11 @@ public class ChatManager {
         }
         try {
             Friend receiver = MessageFactory.buildMessageByJson(message).getReceiver();
-            messageClient.sendMsg(receiver.getIp(),receiver.getPort() , message);
+            messageClient.sendMsg(receiver.getIp(), receiver.getPort(), message);
             return true;
         } catch (JSONException ex) {  //FIXME:: require better exception handle!!!
             ex.printStackTrace();
-        }catch (UnknownHostException ex){
+        } catch (UnknownHostException ex) {
             ex.printStackTrace();
         }
 
@@ -125,7 +130,7 @@ public class ChatManager {
         if (null == message || message.getType() == MessageType.ERROR) {
             return false;
         }
-        Log.v("test chat", "successfully handled!!!");
+        //Log.v("test chat", "successfully handled!!!");
         switch (message.getType()) {
             case CHAT_MESSAGE: {
                 if (!chatMap.containsKey(((ChatMessage) message).getChannelIdentifier())) {
@@ -135,7 +140,7 @@ public class ChatManager {
                     return chat.pushMessage((ChatMessage) message);
                 }
             }
-            case FRIEND_CREATION_REQUEST:{
+            case FRIEND_CREATION_REQUEST: {
                 /*
                 When a friend creation request is processed, it should create a friend creation response and push it to
                 the outgoingQueue.
@@ -144,11 +149,23 @@ public class ChatManager {
                 //TODO:: try to use MessageFactory here later
                 FriendCreationResponse friendCreationResponse = new FriendCreationResponse(message.getSender());
 
-                if (null == friendCreationResponse){
+                if (null == friendCreationResponse) {
                     return false;
                 } else {
                     return this.enqueueOutGoingMessageQueue(friendCreationResponse.convertMessageToJson());
                 }
+            }
+            case FRIEND_CREATION_RESPONSE: {
+                /*
+                In response to a friendCreationResponse, the sender of the response is saved into the database
+                 */
+                FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
+                if (null == fd){
+                    return false;
+                }
+                Friend sender = message.getSender();
+                fd.add(sender);
+                return true;
 
             }
             default:
