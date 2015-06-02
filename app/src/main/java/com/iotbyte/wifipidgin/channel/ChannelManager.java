@@ -39,7 +39,7 @@ public class ChannelManager {
     private ChannelManager(Context context) {
         this.context = context;
 
-        ChannelDao channelDao  = DaoFactory.getInstance().getChannelDao(this.context,DaoFactory.DaoType.SQLITE_DAO, null);
+        ChannelDao channelDao = DaoFactory.getInstance().getChannelDao(this.context, DaoFactory.DaoType.SQLITE_DAO, null);
 
         /* In the event that some where else update the Channel Information in database, update the Channel Information
         from database, and notify the UI to update (notify UI require UI side to registrant this listener */
@@ -119,14 +119,11 @@ public class ChannelManager {
      * @return true for add successfully or false for channel already exist
      */
     public boolean addChannel(Channel channel) {
-        if (channelMap.containsKey(channel)) {
+        if (channelMap.containsKey(channel.getChannelIdentifier())) {
             return false;
         } else {
-            if (saveAChannelToDataBase(channel)){
-                channelMap.put(channel.getChannelIdentifier(), channel);
-                return true;
-            }
-           return false;
+            channelMap.put(channel.getChannelIdentifier(), channel);
+            return saveAChannelToDataBase(channel);
         }
     }
 
@@ -140,13 +137,13 @@ public class ChannelManager {
      * @return true for successfully delete or false for channel does not exist previously.
      */
     public boolean deleteChannel(Channel channel) {
-        if (!channelMap.containsKey(channel)) {
+        if (!channelMap.containsKey(channel.getChannelIdentifier())) {
             return false;
         } else {
+            channelMap.remove(channel.getChannelIdentifier());
             ChannelDao cd = DaoFactory.getInstance().getChannelDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
             DaoError error = cd.delete(channel.getId());
-            if (DaoError.NO_ERROR == error){
-                channelMap.remove(channel.getChannelIdentifier());
+            if (DaoError.NO_ERROR == error) {
                 return true;
             }
             return false;
@@ -229,13 +226,13 @@ public class ChannelManager {
 
     /**
      * saveAChannelToDataBase()
-     *
+     * <p/>
      * Save a specific channel into the database
      *
      * @param channel: a channel to be saved
      * @return true if the channel is saved successfully
      */
-    public boolean saveAChannelToDataBase(Channel channel){
+    public boolean saveAChannelToDataBase(Channel channel) {
         ChannelDao cd = DaoFactory.getInstance().getChannelDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
         FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
 
@@ -243,7 +240,7 @@ public class ChannelManager {
             return false;
         }
 
-        for (Friend friend : channel.getFriendsList()){
+        for (Friend friend : channel.getFriendsList()) {
             if (friend.NO_ID == friend.getId()) {
                 fd.add(friend);
             } else {
@@ -307,7 +304,7 @@ public class ChannelManager {
         }
     }
 
-    public void setChannelDatabaseChangeListener(ChannelDatabaseChangeListener listener){
+    public void setChannelDatabaseChangeListener(ChannelDatabaseChangeListener listener) {
         this.channelDatabaseChangeListener = listener;
     }
 }
