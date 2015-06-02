@@ -7,6 +7,7 @@
     <string name="title_activity_about_page">About_page</string>
     <string name="title_activity_about">About</string>
     <string name="title_activity_display_namecard">DisplayNamecardActivity</string>
+    <string name="title_edit_user_profile">Edit User Profile</string>
     <string name="title_activity_test_chat">testChat</string>
     <string name="title_activity_create_channel">Create Channel</string>
     <string name="title_activity_delete_channel">Delete Channel</string>

@@ -4,8 +4,11 @@ package com.iotbyte.wifipidgin.channel;
 import android.content.Context;
 
 import com.iotbyte.wifipidgin.dao.ChannelDao;
+import com.iotbyte.wifipidgin.dao.DaoError;
 import com.iotbyte.wifipidgin.dao.DaoFactory;
 import com.iotbyte.wifipidgin.dao.FriendDao;
+import com.iotbyte.wifipidgin.dao.event.DaoEvent;
+import com.iotbyte.wifipidgin.dao.event.DaoEventSubscriber;
 import com.iotbyte.wifipidgin.friend.Friend;
 
 import java.net.InetAddress;
@@ -31,8 +34,25 @@ public class ChannelManager {
 
     private HashMap<String, Channel> channelMap; // channelIdentifier and Channel pair
 
-    private ChannelManager(Context context)  {
+    private ChannelDatabaseChangeListener channelDatabaseChangeListener;
+
+    private ChannelManager(Context context) {
         this.context = context;
+
+        ChannelDao channelDao = DaoFactory.getInstance().getChannelDao(this.context, DaoFactory.DaoType.SQLITE_DAO, null);
+
+        /* In the event that some where else update the Channel Information in database, update the Channel Information
+        from database, and notify the UI to update (notify UI require UI side to registrant this listener */
+        channelDao.getDaoEventBoard().registerEventSubscriber(new DaoEventSubscriber() {
+            @Override
+            public void onEvent(DaoEvent event) {
+                updateChannelInfoFromDatabase();
+                if (null != channelDatabaseChangeListener) {
+                    channelDatabaseChangeListener.onChannelDatabaseChange();
+                }
+            }
+        });
+
 
         //Calling database to grep existing channelList
         // or create a new channelList if there is nothing been retrieved
@@ -43,10 +63,9 @@ public class ChannelManager {
         mockChannelInfo();
 
 
-
     }
 
-    public static ChannelManager getInstance(Context context)  {
+    public static ChannelManager getInstance(Context context) {
         if (instance == null) {
             //Thread Safe with synchronized block
             synchronized (ChannelManager.class) {
@@ -56,20 +75,6 @@ public class ChannelManager {
             }
         }
         return instance;
-    }
-
-    /**
-     * saveChannelsInfoIntoDatabase()
-     * <p/>
-     * It will save all information back to the database, this should be called
-     * properly to retain all channel information
-     *
-     * @return true if all channel information is saved successfully, false otherwise.
-     */
-
-    //TODO: adding implementation to add all channels back to database
-    public boolean saveChannelsInfoIntoDatabase() {
-        return true;
     }
 
     /**
@@ -106,18 +111,19 @@ public class ChannelManager {
     /**
      * addChannel()
      * <p/>
-     * Add a channel to the ChannelManager
+     * Add a channel to the ChannelManager and also add to the database by
+     * calling saveAChannelToDataBase()
      * Require update the UI when return true
      *
      * @param channel the channel to be added
      * @return true for add successfully or false for channel already exist
      */
     public boolean addChannel(Channel channel) {
-        if (channelMap.containsKey(channel)) {
+        if (channelMap.containsKey(channel.getChannelIdentifier())) {
             return false;
         } else {
             channelMap.put(channel.getChannelIdentifier(), channel);
-            return true;
+            return saveAChannelToDataBase(channel);
         }
     }
 
@@ -125,17 +131,22 @@ public class ChannelManager {
      * deleteChannel()
      * <p/>
      * Remove a channel from ChannelManager
-     * Require update the UI when return true
+     * Require update the UI when return true, the channel is also removed from database
      *
      * @param channel the channel to be deleted
      * @return true for successfully delete or false for channel does not exist previously.
      */
     public boolean deleteChannel(Channel channel) {
-        if (!channelMap.containsKey(channel)) {
+        if (!channelMap.containsKey(channel.getChannelIdentifier())) {
             return false;
         } else {
             channelMap.remove(channel.getChannelIdentifier());
-            return true;
+            ChannelDao cd = DaoFactory.getInstance().getChannelDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
+            DaoError error = cd.delete(channel.getId());
+            if (DaoError.NO_ERROR == error) {
+                return true;
+            }
+            return false;
         }
     }
 
@@ -214,13 +225,45 @@ public class ChannelManager {
     }
 
     /**
+     * saveAChannelToDataBase()
+     * <p/>
+     * Save a specific channel into the database
+     *
+     * @param channel: a channel to be saved
+     * @return true if the channel is saved successfully
+     */
+    public boolean saveAChannelToDataBase(Channel channel) {
+        ChannelDao cd = DaoFactory.getInstance().getChannelDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
+        FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
+
+        if (null == cd || null == fd) {
+            return false;
+        }
+
+        for (Friend friend : channel.getFriendsList()) {
+            if (friend.NO_ID == friend.getId()) {
+                fd.add(friend);
+            } else {
+                fd.update(friend); //TODO:: might need to change this depends on how to handles friend update
+            }
+        }
+        if (channel.NO_ID == channel.getId()) {
+            cd.add(channel);
+        } else {
+            cd.update(channel);   //TODO:: might need to change this depends on how to handles channel update
+        }
+
+        return true;
+    }
+
+    /**
      * mockChannelInfo()
      * <p/>
      * some mocked channel Info
      */
     private void mockChannelInfo() {
         FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
-        if ( 1 == fd.findAll().size()) {
+        if (1 == fd.findAll().size()) {
 
             try {
                 InetAddress xiaoMingIP = InetAddress.getByName("192.168.1.2");
@@ -261,4 +304,7 @@ public class ChannelManager {
         }
     }
 
+    public void setChannelDatabaseChangeListener(ChannelDatabaseChangeListener listener) {
+        this.channelDatabaseChangeListener = listener;
+    }
 }
