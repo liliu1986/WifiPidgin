@@ -37,7 +37,7 @@ public class MessageServerService extends Service {
             public void onMessageReceived(String msg){
                 Log.d(MSG_SERVICE_TAG, "A message has been received: " + msg);
 
-                ChatManager.getInstance().enqueueIncomingMessageQueue(msg);
+                ChatManager.getInstance(getApplicationContext()).enqueueIncomingMessageQueue(msg);
                 Intent intent = new Intent();
                 intent.setAction(MY_ACTION);
                 intent.putExtra("MSGREC", msg);

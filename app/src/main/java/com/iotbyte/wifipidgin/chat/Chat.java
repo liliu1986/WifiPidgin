@@ -1,5 +1,7 @@
 package com.iotbyte.wifipidgin.chat;
 
+import android.content.Context;
+
 import com.iotbyte.wifipidgin.message.ChatMessage;
 
 import java.util.LinkedList;
@@ -16,9 +18,11 @@ public class Chat {
 
     private final String channelIdentifier;
     private Queue<ChatMessage> chatMessageQueue;
+    private Context context;
 
     /* this queue manage all messages with in the chat, include outgoing and incoming message */
-    public Chat(String channelIdentifier) {
+    public Chat(String channelIdentifier, Context context) {
+        this.context = context;
         this.channelIdentifier = channelIdentifier;
         chatMessageQueue = new LinkedList<>();
     }
@@ -62,7 +66,7 @@ public class Chat {
      */
 
     public boolean sendMessage(ChatMessage message) {
-        return ChatManager.getInstance().enqueueOutGoingMessageQueue(message.convertMessageToJson()) && this.pushMessage(message);
+        return ChatManager.getInstance(context).enqueueOutGoingMessageQueue(message.convertMessageToJson()) && this.pushMessage(message);
     }
 
 

@@ -121,6 +121,10 @@ public abstract class Message {
                 case MessageType.MESSAGE_TYPE_FRIEND_CREATION_REQUEST:
                     this.type = MessageType.FRIEND_CREATION_REQUEST;
                     break;
+
+                case MessageType.MESSAGE_TYPE_FRIEND_CREATION_RESPONSE:
+                    this.type = MessageType.FRIEND_CREATION_RESPONSE;
+                    break;
                 default:
                     this.type = MessageType.ERROR;
             }

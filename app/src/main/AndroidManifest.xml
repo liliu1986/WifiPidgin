@@ -21,7 +21,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
-                <!--category android:name="android.intent.category.LAUNCHER" /-->
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
@@ -30,7 +30,7 @@
             android:label="Wifi Pidgin">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <!--category android:name="android.intent.category.LAUNCHER" /-->
             </intent-filter>
         </activity>
         <activity
@@ -72,6 +72,18 @@
             android:name=".commmodule.MessageServerService"
             android:icon="@drawable/ic_launcher"
             android:label="@string/message_server_service_name"></service>
+        <service
+            android:name=".chat.IncomingMessageHandlingService"
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/incoming_message_handler_service"></service>
+        <service
+            android:name=".chat.OutgoingMessageHandlingService"
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/outgoing_message_handling_service"></service>
+        <service
+            android:name=".nsdmodule.FriendCreationService"
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/outgoing_message_handling_service"></service>
 
     </application>
 

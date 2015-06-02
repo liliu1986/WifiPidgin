@@ -1,6 +1,8 @@
 package com.iotbyte.wifipidgin.nsdmodule;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.util.Log;
@@ -15,7 +17,9 @@ import com.iotbyte.wifipidgin.ui.tempDb;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 public class NsdClient {
 
@@ -32,23 +36,41 @@ public class NsdClient {
 
     NsdServiceInfo mService;
 
-    //The list of channels that is alive
-    private List<Channel> ChannelList;
-    //The list of users showing themselves as visible within the same lan network
-    //private List<Friend> nearbyFriendList;
-    private tempDb mdb;
 
-    private boolean isDiscovering=false;
-    public NsdClient(Context context) {
+    private Queue<Friend> friendCreationQueue = new LinkedList<Friend>();
+
+    private static NsdClient instance = null;
+
+    private boolean isDiscovering = false;
+
+    private NsdClient(Context context) {
         mContext = context;
         mNsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
-        ChannelList=new ArrayList<Channel>();
         //nearbyFriendList =new ArrayList<Friend>();
+        //Start message Server service and NSD Service
+        Log.d(TAG, "Initializing NsdClient");
+
     }
+
+    /**
+     ** NsdClient is a singleton
+     **/
+    public static NsdClient getInstance(Context context) {
+        if (instance == null){
+            synchronized (NsdClient.class) {
+                if (instance == null) {
+                    instance = new NsdClient(context);
+                }
+            }
+        }
+        return instance;
+    }
+
     public void initializeNsdClient() {
         initializeDiscoveryListener();
         initializeResolveListener();
     }
+
     public void initializeDiscoveryListener() {
         mDiscoveryListener = new NsdManager.DiscoveryListener() {
 
@@ -95,13 +117,16 @@ public class NsdClient {
 
                             Friend newFriend = new Friend(Utils.hexStringToByteArray(macString.replaceAll(":", "")), host, 55);
                             newFriend.setIp(host);
-
-                            //mdb.addFriendToList(newFriend);
                             FriendDao fd = DaoFactory.getInstance()
                                     .getFriendDao(mContext, DaoFactory.DaoType.SQLITE_DAO, null);
-                            DaoError err = fd.add(newFriend);
-                            if (err != DaoError.NO_ERROR) {
-                                Log.e(TAG, "wth, something wrong" + err.getValue());
+
+                            //Try to see if the friend is already being created.
+                            if ( false == isInFriendCreationQueue(newFriend) ){
+                                //If not, check if the friend has already been created
+                                if (null == fd.findByMacAddress(newFriend.getMac())){
+                                    //Now, put the friend into the creation queue.
+                                    enqueueFriendCreationQueue(newFriend);
+                                }
                             }
                         }
                     });
@@ -175,13 +200,40 @@ public class NsdClient {
     public NsdServiceInfo getChosenServiceInfo() {
         return mService;
     }
-    public List<Channel> getChannelList(){
-        return ChannelList;
+
+    //TODO -- change public to private after testing
+    public boolean enqueueFriendCreationQueue(Friend inFriend) {
+        Log.d(TAG, "Adding Friend " + inFriend.getMac().toString());
+
+        return friendCreationQueue.offer(inFriend);
     }
 
-    //public List<Friend> getNearbyFriendList(){
-    //	return nearbyFriendList;
-    //}
+    protected Friend dequeueFriendCreationQueue() {
+        return friendCreationQueue.poll();
+    }
+
+    /**
+     *
+     * @param inFriend
+     * @return a boolean value that indicates if the friend is in
+     * the Friend Creation Queue
+     */
+    protected boolean isInFriendCreationQueue(Friend inFriend){
+
+        for (Friend friend : friendCreationQueue) {
+            if (friend.getMac().equals(inFriend.getMac())){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected boolean isEmptyFriendCreationQueue(){
+        if (friendCreationQueue.size() == 0){
+            return true;
+        }
+        return false;
+    }
 
     //Returns if currently the discovery is on going.
     public boolean getIsDiscovering(){

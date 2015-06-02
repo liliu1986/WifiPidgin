@@ -44,7 +44,7 @@ public class MessageServer   {
                 setLocalPort(mServerSocket.getLocalPort());
 
                 //After the message server socket is created, broadcast it.
-                mNsdServer = new NsdServer(getServerContext(), mServerSocket);
+                mNsdServer = NsdServer.getInstance(getServerContext(), mServerSocket);
                 mNsdServer.initializeNsdServer();
                 mNsdServer.broadcastService();
 

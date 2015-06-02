@@ -1,5 +1,7 @@
 package com.iotbyte.wifipidgin.message;
 
+import com.iotbyte.wifipidgin.friend.Friend;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -19,6 +21,12 @@ public class MessageFactory {
           return message;
     }
 
+    public static Message buildMessageByReceiver(Friend Receiver){
+        Message message = null;
+
+        return message;
+    }
+
 
     public static Message buildMessageByJson(String json) throws JSONException, UnknownHostException{
         MessageType type =getMessageType(json);
@@ -28,6 +36,8 @@ public class MessageFactory {
                   return new ChatMessage(json);
               case MessageType.MESSAGE_TYPE_FRIEND_CREATION_REQUEST:
                   return new FriendCreationRequest(json);
+              case MessageType.MESSAGE_TYPE_FRIEND_CREATION_RESPONSE:
+                  return new FriendCreationResponse(json);
               default:
                   return null;
 
@@ -46,6 +56,9 @@ public class MessageFactory {
 
             case MessageType.MESSAGE_TYPE_FRIEND_CREATION_REQUEST:
                 return MessageType.FRIEND_CREATION_REQUEST;
+
+             case MessageType.MESSAGE_TYPE_FRIEND_CREATION_RESPONSE:
+                 return MessageType.FRIEND_CREATION_RESPONSE;
 
             default:
                 return MessageType.ERROR;

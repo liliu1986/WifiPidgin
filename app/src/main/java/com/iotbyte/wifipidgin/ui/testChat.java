@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.iotbyte.wifipidgin.R;
 import com.iotbyte.wifipidgin.chat.ChatManager;
+import com.iotbyte.wifipidgin.chat.IncomingMessageHandlingService;
 import com.iotbyte.wifipidgin.commmodule.CommModuleBroadcastReceiver;
 import com.iotbyte.wifipidgin.commmodule.MessageClient;
 import com.iotbyte.wifipidgin.commmodule.MessageServer;
@@ -64,8 +65,14 @@ public class testChat extends ActionBarActivity implements View.OnClickListener{
         i.putExtra("KEY1", "Value to be used by the service");
         context.startService(i);
 
+        //Start message Server service and NSD Service
+        Intent incomingMessageHandlingServicesIntent= new Intent(getApplicationContext(), IncomingMessageHandlingService.class);
+       // incomingMessageHandlingServicesIntent.putExtra("KEY1", "Value to be used by the service");
+        context.startService(incomingMessageHandlingServicesIntent);
+
+
         //Start the service discovery
-        NsdClient mNsdClient = new NsdClient(this);
+        NsdClient mNsdClient = NsdClient.getInstance(this);
         mNsdClient.initializeNsdClient();
         mNsdClient.discoverServices();
 
@@ -151,7 +158,7 @@ public class testChat extends ActionBarActivity implements View.OnClickListener{
 
                     ChatMessage chatmessage = new ChatMessage(aFriend,"e2qjseahfwo3i",msgTextView.getText().toString());
 
-                    ChatManager chatManager = ChatManager.getInstance();
+                    ChatManager chatManager = ChatManager.getInstance(getApplicationContext());
                     chatManager.enqueueOutGoingMessageQueue(chatmessage.convertMessageToJson());
 
 
@@ -162,7 +169,7 @@ public class testChat extends ActionBarActivity implements View.OnClickListener{
 
                     if (mMessageClient != null){
                         Log.d(TAG, "Sending the msg Now!!!");
-                        mMessageClient.sendMsg(destIP, port, chatManager.dequeueOutGoingMessageQueue());
+                       // mMessageClient.sendMsg(destIP, port, chatManager.dequeueOutGoingMessageQueue());
                     } else {
                         Log.e(TAG, "The message client has not been initialized yet!!!");
                     }
