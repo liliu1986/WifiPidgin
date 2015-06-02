@@ -14,6 +14,7 @@ import android.widget.ListView;
 
 import com.iotbyte.wifipidgin.R;
 import com.iotbyte.wifipidgin.channel.Channel;
+import com.iotbyte.wifipidgin.channel.ChannelDatabaseChangeListener;
 import com.iotbyte.wifipidgin.channel.ChannelManager;
 
 public class ChannelTabFragment extends Fragment {
@@ -21,19 +22,29 @@ public class ChannelTabFragment extends Fragment {
     final String CHANNEL_TAB_FRAG = "Channel Tab Fragment";
 
     Intent i;
+    ChannelManager channelManager;
+    ArrayAdapter<Channel> adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        channelManager = ChannelManager.getInstance(getActivity());
+
+        channelManager.setChannelDatabaseChangeListener(new ChannelDatabaseChangeListener() {
+            @Override
+            public void onChannelDatabaseChange() {
+                Log.d(CHANNEL_TAB_FRAG, "Channel Updated");
+                refreshChannelList();
+            }
+        });
+
         View v = inflater.inflate(R.layout.list_channels, container, false);
 
         ListView lv = (ListView) v.findViewById(android.R.id.list);
         Button button = (Button) v.findViewById(R.id.buttonCreateChannel);
 
         // populate the list view
-
-            lv.setAdapter((new ArrayAdapter<Channel>(lv.getContext(),
-                    android.R.layout.simple_list_item_1,
-                    ChannelManager.getInstance(lv.getContext()).getChannelList())));
+        adapter = (new ArrayAdapter<>(lv.getContext(), android.R.layout.simple_list_item_1, channelManager.getChannelList()));
+        lv.setAdapter(adapter);
 
         // listen to item click to enter a channel
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -75,5 +86,11 @@ public class ChannelTabFragment extends Fragment {
         f.setArguments(b);
 
         return f;
+    }
+
+    public void refreshChannelList() {
+        adapter.clear();
+        adapter.addAll(channelManager.getChannelList());
+        adapter.notifyDataSetChanged();
     }
 }
