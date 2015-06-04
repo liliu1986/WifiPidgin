@@ -66,7 +66,9 @@ public class Chat {
      */
 
     public boolean sendMessage(ChatMessage message) {
-        return ChatManager.getInstance(context).enqueueOutGoingMessageQueue(message.convertMessageToJson()) && this.pushMessage(message);
+        return ChatManager
+                .getInstance(context)
+                .enqueueOutGoingMessageQueue(message.convertMessageToJson()) && this.pushMessage(message);
     }
 
 

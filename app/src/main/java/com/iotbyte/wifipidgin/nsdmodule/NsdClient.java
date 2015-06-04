@@ -212,6 +212,9 @@ public class NsdClient {
         return friendCreationQueue.poll();
     }
 
+    protected Friend topFriendCreationQueue() {
+        return friendCreationQueue.peek();
+    }
     /**
      *
      * @param inFriend
