@@ -1,25 +1,16 @@
 package com.iotbyte.wifipidgin.nsdmodule;
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.util.Log;
 
-import com.iotbyte.wifipidgin.channel.Channel;
-import com.iotbyte.wifipidgin.dao.DaoError;
 import com.iotbyte.wifipidgin.dao.DaoFactory;
 import com.iotbyte.wifipidgin.dao.FriendDao;
 import com.iotbyte.wifipidgin.friend.Friend;
 import com.iotbyte.wifipidgin.utils.Utils;
-import com.iotbyte.wifipidgin.ui.tempDb;
 
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
 
 public class NsdClient {
 
@@ -36,14 +27,9 @@ public class NsdClient {
 
     NsdServiceInfo mService;
 
-
-    private Queue<Friend> friendCreationQueue = new LinkedList<Friend>();
-
-    private static NsdClient instance = null;
-
     private boolean isDiscovering = false;
 
-    private NsdClient(Context context) {
+    public NsdClient(Context context) {
         mContext = context;
         mNsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
         //nearbyFriendList =new ArrayList<Friend>();
@@ -52,19 +38,6 @@ public class NsdClient {
 
     }
 
-    /**
-     ** NsdClient is a singleton
-     **/
-    public static NsdClient getInstance(Context context) {
-        if (instance == null){
-            synchronized (NsdClient.class) {
-                if (instance == null) {
-                    instance = new NsdClient(context);
-                }
-            }
-        }
-        return instance;
-    }
 
     public void initializeNsdClient() {
         initializeDiscoveryListener();
@@ -121,11 +94,12 @@ public class NsdClient {
                                     .getFriendDao(mContext, DaoFactory.DaoType.SQLITE_DAO, null);
 
                             //Try to see if the friend is already being created.
-                            if ( false == isInFriendCreationQueue(newFriend) ){
+                            FriendCreationQueue friendCreationQueue  = FriendCreationQueue.getInstance();
+                            if ( false == friendCreationQueue.isInFriendCreationQueue(newFriend) ){
                                 //If not, check if the friend has already been created
                                 if (null == fd.findByMacAddress(newFriend.getMac())){
                                     //Now, put the friend into the creation queue.
-                                    enqueueFriendCreationQueue(newFriend);
+                                    friendCreationQueue.enqueueFriendCreationQueue(newFriend);
                                 }
                             }
                         }
@@ -201,42 +175,7 @@ public class NsdClient {
         return mService;
     }
 
-    //TODO -- change public to private after testing
-    public boolean enqueueFriendCreationQueue(Friend inFriend) {
-        Log.d(TAG, "Adding Friend " + inFriend.getMac().toString());
 
-        return friendCreationQueue.offer(inFriend);
-    }
-
-    protected Friend dequeueFriendCreationQueue() {
-        return friendCreationQueue.poll();
-    }
-
-    protected Friend topFriendCreationQueue() {
-        return friendCreationQueue.peek();
-    }
-    /**
-     *
-     * @param inFriend
-     * @return a boolean value that indicates if the friend is in
-     * the Friend Creation Queue
-     */
-    protected boolean isInFriendCreationQueue(Friend inFriend){
-
-        for (Friend friend : friendCreationQueue) {
-            if (friend.getMac().equals(inFriend.getMac())){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    protected boolean isEmptyFriendCreationQueue(){
-        if (friendCreationQueue.size() == 0){
-            return true;
-        }
-        return false;
-    }
 
     //Returns if currently the discovery is on going.
     public boolean getIsDiscovering(){

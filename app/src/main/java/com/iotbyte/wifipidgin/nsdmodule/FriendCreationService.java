@@ -35,21 +35,21 @@ public class FriendCreationService extends Service  {
 
         @Override
         public void run() {
-            NsdClient nsdClientInstance = NsdClient.getInstance(getApplicationContext());
+            FriendCreationQueue friendCreationQueue = FriendCreationQueue.getInstance();
             Log.d(TAG, "FriendCreationServiceThread Started");
 
             while (!Thread.currentThread().isInterrupted()) {
                 //Processing the queue
                 //Log.d(TAG, "FriendCreationServiceThread Started");
-                while (!nsdClientInstance.isEmptyFriendCreationQueue()){
+                while (!friendCreationQueue.isEmptyFriendCreationQueue()){
                     try {
-                        Friend creatingFriend = nsdClientInstance.topFriendCreationQueue();
+                        Friend creatingFriend = friendCreationQueue.topFriendCreationQueue();
                         Log.d(TAG, "Creating friend " + creatingFriend.getMac().toString());
                         FriendCreationRequest creationRequest = new FriendCreationRequest(creatingFriend);
                         ChatManager chatManager = ChatManager.getInstance(getApplicationContext());
                         chatManager.enqueueOutGoingMessageQueue(creationRequest.convertMessageToJson());
                         TimeUnit.MILLISECONDS.sleep(delayInterval);
-                        nsdClientInstance.dequeueFriendCreationQueue();
+                        friendCreationQueue.dequeueFriendCreationQueue();
 
                     } catch (InterruptedException e) {
                         e.printStackTrace();

@@ -33,30 +33,15 @@ public class NsdServer {
 	private ServerSocket mServerSocket = null;
 	private ServerStarter mServerStarter;
     private InetAddress nsdHost;
-    private static NsdServer instance = null;
 
     //private ServerSocket mServerSocket;
-    private NsdServer(Context context, ServerSocket inServerSocket) {
+    public NsdServer(Context context, ServerSocket inServerSocket) {
         mContext = context;
         mServerSocket = inServerSocket;
         mNsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
         
         setServerPort(mServerSocket.getLocalPort());
         //mServerStarter = new ServerStarter();
-    }
-
-    /**
-     ** NsdServer is a singleton
-     **/
-    public static NsdServer getInstance(Context context, ServerSocket inServerSocket) {
-        if (instance == null){
-            synchronized (NsdServer.class) {
-                if (instance == null) {
-                    instance = new NsdServer(context, inServerSocket);
-                }
-            }
-        }
-        return instance;
     }
 
     public void initializeNsdServer() {
