@@ -54,9 +54,9 @@ public interface FriendDao {
      * Find a friend in storage by its ip address.
      *
      * @param ip IP address to find friend by.
-     * @return A reference to Friend object found in storage. null if no friend with such ID exists.
+     * @return A list of Friend object found in storage.
      */
-    public Friend findByIp(InetAddress ip);
+    public List<Friend> findByIp(InetAddress ip);
 
     /**
      * Find a friend in storage by its mac address.

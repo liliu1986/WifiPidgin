@@ -40,7 +40,6 @@ public class WifiPidginSqliteHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // TODO: onUpgrade - Not tested.
         try {
             DbUtils.executeSqlScript(context, db, DROP_DB_SCRIPT);
         } catch (IOException e) {
@@ -53,7 +52,7 @@ public class WifiPidginSqliteHelper extends SQLiteOpenHelper {
     /** Tag for logging */
     private static final String TAG = "WifiPidginSqliteHelper";
     /** SQLite database version */
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
     /** SQLite create database script */
     private static final String CREATE_DB_SCRIPT = "createDb.sql";
     /** SQLite drop database script */
