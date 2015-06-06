@@ -16,7 +16,6 @@ public class Chat {
 
     private final String channelIdentifier;
 
-    private Queue<ChatMessage> chatMessageQueue;
     private ChatMessageQueueChangeListener chatMessageQueueChangeListener;
 
     /* this queue manage all messages with in the chat, include outgoing and incoming message */
