@@ -1,6 +1,7 @@
 package com.iotbyte.wifipidgin.message;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.iotbyte.wifipidgin.friend.Friend;
 
@@ -16,6 +17,8 @@ import static com.iotbyte.wifipidgin.utils.Utils.macAddressByteToHexString;
  * Created by dev on 08/05/15.
  */
 public class FriendCreationRequest extends Message {
+
+    final String FRIEND_CREATION_REQUEST_DEBUG = "FCR_DEBUG";
 
 
     /**
@@ -67,6 +70,7 @@ public class FriendCreationRequest extends Message {
 
             //TODO:: change to json.toString() to save on transmission space,
             // return json.toString();
+            Log.d(FRIEND_CREATION_REQUEST_DEBUG,json.toString(4));
 
             return json.toString(4); //this is for easy to visualize/debugging purpose
 

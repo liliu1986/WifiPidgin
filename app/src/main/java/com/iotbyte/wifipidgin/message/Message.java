@@ -1,6 +1,7 @@
 package com.iotbyte.wifipidgin.message;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.iotbyte.wifipidgin.dao.DaoFactory;
 import com.iotbyte.wifipidgin.dao.FriendDao;
@@ -75,6 +76,7 @@ public abstract class Message {
         myself.setName("myself");
         myself.setDescription("I am who I am");
 */
+        Log.d(MESSAGE_DEBUG,"myself IP from DB:"+myself.getIp());
         this.sender = myself;
 
     }

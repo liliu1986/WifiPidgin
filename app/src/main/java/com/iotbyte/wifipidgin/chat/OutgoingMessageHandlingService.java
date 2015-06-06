@@ -2,6 +2,7 @@ package com.iotbyte.wifipidgin.chat;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -13,6 +14,7 @@ import android.util.Log;
 public class OutgoingMessageHandlingService extends Service{
 
     private OutgoingMessageHandler outgoingMessageHandler;
+    private Handler handler;
     private final String OUTGOING_MESSAGE_HANDLING_SERVICE = "out msg serv";
 
     @Override
@@ -24,7 +26,8 @@ public class OutgoingMessageHandlingService extends Service{
     @Override
     public void onCreate() {
         super.onCreate();
-        outgoingMessageHandler = new OutgoingMessageHandler(getApplicationContext());
+        handler = new Handler();
+        outgoingMessageHandler = new OutgoingMessageHandler(getApplicationContext(),handler);
     }
 
     @Override

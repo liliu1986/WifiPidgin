@@ -1,6 +1,7 @@
 package com.iotbyte.wifipidgin.chat;
 
 import android.content.Context;
+import android.os.Handler;
 
 /**
  * Created by yefwen@iotbyte.com on 09/05/15.
@@ -14,27 +15,40 @@ public class IncomingMessageHandler {
 
     Thread thread = null;
 
-    public IncomingMessageHandler(Context context){
+    private Handler handler;
+
+    public IncomingMessageHandler(Context context, Handler handler){
          this.context = context;
+         this.handler = handler;
     }
 
 
-    class Handler implements Runnable {
+
+    class ServiceThread implements Runnable {
 
         @Override
         public void run() {
-
             while (!Thread.currentThread().isInterrupted()) {
                if (!ChatManager.getInstance().isIncomingMessageQueueEmpty()){
-                   ChatManager.getInstance().dequeueIncomingMessageQueue(context); // handled by ChatManager
+                   runOnUiThread(new Runnable() {
+                       @Override
+                       public void run() {
+                           ChatManager.getInstance().dequeueIncomingMessageQueue(context); // handled by ChatManager
+                       }
+                   });
                 }
             }
 
         }
     }
 
+
+    private void runOnUiThread(Runnable runnable) {
+        handler.post(runnable);
+    }
+
     public void startHandler(){
-       thread = new Thread (new Handler());
+       thread = new Thread (new ServiceThread());
        thread.start();
     }
 
