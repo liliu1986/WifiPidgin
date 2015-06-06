@@ -76,13 +76,15 @@ public class MessageServer   {
                                 Log.d(MSG_SERVER_TAG, "Server IP: " + myIP);
                                 self.setIp(myIP);
                                 self.setPort(myPort);
+
                                 fd.update(self);
-                                serviceStarted = true;
                             }
                         } catch (UnknownHostException e) {
                             e.printStackTrace();
                         } catch (Exception e){
                             e.printStackTrace();
+                        } finally {
+                            serviceStarted = true;
                         }
 
                     }

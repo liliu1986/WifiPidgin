@@ -41,8 +41,9 @@ public class FriendCreationService extends Service  {
 
             while (!Thread.currentThread().isInterrupted()) {
                 //Processing the queue
-                //Log.d(TAG, "FriendCreationServiceThread Started");
+                //Log.d(TAG, "FriendCreationServiceThread Started" + MessageServer.serviceStarted);
                 while (MessageServer.serviceStarted && !friendCreationQueue.isEmptyFriendCreationQueue()){
+
                     try {
                         Friend creatingFriend = friendCreationQueue.topFriendCreationQueue();
                         Log.d(TAG, "Creating friend " + creatingFriend.getIp().toString());
