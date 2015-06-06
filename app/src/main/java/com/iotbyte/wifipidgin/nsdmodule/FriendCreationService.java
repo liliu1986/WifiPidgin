@@ -45,7 +45,7 @@ public class FriendCreationService extends Service  {
                     try {
                         Friend creatingFriend = friendCreationQueue.topFriendCreationQueue();
                         Log.d(TAG, "Creating friend " + creatingFriend.getIp().toString());
-                        FriendCreationRequest creationRequest = new FriendCreationRequest(creatingFriend);
+                        FriendCreationRequest creationRequest = new FriendCreationRequest(creatingFriend,getApplicationContext());
                         ChatManager chatManager = ChatManager.getInstance();
                         chatManager.enqueueOutGoingMessageQueue(creationRequest.convertMessageToJson());
                         TimeUnit.MILLISECONDS.sleep(delayInterval);

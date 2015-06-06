@@ -1,5 +1,9 @@
 package com.iotbyte.wifipidgin.message;
 
+import android.content.Context;
+
+import com.iotbyte.wifipidgin.dao.DaoFactory;
+import com.iotbyte.wifipidgin.dao.FriendDao;
 import com.iotbyte.wifipidgin.friend.Friend;
 
 import org.json.JSONException;
@@ -23,6 +27,7 @@ public abstract class Message {
     protected MessageType type;
     protected Timestamp timestamp;
 
+    protected long myselfId = 0;
     private final String MESSAGE_DEBUG = "MESSAGE CLASS";
 
     final protected String MESSAGE_TYPE = "type";
@@ -48,15 +53,16 @@ public abstract class Message {
         this.type = type;
     }
 
-    public Message (Friend receiver){
+    public Message (Friend receiver,Context context){
         this.receiver = receiver;
 
         // Get Timestamp
         Date mDate = new Date();
         this.timestamp = new Timestamp(mDate.getTime());
 
-        //TODO:: myself is defined as the id = 0 from database, implement this when Di complete so
-        //TODO:: remove mocked myself
+        FriendDao fd = DaoFactory.getInstance().getFriendDao(context,DaoFactory.DaoType.SQLITE_DAO, null);
+        Friend myself = fd.findById(myselfId);
+/*
         InetAddress myIp = null;
         try {
             myIp = InetAddress.getByName("192.168.1.1");
@@ -68,6 +74,7 @@ public abstract class Message {
         Friend myself = new Friend(myMac,myIp,port);
         myself.setName("myself");
         myself.setDescription("I am who I am");
+*/
         this.sender = myself;
 
     }

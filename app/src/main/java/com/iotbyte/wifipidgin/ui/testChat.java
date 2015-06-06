@@ -156,7 +156,7 @@ public class testChat extends ActionBarActivity implements View.OnClickListener{
                     byte[] aMac = {0xf,0xc,0xa,0xa,0x1,0x4,0x7,0x9,0xa,0xe,0xb,0xd}; //fc:aa:14:79:ae:bd
                     Friend aFriend = new Friend(aMac,destIP,port);
 
-                    ChatMessage chatmessage = new ChatMessage(aFriend,"e2qjseahfwo3i",msgTextView.getText().toString());
+                    ChatMessage chatmessage = new ChatMessage(aFriend,"e2qjseahfwo3i",msgTextView.getText().toString(),getApplicationContext());
 
                     ChatManager chatManager = ChatManager.getInstance();
                     chatManager.enqueueOutGoingMessageQueue(chatmessage.convertMessageToJson());

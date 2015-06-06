@@ -144,7 +144,7 @@ public class ChatManager {
                  */
 
                 //TODO:: try to use MessageFactory here later
-                FriendCreationResponse friendCreationResponse = new FriendCreationResponse(message.getSender());
+                FriendCreationResponse friendCreationResponse = new FriendCreationResponse(message.getSender(),context);
                 return this.enqueueOutGoingMessageQueue(friendCreationResponse.convertMessageToJson());
             }
             case FRIEND_CREATION_RESPONSE: {

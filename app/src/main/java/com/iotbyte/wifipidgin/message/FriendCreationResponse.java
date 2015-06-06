@@ -1,5 +1,7 @@
 package com.iotbyte.wifipidgin.message;
 
+import android.content.Context;
+
 import com.iotbyte.wifipidgin.friend.Friend;
 
 import org.json.JSONException;
@@ -23,8 +25,8 @@ public class FriendCreationResponse extends Message {
      *
      * @param receiver receiver of the message
      */
-    public FriendCreationResponse(Friend receiver){
-        super(receiver);
+    public FriendCreationResponse(Friend receiver,Context context){
+        super(receiver,context);
         this.type = MessageType.FRIEND_CREATION_RESPONSE;
     }
 
