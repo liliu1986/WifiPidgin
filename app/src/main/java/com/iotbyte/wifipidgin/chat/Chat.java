@@ -15,11 +15,16 @@ import java.util.Queue;
 public class Chat {
 
     private final String channelIdentifier;
+
     private Queue<ChatMessage> chatMessageQueue;
     private ChatMessageQueueChangeListener chatMessageQueueChangeListener;
 
     /* this queue manage all messages with in the chat, include outgoing and incoming message */
+    private Queue<ChatMessage> chatMessageQueue;
+   // private Context context;
+
     public Chat(String channelIdentifier) {
+       // this.context = context;
         this.channelIdentifier = channelIdentifier;
         chatMessageQueue = new LinkedList<>();
 
@@ -76,7 +81,9 @@ public class Chat {
      */
 
     public boolean sendMessage(ChatMessage message) {
-        return ChatManager.getInstance().enqueueOutGoingMessageQueue(message.convertMessageToJson()) && this.pushMessage(message);
+        return ChatManager
+                .getInstance()
+                .enqueueOutGoingMessageQueue(message.convertMessageToJson()) && this.pushMessage(message);
     }
 
     /**

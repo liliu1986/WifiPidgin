@@ -189,6 +189,11 @@ public class SettingsActivity extends PreferenceActivity {
         }
     }
 
+    @Override
+    protected boolean isValidFragment (String fragmentName) {
+        return true;
+    }
+
     private static final boolean ALWAYS_SIMPLE_PREFS = false;
     private static final String TAG = "SettingsActivity";
 

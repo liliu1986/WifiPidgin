@@ -18,7 +18,9 @@ package com.iotbyte.wifipidgin.ui;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -27,6 +29,12 @@ import android.view.MenuItem;
 
 import com.iotbyte.wifipidgin.R;
 import com.iotbyte.wifipidgin.channel.ChannelManager;
+import com.iotbyte.wifipidgin.chat.IncomingMessageHandlingService;
+import com.iotbyte.wifipidgin.chat.OutgoingMessageHandlingService;
+import com.iotbyte.wifipidgin.commmodule.CommModuleBroadcastReceiver;
+import com.iotbyte.wifipidgin.commmodule.MessageServerService;
+import com.iotbyte.wifipidgin.nsdmodule.FriendCreationService;
+import com.iotbyte.wifipidgin.nsdmodule.NsdClient;
 import com.iotbyte.wifipidgin.nsdmodule.NsdWrapper;
 
 public class MainActivity extends FragmentActivity implements ActionBar.TabListener {
@@ -35,11 +43,13 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
     ViewPager mViewPager;
     NsdWrapper mNsdWrapper;
+    CommModuleBroadcastReceiver myReceiver;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Context context = getApplicationContext();
 
         // Create the adapter that will return a fragment for each of the three primary sections
         // of the app.
@@ -78,14 +88,41 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                     .setTabListener(this));
         }
 
-        //Start NSD here
-        //mNsdWrapper = new NsdWrapper(this);
-        //Start DSN broadcasting
-        //mNsdWrapper.Broadcast();
-        //Start DSN discovery
-        //mNsdWrapper.discover();
+        myReceiver = new CommModuleBroadcastReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(MessageServerService.MY_ACTION);
+        registerReceiver(myReceiver, intentFilter);
 
-            ChannelManager.getInstance(getApplicationContext());
+        //Start message Server service and NSD Service
+        Intent i= new Intent(context, MessageServerService.class);
+        i.putExtra("KEY1", "Value to be used by the service");
+        context.startService(i);
+
+        //Start NSD here
+        //Start the service discovery
+        NsdClient mNsdClient = new NsdClient(this);
+        mNsdClient.initializeNsdClient();
+        mNsdClient.discoverServices();
+
+        //Start FriendCreationService
+        Intent iFriendCreationService= new Intent(context, FriendCreationService.class);
+        //i.putExtra("KEY1", "Value to be used by the service");
+        context.startService(iFriendCreationService);
+
+        //Start IncomingMessageHandlingService
+        Intent incomingMessageHandlingServicesIntent= new Intent(context, IncomingMessageHandlingService.class);
+        // incomingMessageHandlingServicesIntent.putExtra("KEY1", "Value to be used by the service");
+        context.startService(incomingMessageHandlingServicesIntent);
+
+        //Start OutGoingMessageHandlingService
+        Intent outGoingMessageHandlingServicesIntent= new Intent(context, OutgoingMessageHandlingService.class);
+        // outGoingMessageHandlingServicesIntent.putExtra("KEY1", "Value to be used by the service");
+        context.startService(outGoingMessageHandlingServicesIntent);
+
+
+
+
+        ChannelManager.getInstance(getApplicationContext());
     }
 
     @Override
@@ -134,4 +171,17 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onResume(){
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(MessageServerService.MY_ACTION);
+        registerReceiver(myReceiver, intentFilter);
+        super.onResume();
+    }
+
+    @Override
+    public void onPause(){
+        unregisterReceiver(myReceiver);
+        super.onPause();
+    }
 }

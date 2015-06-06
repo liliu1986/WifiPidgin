@@ -1,5 +1,7 @@
 package com.iotbyte.wifipidgin.message;
 
+import android.content.Context;
+
 import com.iotbyte.wifipidgin.friend.Friend;
 
 import org.json.JSONException;
@@ -54,9 +56,9 @@ public class ChatMessage extends Message {
      * @param channelIdentifier it defines where the message belongs to
      * @param messageBody       actual message body
      */
-    public ChatMessage(Friend receiver, String channelIdentifier, String messageBody) {
+    public ChatMessage(Friend receiver, String channelIdentifier, String messageBody,Context context) {
 
-        super(receiver);
+        super(receiver,context);
         this.channelIdentifier = channelIdentifier;
         this.messageBody = messageBody;
         this.type = MessageType.CHAT_MESSAGE;

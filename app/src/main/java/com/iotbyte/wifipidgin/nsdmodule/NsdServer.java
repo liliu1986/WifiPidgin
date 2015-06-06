@@ -33,6 +33,7 @@ public class NsdServer {
 	private ServerSocket mServerSocket = null;
 	private ServerStarter mServerStarter;
     private InetAddress nsdHost;
+
     //private ServerSocket mServerSocket;
     public NsdServer(Context context, ServerSocket inServerSocket) {
         mContext = context;
@@ -42,7 +43,7 @@ public class NsdServer {
         setServerPort(mServerSocket.getLocalPort());
         //mServerStarter = new ServerStarter();
     }
-    
+
     public void initializeNsdServer() {
         initializeServiceBroadcastListener();
     }
