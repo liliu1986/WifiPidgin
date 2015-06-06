@@ -10,7 +10,10 @@ import org.apache.http.conn.util.InetAddressUtils;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URISyntaxException;
@@ -25,23 +28,40 @@ import java.util.List;
 public class Utils {
     public static final String UTILS_TAG = "UTILS";
 
-
     /**
      * Returns the sha1 of a given String
      * a boilerplate code from http://www.sha1-online.com/sha1-java/
      *
-     * @param input a string of intention
+     * @param input input to calculate sha1
      * @return sha1 of the input
-     * @throws NoSuchAlgorithmException
      */
-    public static String sha1(String input) throws NoSuchAlgorithmException {
-        MessageDigest mDigest = MessageDigest.getInstance("SHA1");
-        byte[] result = mDigest.digest(input.getBytes());
+    public static String sha1(byte[] input) {
+        MessageDigest mDigest = null;
+        try {
+            mDigest = MessageDigest.getInstance("SHA1");
+        } catch (NoSuchAlgorithmException e) {
+            // this should never happen.
+            assert false;
+            e.printStackTrace();
+            return "";
+        }
+        byte[] result = mDigest.digest(input);
         StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < result.length; i++) {
-            sb.append(Integer.toString((result[i] & 0xff) + 0x100, 16).substring(1));
+        for (int i = 0; i < input.length; i++) {
+            sb.append(Integer.toString((input[i] & 0xff) + 0x100, 16).substring(1));
         }
         return sb.toString();
+
+    }
+    /**
+     * Returns the sha1 of a given String
+     * a boilerplate code from http://www.sha1-online.com/sha1-java/
+     *
+     * @param input input to calculate sha1
+     * @return sha1 of the input
+     */
+    public static String sha1(String input) {
+        return sha1(input.getBytes());
     }
 
     /**
@@ -260,5 +280,39 @@ public class Utils {
         cursor.close();
 
         return path;
+    }
+
+    /**
+     * Calculate file hash base on first x bytes. This implementation uses Utils.sha1().
+     * @param filePath Absolute path of the file.
+     * @param length Number of bytes at the beginning of the file to be used for hash calculation.
+     *               Any length not within [1, fileSizeInBytes] will results in full file content
+     *               to be used for hash calculation.
+     * @return file hash. Empty string if file cannot be accessed.
+     */
+    public static String getFileHash(String filePath, int length) {
+
+        try {
+            FileInputStream ifs = new FileInputStream(filePath);
+            long size = ifs.getChannel().size();
+            if (length > 1 && length < size) {
+                size = length;
+            }
+            byte[] hashableBytes = new byte[(int)size];
+            ifs.read(hashableBytes, 0, length);
+            ifs.close();
+            return sha1(hashableBytes);
+        } catch (IOException e) {
+            return "";
+        }
+    }
+
+    /**
+     * Calculate file hash base on the whole file. This implementation uses Utils.sha1().
+     * @param filePath Absolute path of the file.
+     * @return file hash. Empty string if file cannot be accessed.
+     */
+    public static String getFileHash(String filePath) {
+        return getFileHash(filePath, 0);
     }
 }
