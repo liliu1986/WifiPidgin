@@ -32,6 +32,7 @@ import com.iotbyte.wifipidgin.channel.ChannelManager;
 import com.iotbyte.wifipidgin.chat.IncomingMessageHandlingService;
 import com.iotbyte.wifipidgin.commmodule.CommModuleBroadcastReceiver;
 import com.iotbyte.wifipidgin.commmodule.MessageServerService;
+import com.iotbyte.wifipidgin.nsdmodule.FriendCreationService;
 import com.iotbyte.wifipidgin.nsdmodule.NsdClient;
 import com.iotbyte.wifipidgin.nsdmodule.NsdWrapper;
 
@@ -95,6 +96,12 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         Intent i= new Intent(context, MessageServerService.class);
         i.putExtra("KEY1", "Value to be used by the service");
         context.startService(i);
+
+
+        //Start message Server service and NSD Service
+        Intent iFriendCreationService= new Intent(context, FriendCreationService.class);
+        //i.putExtra("KEY1", "Value to be used by the service");
+        context.startService(iFriendCreationService);
 
         //Start message Server service and NSD Service
         Intent incomingMessageHandlingServicesIntent= new Intent(context, IncomingMessageHandlingService.class);
