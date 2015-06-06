@@ -6,6 +6,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.iotbyte.wifipidgin.chat.ChatManager;
+import com.iotbyte.wifipidgin.commmodule.MessageServer;
 import com.iotbyte.wifipidgin.friend.Friend;
 import com.iotbyte.wifipidgin.message.FriendCreationRequest;
 
@@ -41,7 +42,7 @@ public class FriendCreationService extends Service  {
             while (!Thread.currentThread().isInterrupted()) {
                 //Processing the queue
                 //Log.d(TAG, "FriendCreationServiceThread Started");
-                while (!friendCreationQueue.isEmptyFriendCreationQueue()){
+                while (MessageServer.serviceStarted && !friendCreationQueue.isEmptyFriendCreationQueue()){
                     try {
                         Friend creatingFriend = friendCreationQueue.topFriendCreationQueue();
                         Log.d(TAG, "Creating friend " + creatingFriend.getIp().toString());

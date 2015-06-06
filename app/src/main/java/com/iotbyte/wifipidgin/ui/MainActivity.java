@@ -98,6 +98,11 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         i.putExtra("KEY1", "Value to be used by the service");
         context.startService(i);
 
+        //Start NSD here
+        //Start the service discovery
+        NsdClient mNsdClient = new NsdClient(this);
+        mNsdClient.initializeNsdClient();
+        mNsdClient.discoverServices();
 
         //Start FriendCreationService
         Intent iFriendCreationService= new Intent(context, FriendCreationService.class);
@@ -114,11 +119,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         // outGoingMessageHandlingServicesIntent.putExtra("KEY1", "Value to be used by the service");
         context.startService(outGoingMessageHandlingServicesIntent);
 
-        //Start NSD here
-        //Start the service discovery
-        NsdClient mNsdClient = new NsdClient(this);
-        mNsdClient.initializeNsdClient();
-        mNsdClient.discoverServices();
+
 
 
         ChannelManager.getInstance(getApplicationContext());

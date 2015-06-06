@@ -32,6 +32,7 @@ public class MessageServer   {
     public MessageServer() {}
     private Context mContext;
     private Handler handler;
+    public static boolean serviceStarted = false;
     public MessageServer(Context inContext, Handler inHandler) {
         mContext = inContext;
         handler = inHandler;
@@ -71,10 +72,12 @@ public class MessageServer   {
                             myIP = InetAddress.getByName(Utils.getIPAddress(true));
                             int myPort = mServerSocket.getLocalPort();
                             if (!self.getIp().equals(myIP) || self.getPort() != myPort){
-                                self.setIp(myIP);
+                                Log.d(MSG_SERVER_TAG, "Old Server IP: " + self.getIp());
                                 Log.d(MSG_SERVER_TAG, "Server IP: " + myIP);
+                                self.setIp(myIP);
                                 self.setPort(myPort);
                                 fd.update(self);
+                                serviceStarted = true;
                             }
                         } catch (UnknownHostException e) {
                             e.printStackTrace();
