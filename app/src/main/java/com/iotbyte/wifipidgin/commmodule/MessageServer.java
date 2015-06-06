@@ -4,6 +4,9 @@ import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 
+import com.iotbyte.wifipidgin.dao.DaoFactory;
+import com.iotbyte.wifipidgin.dao.FriendDao;
+import com.iotbyte.wifipidgin.friend.Friend;
 import com.iotbyte.wifipidgin.nsdmodule.NsdServer;
 
 import java.io.ByteArrayOutputStream;
@@ -49,6 +52,16 @@ public class MessageServer   {
                 mNsdServer.broadcastService();
 
 
+                //Update the ip and port for User self
+
+                FriendDao fd = DaoFactory.getInstance()
+                        .getFriendDao(mContext, DaoFactory.DaoType.SQLITE_DAO, null);
+                Friend self = fd.findById(0);
+                self.setIp(mServerSocket.getInetAddress());
+                self.setPort(mServerSocket.getLocalPort());
+                fd.update(self);
+
+                
                 while (!Thread.currentThread().isInterrupted()) {
                     Log.d(MSG_SERVER_TAG, "ServerSocket Created, awaiting connection at port: "
                             + mServerSocket.getLocalPort());
