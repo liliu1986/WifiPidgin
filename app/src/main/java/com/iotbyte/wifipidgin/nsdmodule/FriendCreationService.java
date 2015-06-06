@@ -46,7 +46,7 @@ public class FriendCreationService extends Service  {
                         Friend creatingFriend = friendCreationQueue.topFriendCreationQueue();
                         Log.d(TAG, "Creating friend " + creatingFriend.getMac().toString());
                         FriendCreationRequest creationRequest = new FriendCreationRequest(creatingFriend);
-                        ChatManager chatManager = ChatManager.getInstance(getApplicationContext());
+                        ChatManager chatManager = ChatManager.getInstance();
                         chatManager.enqueueOutGoingMessageQueue(creationRequest.convertMessageToJson());
                         TimeUnit.MILLISECONDS.sleep(delayInterval);
                         friendCreationQueue.dequeueFriendCreationQueue();

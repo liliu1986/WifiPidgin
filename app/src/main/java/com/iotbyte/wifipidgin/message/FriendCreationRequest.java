@@ -20,7 +20,7 @@ public class FriendCreationRequest extends Message {
      * Constructor for FriendCreationRequest Class, it create a new message object based on known
      * receiver information.  This message object will be send to others.
      *
-     * @param receiver     receiver pf the message
+     * @param receiver     receiver of the message
      */
     public FriendCreationRequest(Friend receiver){
         super(receiver);

@@ -3,6 +3,7 @@ package com.iotbyte.wifipidgin.chat;
 import android.content.Context;
 
 import com.iotbyte.wifipidgin.commmodule.MessageClient;
+import com.iotbyte.wifipidgin.dao.DaoError;
 import com.iotbyte.wifipidgin.dao.DaoFactory;
 import com.iotbyte.wifipidgin.dao.FriendDao;
 import com.iotbyte.wifipidgin.friend.Friend;
@@ -39,22 +40,21 @@ public class ChatManager {
 
     private MessageClient messageClient;
 
-    private Context context;
+   // private Context context;
 
-    private ChatManager(Context context) {
-        this.context = context;
+    private ChatManager() {
         outGoingMessageQueue = new ConcurrentLinkedQueue<>();
         incomingMessageQueue = new ConcurrentLinkedQueue<>();
         chatMap = new HashMap<>();
         messageClient = new MessageClient();
     }
 
-    public static ChatManager getInstance(Context context) {
+    public static ChatManager getInstance() {
         if (instance == null) {
             //Thread Safe with synchronized block
             synchronized (ChatManager.class) {
                 if (instance == null) {
-                    instance = new ChatManager(context);
+                    instance = new ChatManager();
                 }
             }
         }
@@ -82,9 +82,6 @@ public class ChatManager {
      * return false otherwise
      */
     public boolean dequeueOutGoingMessageQueue() {
-        if (null == messageClient) {
-            return false;
-        }
         String message = outGoingMessageQueue.poll();
 
         if (null == message) {
@@ -125,7 +122,7 @@ public class ChatManager {
 
     // Note the logic here, a chat has to exist under ChatManager before it can store
     // any message into.
-    public boolean dequeueIncomingMessageQueue() {
+    public boolean dequeueIncomingMessageQueue(Context context) {
         Message message = incomingMessageQueue.poll();
         if (null == message || message.getType() == MessageType.ERROR) {
             return false;
@@ -148,12 +145,7 @@ public class ChatManager {
 
                 //TODO:: try to use MessageFactory here later
                 FriendCreationResponse friendCreationResponse = new FriendCreationResponse(message.getSender());
-
-                if (null == friendCreationResponse) {
-                    return false;
-                } else {
-                    return this.enqueueOutGoingMessageQueue(friendCreationResponse.convertMessageToJson());
-                }
+                return this.enqueueOutGoingMessageQueue(friendCreationResponse.convertMessageToJson());
             }
             case FRIEND_CREATION_RESPONSE: {
                 /*
@@ -164,8 +156,12 @@ public class ChatManager {
                     return false;
                 }
                 Friend sender = message.getSender();
-                fd.add(sender);
-                return true;
+                if (DaoError.NO_ERROR == fd.add(sender)){
+                    return true;
+                } else
+                {
+                    return false;
+                }
 
             }
             default:
