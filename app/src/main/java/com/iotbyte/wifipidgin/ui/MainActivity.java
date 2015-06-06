@@ -30,6 +30,7 @@ import android.view.MenuItem;
 import com.iotbyte.wifipidgin.R;
 import com.iotbyte.wifipidgin.channel.ChannelManager;
 import com.iotbyte.wifipidgin.chat.IncomingMessageHandlingService;
+import com.iotbyte.wifipidgin.chat.OutgoingMessageHandlingService;
 import com.iotbyte.wifipidgin.commmodule.CommModuleBroadcastReceiver;
 import com.iotbyte.wifipidgin.commmodule.MessageServerService;
 import com.iotbyte.wifipidgin.nsdmodule.FriendCreationService;
@@ -98,15 +99,21 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         context.startService(i);
 
 
-        //Start message Server service and NSD Service
+        //Start FriendCreationService
         Intent iFriendCreationService= new Intent(context, FriendCreationService.class);
         //i.putExtra("KEY1", "Value to be used by the service");
         context.startService(iFriendCreationService);
 
-        //Start message Server service and NSD Service
+        //Start IncomingMessageHandlingService
         Intent incomingMessageHandlingServicesIntent= new Intent(context, IncomingMessageHandlingService.class);
         // incomingMessageHandlingServicesIntent.putExtra("KEY1", "Value to be used by the service");
         context.startService(incomingMessageHandlingServicesIntent);
+
+        //Start OutGoingMessageHandlingService
+        Intent outGoingMessageHandlingServicesIntent= new Intent(context, OutgoingMessageHandlingService.class);
+        // outGoingMessageHandlingServicesIntent.putExtra("KEY1", "Value to be used by the service");
+        context.startService(outGoingMessageHandlingServicesIntent);
+
         //Start NSD here
         //Start the service discovery
         NsdClient mNsdClient = new NsdClient(this);
