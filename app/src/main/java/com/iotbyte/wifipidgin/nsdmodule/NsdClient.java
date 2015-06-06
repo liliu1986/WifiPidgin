@@ -67,12 +67,15 @@ public class NsdClient {
                             Log.e(TAG, "Resolve Succeeded. " + serviceInfo.getServiceName());
                             mService = serviceInfo;
                             String serviceName = serviceInfo.getServiceName();
+
                             if (!serviceName.startsWith(mServiceName + "-")) {
                                 Log.d(TAG, "Unknown App");
                                 return;
                             }
 
                             InetAddress host = mService.getHost();
+                            int Friendport = serviceInfo.getPort();
+
                             Log.d(TAG, "The friend's ip is " + host.getHostAddress());
                             Log.d(TAG, "The ip for my current device is " + Utils.getIPAddress(true));
                             if (host.getHostAddress().equals(Utils.getIPAddress(true))) {
@@ -88,7 +91,7 @@ public class NsdClient {
                             String macString = serviceName.substring(macStart, macEnd);
                             Log.d(TAG, "The friend's mac address is " + macString);
 
-                            Friend newFriend = new Friend(Utils.hexStringToByteArray(macString.replaceAll(":", "")), host, 55);
+                            Friend newFriend = new Friend(Utils.hexStringToByteArray(macString.replaceAll(":", "")), host, Friendport);
                             newFriend.setIp(host);
                             FriendDao fd = DaoFactory.getInstance()
                                     .getFriendDao(mContext, DaoFactory.DaoType.SQLITE_DAO, null);
@@ -97,9 +100,19 @@ public class NsdClient {
                             FriendCreationQueue friendCreationQueue  = FriendCreationQueue.getInstance();
                             if ( false == friendCreationQueue.isInFriendCreationQueue(newFriend) ){
                                 //If not, check if the friend has already been created
-                                if (null == fd.findByMacAddress(newFriend.getMac())){
+                                Friend dbFriend = fd.findByMacAddress(newFriend.getMac());
+                                if (null == dbFriend){
                                     //Now, put the friend into the creation queue.
                                     friendCreationQueue.enqueueFriendCreationQueue(newFriend);
+                                } else {
+                                    //If the friend is already in the Database,
+                                    //update the ip and port if necessary.
+                                    if ( dbFriend.getPort() != Friendport || !dbFriend.getIp().equals(host) ){
+                                        dbFriend.setIp(host);
+                                        dbFriend.setPort(Friendport);
+                                        dbFriend.setStatus(Friend.FriendStatus.ONLINE);
+                                        fd.update(dbFriend);
+                                    }
                                 }
                             }
                         }
