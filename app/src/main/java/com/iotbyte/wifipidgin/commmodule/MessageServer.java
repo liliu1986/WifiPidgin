@@ -1,21 +1,26 @@
 package com.iotbyte.wifipidgin.commmodule;
 
 import android.content.Context;
+import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
 
 import com.iotbyte.wifipidgin.dao.DaoFactory;
 import com.iotbyte.wifipidgin.dao.FriendDao;
 import com.iotbyte.wifipidgin.friend.Friend;
 import com.iotbyte.wifipidgin.nsdmodule.NsdServer;
+import com.iotbyte.wifipidgin.utils.Utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 /**
  * Created by fire on 19/04/15.
@@ -26,8 +31,10 @@ public class MessageServer   {
     private NsdServer mNsdServer;
     public MessageServer() {}
     private Context mContext;
-    public MessageServer(Context inContext) {
+    private Handler handler;
+    public MessageServer(Context inContext, Handler inHandler) {
         mContext = inContext;
+        handler = inHandler;
     }
     /**
      * Sets the listener for receiving a msg on this server
@@ -53,15 +60,32 @@ public class MessageServer   {
 
 
                 //Update the ip and port for User self
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        FriendDao fd = DaoFactory.getInstance()
+                                .getFriendDao(mContext, DaoFactory.DaoType.SQLITE_DAO, null);
+                        Friend self = fd.findById(0);
+                        InetAddress myIP = null;
+                        try {
+                            myIP = InetAddress.getByName(Utils.getIPAddress(true));
+                            int myPort = mServerSocket.getLocalPort();
+                            if (!self.getIp().equals(myIP) || self.getPort() != myPort){
+                                self.setIp(myIP);
+                                Log.d(MSG_SERVER_TAG, "Server IP: " + myIP);
+                                self.setPort(myPort);
+                                fd.update(self);
+                            }
+                        } catch (UnknownHostException e) {
+                            e.printStackTrace();
+                        } catch (Exception e){
+                            e.printStackTrace();
+                        }
 
-                FriendDao fd = DaoFactory.getInstance()
-                        .getFriendDao(mContext, DaoFactory.DaoType.SQLITE_DAO, null);
-                Friend self = fd.findById(0);
-                self.setIp(mServerSocket.getInetAddress());
-                self.setPort(mServerSocket.getLocalPort());
-                fd.update(self);
+                    }
+                });
 
-                
+
                 while (!Thread.currentThread().isInterrupted()) {
                     Log.d(MSG_SERVER_TAG, "ServerSocket Created, awaiting connection at port: "
                             + mServerSocket.getLocalPort());
@@ -155,7 +179,9 @@ public class MessageServer   {
         }
 
     }
-
+    private void runOnUiThread(Runnable runnable) {
+        handler.post(runnable);
+    }
     /**
      * Starts a thread to send some reply msg back to the client(in case needed)
      *

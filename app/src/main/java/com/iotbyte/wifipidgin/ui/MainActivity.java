@@ -170,4 +170,17 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onResume(){
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(MessageServerService.MY_ACTION);
+        registerReceiver(myReceiver, intentFilter);
+        super.onResume();
+    }
+
+    @Override
+    public void onPause(){
+        unregisterReceiver(myReceiver);
+        super.onPause();
+    }
 }
