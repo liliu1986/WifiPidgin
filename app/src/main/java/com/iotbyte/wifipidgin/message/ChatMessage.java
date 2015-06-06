@@ -20,6 +20,7 @@ public class ChatMessage extends Message {
 
     private final String channelIdentifier;
     private String messageBody;
+    private boolean isMyself;
 
 
 
@@ -40,6 +41,7 @@ public class ChatMessage extends Message {
             JSONObject json = new JSONObject(jsonMessageData);
             this.messageBody = json.getString(MESSAGE_MESSAGE_BODY);
             this.channelIdentifier = json.getString(MESSAGE_CHANNEL_IDENTIFIER);
+            this.isMyself = false;
 
     }
 
@@ -58,6 +60,7 @@ public class ChatMessage extends Message {
         this.channelIdentifier = channelIdentifier;
         this.messageBody = messageBody;
         this.type = MessageType.CHAT_MESSAGE;
+        this.isMyself = true;
     }
 
     /**
@@ -118,6 +121,19 @@ public class ChatMessage extends Message {
 
     public String getChannelIdentifier() {
         return channelIdentifier;
+    }
+
+
+    /**
+     * isFromMyself()
+     *
+     * Return whether the message original is myself
+     *
+     * @return true if the message is construct through the multi value constructor
+     * false if message is construct through {@link #ChatMessage(String)}
+     */
+    public boolean isFromMyself(){
+        return this.isMyself;
     }
 
 
