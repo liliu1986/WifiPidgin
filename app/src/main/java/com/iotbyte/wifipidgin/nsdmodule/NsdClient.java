@@ -90,7 +90,13 @@ public class NsdClient {
                             Log.d(TAG, "Service name is " + serviceName);
                             int macStart = mServiceName.length() + 1;
                             int macEnd = macStart + 17;
-                            String macString = serviceName.substring(macStart, macEnd);
+                            String macString = null;
+                            try {
+                                macString = serviceName.substring(macStart, macEnd);
+                            } catch (StringIndexOutOfBoundsException e) {
+                                Log.e(TAG, "Received an invalid service name " + serviceName);
+                                return;
+                            }
                             Log.d(TAG, "The friend's mac address is " + macString);
 
                             Friend newFriend = new Friend(Utils.hexStringToByteArray(macString.replaceAll(":", "")), host, 55);
