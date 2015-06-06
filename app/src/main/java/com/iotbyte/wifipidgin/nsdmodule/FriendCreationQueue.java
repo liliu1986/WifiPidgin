@@ -31,7 +31,7 @@ public class FriendCreationQueue {
 
     //TODO -- change public to private after testing
     public boolean enqueueFriendCreationQueue(Friend inFriend) {
-        Log.d(TAG, "Adding Friend " + inFriend.getMac().toString());
+        Log.d(TAG, "Adding Friend " + inFriend.getIp().toString());
 
         return friendCreationQueue.offer(inFriend);
     }
