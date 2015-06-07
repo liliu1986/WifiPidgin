@@ -29,14 +29,16 @@ public class IncomingMessageHandler {
         @Override
         public void run() {
             while (!Thread.currentThread().isInterrupted()) {
-               if (!ChatManager.getInstance().isIncomingMessageQueueEmpty()){
-                   runOnUiThread(new Runnable() {
-                       @Override
-                       public void run() {
-                           ChatManager.getInstance().dequeueIncomingMessageQueue(context); // handled by ChatManager
-                       }
-                   });
-                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (!ChatManager.getInstance().isIncomingMessageQueueEmpty()) {
+                            ChatManager.getInstance().dequeueIncomingMessageQueue(context); // handled by ChatManager
+                        }
+
+                    }
+                });
+
             }
 
         }
