@@ -1,7 +1,7 @@
 package com.iotbyte.wifipidgin.ui;
 
 import android.app.Activity;
-import android.database.DataSetObserver;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -11,9 +11,9 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 import com.iotbyte.wifipidgin.R;
-import com.iotbyte.wifipidgin.message.ChatMessage;
-
-import java.util.ArrayList;
+import com.iotbyte.wifipidgin.chat.Chat;
+import com.iotbyte.wifipidgin.chat.ChatManager;
+import com.iotbyte.wifipidgin.chat.ChatMessageQueueChangeListener;
 
 public class ChatActivity extends Activity {
     private static final String TAG = "ChatActivity";
@@ -24,23 +24,30 @@ public class ChatActivity extends Activity {
     private Button buttonSend;
     String ChannelId;
 
-    ArrayList<String> data = new ArrayList<String>();
+    ChatManager chatManager;
+    Chat chat;
+    Context context;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
+        context = this;
+
         ChannelId = (String) getIntent().getExtras().get("ChannelId");
 
-        data.add("Message 1");
-        data.add("Message 2");
-        data.add("Message 3");
+        chatManager = ChatManager.getInstance();
+        chat = chatManager.getChatByChannelIdentifier(ChannelId);
+        if (null == chat) {
+            chat = new Chat(ChannelId);
+            chatManager.addChat(chat);
+        }
 
         buttonSend = (Button) findViewById(R.id.buttonSendMessage);
 
         listView = (ListView) findViewById(R.id.chatList);
-        chatArrayAdapter = new ChatArrayAdapter(getApplicationContext(), R.layout.activity_chat_single_message, data);
+        chatArrayAdapter = new ChatArrayAdapter(context, R.layout.activity_chat_single_message, chat.getChatMessageList());
         listView.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
         listView.setAdapter(chatArrayAdapter);
 
@@ -52,14 +59,28 @@ public class ChatActivity extends Activity {
                 sendChatMessage();
             }
         });
+
+        chat.setChatMessageQueueChangeListener(new ChatMessageQueueChangeListener() {
+            @Override
+            public void onChatMessageQueueNotEmpty() {
+                refreshChatList();
+            }
+        });
     }
 
     private void sendChatMessage() {
         String message = chatText.getText().toString();
         if (!message.equals("")) {
-            data.add(message);
-            listView.setSelection(chatArrayAdapter.getCount() - 1);
+            chat.sendMessageToAll(message, context);
             chatText.setText("");
         }
+    }
+
+    private void refreshChatList() {
+        chatArrayAdapter.clear();
+        Log.i("TEST", "Count: " + chat.getChatMessageList().size());
+        chatArrayAdapter.addAll(chat.getChatMessageList());
+        chatArrayAdapter.notifyDataSetChanged();
+        listView.setSelection(chatArrayAdapter.getCount() - 1);
     }
 }

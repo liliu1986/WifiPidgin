@@ -64,7 +64,7 @@ public class ChannelTabFragment extends Fragment {
                 Log.d(CHANNEL_TAB_FRAG, "channel long clicked");
                 i = new Intent(getActivity(), DeleteChannelActivity.class);
                 startActivity(i);
-                return false;
+                return true;
             }
         });
 

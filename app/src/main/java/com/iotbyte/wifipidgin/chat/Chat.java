@@ -9,8 +9,7 @@ import com.iotbyte.wifipidgin.dao.FriendDao;
 import com.iotbyte.wifipidgin.friend.Friend;
 import com.iotbyte.wifipidgin.message.ChatMessage;
 
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.ArrayList;
 
 /**
  * Chat class is the core for chat UI backend. It links to it's corresponding channel by
@@ -26,13 +25,13 @@ public class Chat {
     private ChatMessageQueueChangeListener chatMessageQueueChangeListener;
 
     /* this queue manage all messages with in the chat, include outgoing and incoming message */
-    private Queue<ChatMessage> chatMessageQueue;
+    private ArrayList<ChatMessage> chatMessageList;
    // private Context context;
 
     public Chat(String channelIdentifier) {
        // this.context = context;
         this.channelIdentifier = channelIdentifier;
-        chatMessageQueue = new LinkedList<>();
+        chatMessageList = new ArrayList<>();
 
 
     }
@@ -49,15 +48,13 @@ public class Chat {
     }
 
     /**
-     * getMessage()
-     * <p/>
-     * get a message from the chatMessageQueue, this should be called when the
-     * chatMessageQueueChangeListener fires a onChatMessageQueueNotEmpty() event;
+     * getChatMessageList()
      *
-     * @return the chatMessage from the head of the queue
+     * Getter method for ChatMessageList
+     * @return ChatMessageList
      */
-    public ChatMessage getMessage() {
-        return chatMessageQueue.poll();
+    public ArrayList<ChatMessage> getChatMessageList() {
+        return new ArrayList<>(chatMessageList);
     }
 
     /**
@@ -71,16 +68,18 @@ public class Chat {
      */
     public boolean pushMessage(ChatMessage message) {
         if (null != chatMessageQueueChangeListener) {
+            chatMessageList.add(message);
             chatMessageQueueChangeListener.onChatMessageQueueNotEmpty();
+            return true;
         }
-        return chatMessageQueue.offer(message);
+        return false;
     }
 
     /**
      * sendMessage()
      * <p/>
      * send message by push message to the out going message queue managed by ChatManager
-     * and push the same message to chatMessageQueue for display
+     * and push the same message to chatMessageList for display
      *
      * @param message message to be send out
      * @return true if send successfully, false otherwise
