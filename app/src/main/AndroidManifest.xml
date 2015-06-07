@@ -67,6 +67,10 @@
         <activity
             android:name=".ui.DeleteChannelActivity"
             android:label="@string/title_activity_delete_channel"></activity>
+        <activity
+            android:name=".ui.ChatActivity"
+            android:label="Chat"></activity>
+
 
         <service
             android:name=".commmodule.MessageServerService"

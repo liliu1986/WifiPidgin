@@ -18,4 +18,6 @@
     <string name="Cancel">Cancel</string>
     <string name="OK">OK</string>
     <string name="DeleteChannel">Delete Selected Channels</string>
+    <string name="Send">Send</string>
+    <string name="enterMessage">Enter a message</string>
 </resources>
