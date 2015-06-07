@@ -1,5 +1,12 @@
 package com.iotbyte.wifipidgin.chat;
 
+import android.content.Context;
+
+import com.iotbyte.wifipidgin.channel.Channel;
+import com.iotbyte.wifipidgin.channel.ChannelManager;
+import com.iotbyte.wifipidgin.dao.DaoFactory;
+import com.iotbyte.wifipidgin.dao.FriendDao;
+import com.iotbyte.wifipidgin.friend.Friend;
 import com.iotbyte.wifipidgin.message.ChatMessage;
 
 import java.util.LinkedList;
@@ -43,7 +50,7 @@ public class Chat {
 
     /**
      * getMessage()
-     *
+     * <p/>
      * get a message from the chatMessageQueue, this should be called when the
      * chatMessageQueueChangeListener fires a onChatMessageQueueNotEmpty() event;
      *
@@ -63,7 +70,7 @@ public class Chat {
      * @return true if insert successfully, false otherwise
      */
     public boolean pushMessage(ChatMessage message) {
-        if (null != chatMessageQueueChangeListener){
+        if (null != chatMessageQueueChangeListener) {
             chatMessageQueueChangeListener.onChatMessageQueueNotEmpty();
         }
         return chatMessageQueue.offer(message);
@@ -78,7 +85,7 @@ public class Chat {
      * @param message message to be send out
      * @return true if send successfully, false otherwise
      */
-
+    @Deprecated
     public boolean sendMessage(ChatMessage message) {
         return ChatManager
                 .getInstance()
@@ -87,12 +94,37 @@ public class Chat {
 
     /**
      * setChatMessageQueueChangeListener()
-     *
+     * <p/>
      * A setter method for ChatMessageQueueChangeListener
      *
      * @param chatMessageQueueChangeListener the listener to be set
      */
     public void setChatMessageQueueChangeListener(ChatMessageQueueChangeListener chatMessageQueueChangeListener) {
         this.chatMessageQueueChangeListener = chatMessageQueueChangeListener;
+    }
+
+
+    /**
+     * sendMessageToAll()
+     * <p/>
+     * Send message to all friends of the channel, also post this message to this chat's own queue by
+     * calling {@link #pushMessage(ChatMessage)}
+     *
+     * @param messageBody
+     * @param context
+     */
+
+    public void sendMessageToAll(String messageBody, Context context) {
+
+        Channel channel = ChannelManager.getInstance(context).getChannelByIdentifier(this.channelIdentifier);
+        ChatMessage chatMessage;
+        for (Friend friend : channel.getFriendsList()) {
+            chatMessage = new ChatMessage(friend, this.getChannelIdentifier(), messageBody);
+            ChatManager.getInstance().enqueueOutGoingMessageQueue(chatMessage.convertMessageToJson());
+        }
+        FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
+        Friend myself = fd.findById(0);
+        chatMessage = new ChatMessage(myself, this.channelIdentifier, messageBody);
+        pushMessage(chatMessage);
     }
 }

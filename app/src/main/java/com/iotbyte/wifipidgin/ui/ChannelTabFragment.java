@@ -51,6 +51,9 @@ public class ChannelTabFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.d(CHANNEL_TAB_FRAG, "channel clicked");
+                i = new Intent(getActivity(), ChatActivity.class);
+                i.putExtra("ChannelId", adapter.getItem(position).getChannelIdentifier());
+                startActivity(i);
             }
         });
 
