@@ -54,7 +54,7 @@ public class Chat {
      * @return ChatMessageList
      */
     public ArrayList<ChatMessage> getChatMessageList() {
-        return chatMessageList;
+        return new ArrayList<>(chatMessageList);
     }
 
     /**
@@ -68,9 +68,11 @@ public class Chat {
      */
     public boolean pushMessage(ChatMessage message) {
         if (null != chatMessageQueueChangeListener) {
+            chatMessageList.add(message);
             chatMessageQueueChangeListener.onChatMessageQueueNotEmpty();
+            return true;
         }
-        return chatMessageList.add(message);
+        return false;
     }
 
     /**
