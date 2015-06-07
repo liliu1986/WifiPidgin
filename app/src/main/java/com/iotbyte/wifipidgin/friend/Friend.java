@@ -1,5 +1,7 @@
 package com.iotbyte.wifipidgin.friend;
 
+import com.iotbyte.wifipidgin.utils.Utils;
+
 import java.net.InetAddress;
 
 /**
@@ -57,6 +59,8 @@ public class Friend {
         this.status = FriendStatus.UNINIT;
         this.imagePath = UNINIT_STRING;
         this.isFavourite = false;
+        this.nameDescriptionHash = UNINIT_STRING;
+        this.imageHash = UNINIT_STRING;
     }
 
     public long getId() {
@@ -93,6 +97,8 @@ public class Friend {
 
     public void setName(String name) {
         this.name = name;
+        // recalculate hash
+        this.nameDescriptionHash = Utils.sha1(this.name + this.description);
     }
 
     public String getDescription() {
@@ -101,6 +107,8 @@ public class Friend {
 
     public void setDescription(String description) {
         this.description = description;
+        // recalculate hash
+        this.nameDescriptionHash = Utils.sha1(this.name + this.description);
     }
 
     public FriendStatus getStatus() {
@@ -117,6 +125,7 @@ public class Friend {
 
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
+        this.imageHash = Utils.getFileHash(imagePath, IMAGE_HASHABLE_BYTES);
     }
 
     public boolean isFavourite() {
@@ -127,7 +136,18 @@ public class Friend {
         this.isFavourite = isFavourite;
     }
 
+    public String getNameDescriptionHash() {
+        return nameDescriptionHash;
+    }
+
+    public String getImageHash() {
+        return imageHash;
+    }
+
     static private final String UNINIT_STRING = "Un-init";
+
+    /** Number of bytes used to calcuate image hash */
+    static private final int IMAGE_HASHABLE_BYTES = 100;
 
     /**
      * id to identify friend in storage.
@@ -174,6 +194,18 @@ public class Friend {
      * Whether this Friend has is a favourite
      */
     private boolean isFavourite;
+
+    /**
+     * Hash of name and description. The hash is sent with every chat message.
+     * When remote client detects a hash change, it will request the updated name and description.
+     */
+    private String nameDescriptionHash;
+
+    /**
+     * Hash of friend image. The hash is sent with every chat message.
+     * When remote client detects a hash change, it will request the updated image.
+     */
+    private String imageHash;
 
     @Override
     public String toString() {

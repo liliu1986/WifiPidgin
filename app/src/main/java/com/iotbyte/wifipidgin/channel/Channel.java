@@ -60,11 +60,7 @@ public class Channel {
         Timestamp mTimestamp = new Timestamp(mDate.getTime());
         String identifier = address + mTimestamp.toString();
         String identifierHolder;
-        try {
-            identifierHolder = com.iotbyte.wifipidgin.utils.Utils.sha1(identifier);
-        } catch (NoSuchAlgorithmException e) {
-            identifierHolder = identifier;
-        }
+        identifierHolder = com.iotbyte.wifipidgin.utils.Utils.sha1(identifier);
         this.channelIdentifier = identifierHolder;
 
         Log.v(CHANNEL_TAG, "the channelIdentifier is " + this.channelIdentifier);
