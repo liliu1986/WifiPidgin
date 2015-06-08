@@ -61,34 +61,28 @@ public class MessageServer   {
 
 
                 //Update the ip and port for User self
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        FriendDao fd = DaoFactory.getInstance()
-                                .getFriendDao(mContext, DaoFactory.DaoType.SQLITE_DAO, null);
-                        Friend self = fd.findById(0);
-                        InetAddress myIP = null;
-                        try {
-                            myIP = InetAddress.getByName(Utils.getIPAddress(true));
-                            int myPort = mServerSocket.getLocalPort();
-                            if (!self.getIp().equals(myIP) || self.getPort() != myPort){
-                                Log.d(MSG_SERVER_TAG, "Old Server IP: " + self.getIp());
-                                Log.d(MSG_SERVER_TAG, "Server IP: " + myIP);
-                                self.setIp(myIP);
-                                self.setPort(myPort);
+                FriendDao fd = DaoFactory.getInstance()
+                        .getFriendDao(mContext, DaoFactory.DaoType.SQLITE_DAO, null);
+                Friend self = fd.findById(0);
+                InetAddress myIP = null;
+                try {
+                    myIP = InetAddress.getByName(Utils.getIPAddress(true));
+                    int myPort = mServerSocket.getLocalPort();
+                    if (!self.getIp().equals(myIP) || self.getPort() != myPort){
+                        Log.d(MSG_SERVER_TAG, "Old Server IP: " + self.getIp());
+                        Log.d(MSG_SERVER_TAG, "Server IP: " + myIP);
+                        self.setIp(myIP);
+                        self.setPort(myPort);
 
-                                fd.update(self);
-                            }
-                        } catch (UnknownHostException e) {
-                            e.printStackTrace();
-                        } catch (Exception e){
-                            e.printStackTrace();
-                        } finally {
-                            serviceStarted = true;
-                        }
-
+                        fd.update(self);
                     }
-                });
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
+                } catch (Exception e){
+                    e.printStackTrace();
+                } finally {
+                    serviceStarted = true;
+                }
 
 
                 while (!Thread.currentThread().isInterrupted()) {
@@ -123,6 +117,7 @@ public class MessageServer   {
             }
         }
     }
+
     private Context getServerContext(){
         return mContext;
     }
@@ -179,6 +174,8 @@ public class MessageServer   {
 
             }catch (IOException e) {
                 // TODO Auto-generated catch block
+                e.printStackTrace();
+            }catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -240,6 +237,9 @@ public class MessageServer   {
     public void tearDown(){
         if(mThread != null){
             mThread.interrupt();
+        }
+        if (mNsdServer != null){
+            mNsdServer.tearDown();
         }
     }
 

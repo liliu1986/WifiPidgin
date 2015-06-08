@@ -1,6 +1,7 @@
 package com.iotbyte.wifipidgin.chat;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.iotbyte.wifipidgin.commmodule.MessageClient;
 import com.iotbyte.wifipidgin.dao.DaoError;
@@ -127,7 +128,7 @@ public class ChatManager {
         if (null == message || message.getType() == MessageType.ERROR) {
             return false;
         }
-        //Log.v("test chat", "successfully handled!!!");
+        Log.v("test chat", "Get: " + message.convertMessageToJson());
         switch (message.getType()) {
             case CHAT_MESSAGE: {
                 if (!chatMap.containsKey(((ChatMessage) message).getChannelIdentifier())) {

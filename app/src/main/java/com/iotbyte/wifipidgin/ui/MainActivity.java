@@ -42,7 +42,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     FunctionSelectTabAdapter mFunctionSelectTabAdapter;
 
     ViewPager mViewPager;
-    NsdWrapper mNsdWrapper;
     CommModuleBroadcastReceiver myReceiver;
 
     public void onCreate(Bundle savedInstanceState) {
@@ -93,34 +92,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         intentFilter.addAction(MessageServerService.MY_ACTION);
         registerReceiver(myReceiver, intentFilter);
 
-        //Start message Server service and NSD Service
-        Intent i= new Intent(context, MessageServerService.class);
-        i.putExtra("KEY1", "Value to be used by the service");
-        context.startService(i);
-
-        //Start NSD here
-        //Start the service discovery
-        NsdClient mNsdClient = new NsdClient(this);
-        mNsdClient.initializeNsdClient();
-        mNsdClient.discoverServices();
-
-        //Start FriendCreationService
-        Intent iFriendCreationService= new Intent(context, FriendCreationService.class);
-        //i.putExtra("KEY1", "Value to be used by the service");
-        context.startService(iFriendCreationService);
-
-        //Start IncomingMessageHandlingService
-        Intent incomingMessageHandlingServicesIntent= new Intent(context, IncomingMessageHandlingService.class);
-        // incomingMessageHandlingServicesIntent.putExtra("KEY1", "Value to be used by the service");
-        context.startService(incomingMessageHandlingServicesIntent);
-
-        //Start OutGoingMessageHandlingService
-        Intent outGoingMessageHandlingServicesIntent= new Intent(context, OutgoingMessageHandlingService.class);
-        // outGoingMessageHandlingServicesIntent.putExtra("KEY1", "Value to be used by the service");
-        context.startService(outGoingMessageHandlingServicesIntent);
-
-
-
+        //Start all the related services
+        startServices();
 
         ChannelManager.getInstance(getApplicationContext());
     }
@@ -139,13 +112,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
 
-    //TODO need to destroy the NSD
-    @Override
-    protected void onDestroy() {
-        if (mNsdWrapper != null)
-            mNsdWrapper.tearDown();
-        super.onDestroy();
-    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -184,4 +151,49 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         unregisterReceiver(myReceiver);
         super.onPause();
     }
+
+
+    //TODO need to destroy the NSD
+    @Override
+    protected void onDestroy() {
+        Context context = getApplicationContext();
+        context.stopService(messageServerServiceIntent);
+        mNsdClient.stopDiscovery();
+        context.stopService(friendCreationServiceIntent);
+        context.stopService(incomingMessageHandlingServicesIntent);
+        context.stopService(outGoingMessageHandlingServicesIntent);
+
+        super.onDestroy();
+    }
+
+
+    private void startServices(){
+        Context context = getApplicationContext();
+        //Start message Server service and NSD Service
+        messageServerServiceIntent= new Intent(context, MessageServerService.class);
+        context.startService(messageServerServiceIntent);
+
+        //Start NSD Client here
+        //Start the service discovery
+        mNsdClient = new NsdClient(this);
+        mNsdClient.initializeNsdClient();
+        mNsdClient.discoverServices();
+
+        //Start FriendCreationService
+        friendCreationServiceIntent = new Intent(context, FriendCreationService.class);
+        context.startService(friendCreationServiceIntent);
+
+        //Start IncomingMessageHandlingService
+        incomingMessageHandlingServicesIntent = new Intent(context, IncomingMessageHandlingService.class);
+        context.startService(incomingMessageHandlingServicesIntent);
+
+        //Start OutGoingMessageHandlingService
+        outGoingMessageHandlingServicesIntent = new Intent(context, OutgoingMessageHandlingService.class);
+        context.startService(outGoingMessageHandlingServicesIntent);
+    }
+    NsdClient mNsdClient;
+    private Intent messageServerServiceIntent;
+    private Intent friendCreationServiceIntent;
+    private Intent incomingMessageHandlingServicesIntent;
+    private Intent outGoingMessageHandlingServicesIntent;
 }

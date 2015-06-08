@@ -45,6 +45,11 @@ public class MessageServerService extends Service {
             }
         });
     }
+    @Override
+    public void onDestroy() {
+        mMessageServer.tearDown();
+    }
+
 
     private final String MSG_SERVICE_TAG = "MessageService";
 

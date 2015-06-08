@@ -38,6 +38,7 @@ public class FriendListManager {
         //updatetmpfriendlistItems = fd.findByIsFavourite(isFavourite);
 
         //register subscriber to data base event.
+
         fd.getDaoEventBoard().registerEventSubscriber(new DaoEventSubscriber() {
             @Override
             public void onEvent(DaoEvent event) {
@@ -45,15 +46,21 @@ public class FriendListManager {
                 if (event == DaoEvent.FRIEND_LIST_CHANGED){
                     //check if adapter and adapter's list has been initialized.
                     if (adapter != null && tmpfriendlistItems != null){
-                        //clear adapter's list.
-                        adapter.clear();
-                        //get updated friend list item from data base.
-                        updatetmpfriendlistItems = fd.findByIsFavourite(isFavourite);
-                        //Log.d("TAG", "New friend list has % members"+tmpfriendlistItems.size());
-                        //pass new friend list to adapter
-                        adapter.addAll(updatetmpfriendlistItems);
-                        //this will let adapter update UI.
-                        adapter.notifyDataSetChanged();
+                        mFragmentActivity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                //clear adapter's list.
+                                adapter.clear();
+                                //get updated friend list item from data base.
+                                updatetmpfriendlistItems = fd.findByIsFavourite(isFavourite);
+                                //Log.d("TAG", "New friend list has % members"+tmpfriendlistItems.size());
+                                //pass new friend list to adapter
+                                adapter.addAll(updatetmpfriendlistItems);
+                                //this will let adapter update UI.
+                                adapter.notifyDataSetChanged();
+                            }
+                        });
+
                     }
                 }
             }

@@ -29,15 +29,9 @@ public class IncomingMessageHandler {
         @Override
         public void run() {
             while (!Thread.currentThread().isInterrupted()) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!ChatManager.getInstance().isIncomingMessageQueueEmpty()) {
-                            ChatManager.getInstance().dequeueIncomingMessageQueue(context); // handled by ChatManager
-                        }
-
-                    }
-                });
+                if (!ChatManager.getInstance().isIncomingMessageQueueEmpty()) {
+                    ChatManager.getInstance().dequeueIncomingMessageQueue(context); // handled by ChatManager
+                }
 
             }
 

@@ -28,14 +28,9 @@ public class OutgoingMessageHandler  {
         public void run() {
 
             while (!Thread.currentThread().isInterrupted()) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (!ChatManager.getInstance().isOutGoingMessageQueueEmpty()){
-                                ChatManager.getInstance().dequeueOutGoingMessageQueue(); // handled by ChatManager
-                            }
-                        }
-                    });
+                if (!ChatManager.getInstance().isOutGoingMessageQueueEmpty()){
+                    ChatManager.getInstance().dequeueOutGoingMessageQueue(); // handled by ChatManager
+                }
 
             }
 
