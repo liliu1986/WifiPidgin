@@ -51,6 +51,9 @@ public class ChannelTabFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.d(CHANNEL_TAB_FRAG, "channel clicked");
+                i = new Intent(getActivity(), ChatActivity.class);
+                i.putExtra("ChannelId", adapter.getItem(position).getChannelIdentifier());
+                startActivity(i);
             }
         });
 
@@ -61,7 +64,7 @@ public class ChannelTabFragment extends Fragment {
                 Log.d(CHANNEL_TAB_FRAG, "channel long clicked");
                 i = new Intent(getActivity(), DeleteChannelActivity.class);
                 startActivity(i);
-                return false;
+                return true;
             }
         });
 
@@ -89,8 +92,14 @@ public class ChannelTabFragment extends Fragment {
     }
 
     public void refreshChannelList() {
-        adapter.clear();
-        adapter.addAll(channelManager.getChannelList());
-        adapter.notifyDataSetChanged();
+        this.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                adapter.clear();
+                adapter.addAll(channelManager.getChannelList());
+                adapter.notifyDataSetChanged();
+            }
+        });
+
     }
 }

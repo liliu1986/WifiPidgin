@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.iotbyte.wifipidgin">
+    package="com.iotbyte.wifipidgin"
+    android:versionCode="2"
+    android:versionName="0.2">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -30,7 +32,7 @@
             android:label="Wifi Pidgin">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <activity
@@ -67,11 +69,27 @@
         <activity
             android:name=".ui.DeleteChannelActivity"
             android:label="@string/title_activity_delete_channel"></activity>
+        <activity
+            android:name=".ui.ChatActivity"
+            android:label="Chat"></activity>
+
 
         <service
             android:name=".commmodule.MessageServerService"
             android:icon="@drawable/ic_launcher"
             android:label="@string/message_server_service_name"></service>
+        <service
+            android:name=".chat.IncomingMessageHandlingService"
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/incoming_message_handler_service"></service>
+        <service
+            android:name=".chat.OutgoingMessageHandlingService"
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/outgoing_message_handling_service"></service>
+        <service
+            android:name=".nsdmodule.FriendCreationService"
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/outgoing_message_handling_service"></service>
 
     </application>
 

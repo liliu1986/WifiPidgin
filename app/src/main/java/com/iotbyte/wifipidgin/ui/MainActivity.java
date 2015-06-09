@@ -18,7 +18,9 @@ package com.iotbyte.wifipidgin.ui;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -27,6 +29,12 @@ import android.view.MenuItem;
 
 import com.iotbyte.wifipidgin.R;
 import com.iotbyte.wifipidgin.channel.ChannelManager;
+import com.iotbyte.wifipidgin.chat.IncomingMessageHandlingService;
+import com.iotbyte.wifipidgin.chat.OutgoingMessageHandlingService;
+import com.iotbyte.wifipidgin.commmodule.CommModuleBroadcastReceiver;
+import com.iotbyte.wifipidgin.commmodule.MessageServerService;
+import com.iotbyte.wifipidgin.nsdmodule.FriendCreationService;
+import com.iotbyte.wifipidgin.nsdmodule.NsdClient;
 import com.iotbyte.wifipidgin.nsdmodule.NsdWrapper;
 
 public class MainActivity extends FragmentActivity implements ActionBar.TabListener {
@@ -34,12 +42,13 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     FunctionSelectTabAdapter mFunctionSelectTabAdapter;
 
     ViewPager mViewPager;
-    NsdWrapper mNsdWrapper;
+    CommModuleBroadcastReceiver myReceiver;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Context context = getApplicationContext();
 
         // Create the adapter that will return a fragment for each of the three primary sections
         // of the app.
@@ -78,14 +87,15 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                     .setTabListener(this));
         }
 
-        //Start NSD here
-        //mNsdWrapper = new NsdWrapper(this);
-        //Start DSN broadcasting
-        //mNsdWrapper.Broadcast();
-        //Start DSN discovery
-        //mNsdWrapper.discover();
+        myReceiver = new CommModuleBroadcastReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(MessageServerService.MY_ACTION);
+        registerReceiver(myReceiver, intentFilter);
 
-            ChannelManager.getInstance(getApplicationContext());
+        //Start all the related services
+        startServices();
+
+        ChannelManager.getInstance(getApplicationContext());
     }
 
     @Override
@@ -102,13 +112,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
 
-    //TODO need to destroy the NSD
-    @Override
-    protected void onDestroy() {
-        if (mNsdWrapper != null)
-            mNsdWrapper.tearDown();
-        super.onDestroy();
-    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -134,4 +138,62 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onResume(){
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(MessageServerService.MY_ACTION);
+        registerReceiver(myReceiver, intentFilter);
+        super.onResume();
+    }
+
+    @Override
+    public void onPause(){
+        unregisterReceiver(myReceiver);
+        super.onPause();
+    }
+
+
+    //TODO need to destroy the NSD
+    @Override
+    protected void onDestroy() {
+        Context context = getApplicationContext();
+        context.stopService(messageServerServiceIntent);
+        mNsdClient.stopDiscovery();
+        context.stopService(friendCreationServiceIntent);
+        context.stopService(incomingMessageHandlingServicesIntent);
+        context.stopService(outGoingMessageHandlingServicesIntent);
+
+        super.onDestroy();
+    }
+
+
+    private void startServices(){
+        Context context = getApplicationContext();
+        //Start message Server service and NSD Service
+        messageServerServiceIntent= new Intent(context, MessageServerService.class);
+        context.startService(messageServerServiceIntent);
+
+        //Start NSD Client here
+        //Start the service discovery
+        mNsdClient = new NsdClient(this);
+        mNsdClient.initializeNsdClient();
+        mNsdClient.discoverServices();
+
+        //Start FriendCreationService
+        friendCreationServiceIntent = new Intent(context, FriendCreationService.class);
+        context.startService(friendCreationServiceIntent);
+
+        //Start IncomingMessageHandlingService
+        incomingMessageHandlingServicesIntent = new Intent(context, IncomingMessageHandlingService.class);
+        context.startService(incomingMessageHandlingServicesIntent);
+
+        //Start OutGoingMessageHandlingService
+        outGoingMessageHandlingServicesIntent = new Intent(context, OutgoingMessageHandlingService.class);
+        context.startService(outGoingMessageHandlingServicesIntent);
+    }
+    NsdClient mNsdClient;
+    private Intent messageServerServiceIntent;
+    private Intent friendCreationServiceIntent;
+    private Intent incomingMessageHandlingServicesIntent;
+    private Intent outGoingMessageHandlingServicesIntent;
 }

@@ -9,7 +9,7 @@ CREATE TABLE friend
     -- MAC stored as hex string
     mac_addr    TEXT NOT NULL UNIQUE,
     -- IP stored as string (InetAddress.getHostAddress())
-    ip          TEXT NOT NULL UNIQUE,
+    ip          TEXT NOT NULL,
     port        INTEGER NOT NULL,
     name        TEXT,
     description TEXT,

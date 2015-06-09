@@ -16,9 +16,7 @@ public class NsdServer {
 	
 	Context mContext;
 	NsdManager mNsdManager;
-	
-    NsdManager.ResolveListener mResolveListener;
-    NsdManager.DiscoveryListener mDiscoveryListener;
+
     NsdManager.RegistrationListener mRegistrationListener;
     
     public static boolean RegisterredServiceFlag = false;
@@ -33,6 +31,7 @@ public class NsdServer {
 	private ServerSocket mServerSocket = null;
 	private ServerStarter mServerStarter;
     private InetAddress nsdHost;
+
     //private ServerSocket mServerSocket;
     public NsdServer(Context context, ServerSocket inServerSocket) {
         mContext = context;
@@ -42,7 +41,7 @@ public class NsdServer {
         setServerPort(mServerSocket.getLocalPort());
         //mServerStarter = new ServerStarter();
     }
-    
+
     public void initializeNsdServer() {
         initializeServiceBroadcastListener();
     }
@@ -75,6 +74,7 @@ public class NsdServer {
             
             @Override
             public void onUnregistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
+                Log.d(TAG, "Failed to register the service " + mServiceName );
             }
             
         };
@@ -152,11 +152,9 @@ public class NsdServer {
     
     public void tearDown() {
     	try{
-    		if(RegisterredServiceFlag)
-    			mNsdManager.unregisterService(mRegistrationListener);
+            mNsdManager.unregisterService(mRegistrationListener);
     	}catch(Exception e){
     		Log.w(TAG, "Problem happened during unregisterService()!");
     	}
-    	
     }
 }

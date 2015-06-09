@@ -129,15 +129,14 @@ public class FriendSqliteDao implements FriendDao {
     }
 
     @Override
-    public Friend findByIp(InetAddress ip) {
+    public List<Friend> findByIp(InetAddress ip) {
         SQLiteDatabase db = sqliteHelper.getReadableDatabase();
         Cursor c = null;
         try {
             String[] whereArgs = {ip.getHostAddress()};
             c = db.query(FRIEND_TABLE, ALL_COLUMNS, IP_FIELD + " = ?", whereArgs, null, null, null);
             List<Friend> fl = getFriendsFromCursor(c);
-            assert fl.size() <= 1;
-            return fl.size() == 0 ? null : fl.get(0);
+            return fl;
         } finally {
             cleanup(db, c);
         }

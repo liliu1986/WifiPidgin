@@ -30,8 +30,8 @@ public class MessageServerService extends Service {
 
     @Override
     public void onCreate() {
-
-        mMessageServer = new MessageServer(getApplicationContext());
+        handler = new Handler();
+        mMessageServer = new MessageServer(getApplicationContext(), handler);
         mMessageServer.setMessageReceivingListener(new MessageReceivingListener(){
             @Override
             public void onMessageReceived(String msg){
@@ -45,6 +45,11 @@ public class MessageServerService extends Service {
             }
         });
     }
+    @Override
+    public void onDestroy() {
+        mMessageServer.tearDown();
+    }
+
 
     private final String MSG_SERVICE_TAG = "MessageService";
 
@@ -53,6 +58,7 @@ public class MessageServerService extends Service {
 
     private ServerSocket mServerSocket = null;
     private int mPort = -1;
+    private Handler handler;
 
     public final static String MY_ACTION = "MY_ACTION";
 }

@@ -5,17 +5,12 @@ import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.util.Log;
 
-import com.iotbyte.wifipidgin.channel.Channel;
-import com.iotbyte.wifipidgin.dao.DaoError;
 import com.iotbyte.wifipidgin.dao.DaoFactory;
 import com.iotbyte.wifipidgin.dao.FriendDao;
 import com.iotbyte.wifipidgin.friend.Friend;
 import com.iotbyte.wifipidgin.utils.Utils;
-import com.iotbyte.wifipidgin.ui.tempDb;
 
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.List;
 
 public class NsdClient {
 
@@ -32,23 +27,23 @@ public class NsdClient {
 
     NsdServiceInfo mService;
 
-    //The list of channels that is alive
-    private List<Channel> ChannelList;
-    //The list of users showing themselves as visible within the same lan network
-    //private List<Friend> nearbyFriendList;
-    private tempDb mdb;
+    private boolean isDiscovering = false;
 
-    private boolean isDiscovering=false;
     public NsdClient(Context context) {
         mContext = context;
         mNsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
-        ChannelList=new ArrayList<Channel>();
         //nearbyFriendList =new ArrayList<Friend>();
+        //Start message Server service and NSD Service
+        Log.d(TAG, "Initializing NsdClient");
+
     }
+
+
     public void initializeNsdClient() {
         initializeDiscoveryListener();
         initializeResolveListener();
     }
+
     public void initializeDiscoveryListener() {
         mDiscoveryListener = new NsdManager.DiscoveryListener() {
 
@@ -72,12 +67,15 @@ public class NsdClient {
                             Log.e(TAG, "Resolve Succeeded. " + serviceInfo.getServiceName());
                             mService = serviceInfo;
                             String serviceName = serviceInfo.getServiceName();
+
                             if (!serviceName.startsWith(mServiceName + "-")) {
                                 Log.d(TAG, "Unknown App");
                                 return;
                             }
 
                             InetAddress host = mService.getHost();
+                            int Friendport = serviceInfo.getPort();
+
                             Log.d(TAG, "The friend's ip is " + host.getHostAddress());
                             Log.d(TAG, "The ip for my current device is " + Utils.getIPAddress(true));
                             if (host.getHostAddress().equals(Utils.getIPAddress(true))) {
@@ -90,18 +88,38 @@ public class NsdClient {
                             Log.d(TAG, "Service name is " + serviceName);
                             int macStart = mServiceName.length() + 1;
                             int macEnd = macStart + 17;
-                            String macString = serviceName.substring(macStart, macEnd);
+                            String macString = null;
+                            try {
+                                macString = serviceName.substring(macStart, macEnd);
+                            } catch (StringIndexOutOfBoundsException e) {
+                                Log.e(TAG, "Received an invalid service name " + serviceName);
+                                return;
+                            }
                             Log.d(TAG, "The friend's mac address is " + macString);
 
-                            Friend newFriend = new Friend(Utils.hexStringToByteArray(macString.replaceAll(":", "")), host, 55);
+                            Friend newFriend = new Friend(Utils.hexStringToByteArray(macString.replaceAll(":", "")), host, Friendport);
                             newFriend.setIp(host);
-
-                            //mdb.addFriendToList(newFriend);
                             FriendDao fd = DaoFactory.getInstance()
                                     .getFriendDao(mContext, DaoFactory.DaoType.SQLITE_DAO, null);
-                            DaoError err = fd.add(newFriend);
-                            if (err != DaoError.NO_ERROR) {
-                                Log.e(TAG, "wth, something wrong" + err.getValue());
+
+                            //Try to see if the friend is already being created.
+                            FriendCreationQueue friendCreationQueue  = FriendCreationQueue.getInstance();
+                            if ( false == friendCreationQueue.isInFriendCreationQueue(newFriend) ){
+                                //If not, check if the friend has already been created
+                                Friend dbFriend = fd.findByMacAddress(newFriend.getMac());
+                                if (null == dbFriend){
+                                    //Now, put the friend into the creation queue.
+                                    friendCreationQueue.enqueueFriendCreationQueue(newFriend);
+                                } else {
+                                    //If the friend is already in the Database,
+                                    //update the ip and port if necessary.
+                                    if ( dbFriend.getPort() != Friendport || !dbFriend.getIp().equals(host) ){
+                                        dbFriend.setIp(host);
+                                        dbFriend.setPort(Friendport);
+                                        dbFriend.setStatus(Friend.FriendStatus.ONLINE);
+                                        fd.update(dbFriend);
+                                    }
+                                }
                             }
                         }
                     });
@@ -175,13 +193,8 @@ public class NsdClient {
     public NsdServiceInfo getChosenServiceInfo() {
         return mService;
     }
-    public List<Channel> getChannelList(){
-        return ChannelList;
-    }
 
-    //public List<Friend> getNearbyFriendList(){
-    //	return nearbyFriendList;
-    //}
+
 
     //Returns if currently the discovery is on going.
     public boolean getIsDiscovering(){
