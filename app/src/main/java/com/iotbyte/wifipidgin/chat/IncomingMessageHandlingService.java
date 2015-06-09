@@ -14,7 +14,7 @@ import android.os.Handler;
  */
 public class IncomingMessageHandlingService extends Service {
 
-    private Handler handler;
+    //private Handler handler;
     private IncomingMessageHandler incomingMessageHandler;
     private final String INCOMING_MESSAGE_HANDLING_SERVICE = "inc msg serv";
 
@@ -27,8 +27,8 @@ public class IncomingMessageHandlingService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        handler = new Handler();
-        incomingMessageHandler = new IncomingMessageHandler(getApplicationContext(), handler);
+       // handler = new Handler();
+        incomingMessageHandler = new IncomingMessageHandler(getApplicationContext());
     }
 
     @Override

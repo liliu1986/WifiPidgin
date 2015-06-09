@@ -92,8 +92,14 @@ public class ChannelTabFragment extends Fragment {
     }
 
     public void refreshChannelList() {
-        adapter.clear();
-        adapter.addAll(channelManager.getChannelList());
-        adapter.notifyDataSetChanged();
+        this.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                adapter.clear();
+                adapter.addAll(channelManager.getChannelList());
+                adapter.notifyDataSetChanged();
+            }
+        });
+
     }
 }

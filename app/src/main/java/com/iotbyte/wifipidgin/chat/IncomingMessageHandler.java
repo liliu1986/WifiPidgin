@@ -1,7 +1,6 @@
 package com.iotbyte.wifipidgin.chat;
 
 import android.content.Context;
-import android.os.Handler;
 
 /**
  * Created by yefwen@iotbyte.com on 09/05/15.
@@ -15,11 +14,11 @@ public class IncomingMessageHandler {
 
     Thread thread = null;
 
-    private Handler handler;
+    //private Handler handler;
 
-    public IncomingMessageHandler(Context context, Handler handler){
+    public IncomingMessageHandler(Context context){
          this.context = context;
-         this.handler = handler;
+        // this.handler = handler;
     }
 
 
@@ -39,9 +38,9 @@ public class IncomingMessageHandler {
     }
 
 
-    private void runOnUiThread(Runnable runnable) {
+/*    private void runOnUiThread(Runnable runnable) {
         handler.post(runnable);
-    }
+    }*/
 
     public void startHandler(){
        thread = new Thread (new ServiceThread());
