@@ -52,64 +52,59 @@ public class MessageClient {
             Log.d(MSG_CLIENT_TAG, "MessageSendingThread started");
             /*TODO - Need handle the scenario that if the server is busy and unable to establish connection
              */
-            try {
-                if (getSocket() == null) {
-                    Log.d(MSG_CLIENT_TAG, "Trying to connect to " + mAddress.toString() + ":" + PORT);
-                    setSocket(new Socket(mAddress, PORT));
-                    Log.d(MSG_CLIENT_TAG, "Sending-side socket initialized.");
-                } else {
-                    Log.d(MSG_CLIENT_TAG, "Socket already initialized. skipping!");
-                }
+            Log.d(MSG_CLIENT_TAG, "Trying to connect to " + mAddress.toString() + ":" + PORT);
+            Socket newSocket = createSocket();
+            if (newSocket != null){
+                //setSocket(newSocket);
+                Log.d(MSG_CLIENT_TAG, "Sending-side socket initialized.");
+                sendMessage(MSG, newSocket);
 
-                sendMessage(MSG);
-
-            } catch (UnknownHostException e) {
-                Log.d(MSG_CLIENT_TAG, "Initializing socket failed, UHE", e);
-            } catch (IOException e) {
-                Log.d(MSG_CLIENT_TAG, "Initializing socket failed, IOE.", e);
-            }
-        }
-
-    }
-
-
-    private synchronized void setSocket(Socket socket) {
-
-        if (mSocket != null) {
-            if (mSocket.isConnected()) {
+                //Close and delete the socket
                 try {
-                    mSocket.close();
+                    newSocket.close();
                 } catch (IOException e) {
                     e.printStackTrace();
+                } finally {
+                    newSocket = null;
+                    System.gc();
                 }
+
+            } else {
+                Log.w(MSG_CLIENT_TAG, "Sending-side socket cannot be initialized");
             }
         }
-        mSocket = socket;
+
     }
 
-    public Socket getSocket() {
-        if(mSocket == null || mSocket.isClosed()){
-            return null;
-        }else{
-            return mSocket;
-        }
-    }
-
-    private void sendMessage(String msg) {
+    private Socket createSocket(){
+        Socket newSocket = null;
         try {
-            Socket socket = getSocket();
-            if (socket == null) {
-                Log.d(MSG_CLIENT_TAG, "Socket is null, wtf?");
+            newSocket  = new Socket(mAddress, PORT);
+        } catch (UnknownHostException e) {
+            Log.d(MSG_CLIENT_TAG, "Initializing socket failed, UHE", e);
+        } catch (IOException e) {
+            Log.d(MSG_CLIENT_TAG, "Initializing socket failed, IOE.", e);
+        }
+        return newSocket;
+    }
+
+    private void sendMessage(String msg, Socket inSocket) {
+        try {
+            Socket socket = inSocket;
+            if (socket == null || socket.isClosed()) {
+                Log.d(MSG_CLIENT_TAG, "Socket is null or closed, wtf?");
             } else if (socket.getOutputStream() == null) {
                 Log.d(MSG_CLIENT_TAG, "Socket output stream is null, wtf?");
+            } else {
+                PrintWriter out = new PrintWriter(
+                        new BufferedWriter(
+                                new OutputStreamWriter(socket.getOutputStream())), true);
+                out.println(msg);
+                out.flush();
+                socket.close();
+                Log.d(MSG_CLIENT_TAG, "Client sent message: " + msg);
             }
 
-            PrintWriter out = new PrintWriter(
-                    new BufferedWriter(
-                            new OutputStreamWriter(getSocket().getOutputStream())), true);
-            out.println(msg);
-            out.flush();
-            socket.close();
         } catch (UnknownHostException e) {
             Log.d(MSG_CLIENT_TAG, "Unknown Host", e);
         } catch (IOException e) {
@@ -117,7 +112,7 @@ public class MessageClient {
         } catch (Exception e) {
             Log.d(MSG_CLIENT_TAG, "Error3", e);
         }
-        Log.d(MSG_CLIENT_TAG, "Client sent message: " + msg);
+
     }
     private Socket mSocket;
 
