@@ -88,7 +88,11 @@ public class MessageClient {
     }
 
     public Socket getSocket() {
-        return mSocket;
+        if(mSocket == null || mSocket.isClosed()){
+            return null;
+        }else{
+            return mSocket;
+        }
     }
 
     private void sendMessage(String msg) {
@@ -105,6 +109,7 @@ public class MessageClient {
                             new OutputStreamWriter(getSocket().getOutputStream())), true);
             out.println(msg);
             out.flush();
+            socket.close();
         } catch (UnknownHostException e) {
             Log.d(MSG_CLIENT_TAG, "Unknown Host", e);
         } catch (IOException e) {
