@@ -1,6 +1,7 @@
 package com.iotbyte.wifipidgin.commmodule;
 
 import android.content.Context;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.view.View;
 import com.iotbyte.wifipidgin.dao.DaoFactory;
 import com.iotbyte.wifipidgin.dao.FriendDao;
 import com.iotbyte.wifipidgin.friend.Friend;
+import com.iotbyte.wifipidgin.friend.Myself;
 import com.iotbyte.wifipidgin.nsdmodule.NsdServer;
 import com.iotbyte.wifipidgin.utils.Utils;
 
@@ -63,8 +65,21 @@ public class MessageServer   {
                 //Update the ip and port for User self
                 FriendDao fd = DaoFactory.getInstance()
                         .getFriendDao(mContext, DaoFactory.DaoType.SQLITE_DAO, null);
-                Friend self = fd.findById(0);
+                Friend selfFriend = fd.findById(0);
+
+                //--TODO this is a walk around for now!!!!
+                Myself self = new Myself(selfFriend.getMac(), selfFriend.getIp(), selfFriend.getPort());
+                self.setDescription(selfFriend.getDescription());
+                self.setStatus(selfFriend.getStatus());
+                self.setId(selfFriend.getId());
+                self.setImagePath(selfFriend.getImagePath());
+                self.setName(selfFriend.getName());
+
+
                 InetAddress myIP = null;
+                WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+                WifiInfo wInfo = wifiManager.getConnectionInfo();
+                String macString = wInfo.getMacAddress();
                 try {
                     myIP = InetAddress.getByName(Utils.getIPAddress(true));
                     int myPort = mServerSocket.getLocalPort();
@@ -73,6 +88,7 @@ public class MessageServer   {
                         Log.d(MSG_SERVER_TAG, "Server IP: " + myIP);
                         self.setIp(myIP);
                         self.setPort(myPort);
+                        self.setMac(Utils.hexStringToByteArray(macString.replaceAll(":", "")));
 
                         fd.update(self);
                     }

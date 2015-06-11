@@ -109,10 +109,12 @@ public class NsdClient {
                                 Friend dbFriend = fd.findByMacAddress(newFriend.getMac());
                                 if (null == dbFriend){
                                     //Now, put the friend into the creation queue.
+                                    Log.w(TAG, "The friend is not created in the DB yet." );
                                     friendCreationQueue.enqueueFriendCreationQueue(newFriend);
                                 } else {
                                     //If the friend is already in the Database,
                                     //update the ip and port if necessary.
+                                    Log.e(TAG, "The friend is in the DB already!!" );
                                     if ( dbFriend.getPort() != Friendport || !dbFriend.getIp().equals(host) ){
                                         dbFriend.setIp(host);
                                         dbFriend.setPort(Friendport);
