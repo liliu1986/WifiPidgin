@@ -87,7 +87,7 @@
             android:icon="@drawable/ic_launcher"
             android:label="@string/outgoing_message_handling_service"></service>
         <service
-            android:name=".nsdmodule.FriendCreationService"
+            android:name=".nsdmodule.FriendStatusTrackingService"
             android:icon="@drawable/ic_launcher"
             android:label="@string/outgoing_message_handling_service"></service>
 

@@ -10,19 +10,19 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 /**
  * Created by fire on 03/06/15.
  */
-public class FriendCreationQueue {
-    private static FriendCreationQueue instance = null;
+public class FriendOnlineList {
+    private static FriendOnlineList instance = null;
     private Queue<Friend> friendCreationQueue;
     public static final String TAG = "FriendCreationQueue";
 
-    private FriendCreationQueue(){
+    private FriendOnlineList(){
         friendCreationQueue = new ConcurrentLinkedQueue<>();
     }
-    public static FriendCreationQueue getInstance() {
+    public static FriendOnlineList getInstance() {
         if (instance == null){
-            synchronized (FriendCreationQueue.class) {
+            synchronized (FriendOnlineList.class) {
                 if (instance == null) {
-                    instance = new FriendCreationQueue();
+                    instance = new FriendOnlineList();
                 }
             }
         }

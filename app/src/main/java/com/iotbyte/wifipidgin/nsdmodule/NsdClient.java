@@ -5,12 +5,15 @@ import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.util.Log;
 
+import com.iotbyte.wifipidgin.chat.ChatManager;
 import com.iotbyte.wifipidgin.dao.DaoFactory;
 import com.iotbyte.wifipidgin.dao.FriendDao;
 import com.iotbyte.wifipidgin.friend.Friend;
+import com.iotbyte.wifipidgin.message.FriendCreationRequest;
 import com.iotbyte.wifipidgin.utils.Utils;
 
 import java.net.InetAddress;
+import java.sql.Timestamp;
 
 public class NsdClient {
 
@@ -103,25 +106,44 @@ public class NsdClient {
                                     .getFriendDao(mContext, DaoFactory.DaoType.SQLITE_DAO, null);
 
                             //Try to see if the friend is already being created.
-                            FriendCreationQueue friendCreationQueue  = FriendCreationQueue.getInstance();
-                            if ( false == friendCreationQueue.isInFriendCreationQueue(newFriend) ){
-                                //If not, check if the friend has already been created
-                                Friend dbFriend = fd.findByMacAddress(newFriend.getMac());
-                                if (null == dbFriend){
-                                    //Now, put the friend into the creation queue.
-                                    Log.w(TAG, "The friend is not created in the DB yet." );
-                                    friendCreationQueue.enqueueFriendCreationQueue(newFriend);
-                                } else {
-                                    //If the friend is already in the Database,
-                                    //update the ip and port if necessary.
-                                    Log.e(TAG, "The friend is in the DB already!!" );
-                                    if ( dbFriend.getPort() != Friendport || !dbFriend.getIp().equals(host) ){
+                            FriendOnlineHashMap friendOnlineHashMap = FriendOnlineHashMap.getInstance();
+                            String friendMacString = Utils.bytesToHex(newFriend.getMac());
+
+                            Friend friendFromOnlineList = friendOnlineHashMap.get(friendMacString);
+
+                            Timestamp tsTemp = new Timestamp(System.currentTimeMillis());
+
+                            if (friendFromOnlineList == null){
+                                //If the friend is not in the map, put it in the map and send a request for more info.
+                                Log.d(TAG, "This is a new friend coming online");
+                                newFriend.setLastOnlineTimeStamp(tsTemp);
+                                //friendOnlineHashMap.put(friendMacString, newFriend);
+                                FriendCreationRequest creationRequest = new FriendCreationRequest(newFriend, mContext);
+                                ChatManager chatManager = ChatManager.getInstance();
+                                chatManager.enqueueOutGoingMessageQueue(creationRequest.convertMessageToJson());
+
+                            } else {
+                                //Otherwise, update the friend's time stamp. and update the ip and port
+                                Log.d(TAG, "The friend is in the online list");
+
+                                if ((!friendFromOnlineList.getIp().equals(host))
+                                        || friendFromOnlineList.getPort() != Friendport){
+                                    Log.d(TAG, "Updating the friend's ip and port");
+
+                                    //If the ip or port is changed, update them in DB
+                                    friendFromOnlineList.setIp(host);
+                                    friendFromOnlineList.setPort(Friendport);
+                                    Friend dbFriend = fd.findByMacAddress(friendFromOnlineList.getMac());
+                                    if (dbFriend != null){
                                         dbFriend.setIp(host);
                                         dbFriend.setPort(Friendport);
                                         dbFriend.setStatus(Friend.FriendStatus.ONLINE);
                                         fd.update(dbFriend);
                                     }
+
                                 }
+                                friendFromOnlineList.setLastOnlineTimeStamp(tsTemp);
+                                friendOnlineHashMap.put(friendMacString, friendFromOnlineList);
                             }
                         }
                     });

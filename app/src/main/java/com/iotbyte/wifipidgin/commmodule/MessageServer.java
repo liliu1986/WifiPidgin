@@ -23,6 +23,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by fire on 19/04/15.
@@ -56,6 +57,13 @@ public class MessageServer   {
                 mServerSocket = new ServerSocket(0);
                 setLocalPort(mServerSocket.getLocalPort());
 
+                //Noticed that after server socket initialized, need a period to allow the actual
+                //connection to be able to establish.
+                try {
+                    TimeUnit.MILLISECONDS.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 //After the message server socket is created, broadcast it.
                 mNsdServer = new NsdServer(getServerContext(), mServerSocket);
                 mNsdServer.initializeNsdServer();
