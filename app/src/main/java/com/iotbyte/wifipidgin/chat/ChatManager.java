@@ -13,10 +13,13 @@ import com.iotbyte.wifipidgin.message.FriendCreationResponse;
 import com.iotbyte.wifipidgin.message.Message;
 import com.iotbyte.wifipidgin.message.MessageFactory;
 import com.iotbyte.wifipidgin.message.MessageType;
+import com.iotbyte.wifipidgin.nsdmodule.FriendOnlineHashMap;
+import com.iotbyte.wifipidgin.utils.Utils;
 
 import org.json.JSONException;
 
 import java.net.UnknownHostException;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -89,7 +92,14 @@ public class ChatManager {
             return false;
         }
         try {
-            Friend receiver = MessageFactory.buildMessageByJson(message).getReceiver();
+            Message outMsg = MessageFactory.buildMessageByJson(message);
+            Friend receiver = outMsg.getReceiver();
+            if (outMsg.getType() == MessageType.FRIEND_CREATION_REQUEST){
+                //When the friend creation request is sent out, remove it from the map
+                FriendOnlineHashMap friendOnlineHashMap = FriendOnlineHashMap.getInstance();
+                String friendMacString = Utils.bytesToHex(receiver.getMac());
+                friendOnlineHashMap.removeFriendbyMac(friendMacString);
+            }
             messageClient.sendMsg(receiver.getIp(), receiver.getPort(), message);
             return true;
         } catch (JSONException ex) {  //FIXME:: require better exception handle!!!
@@ -157,6 +167,12 @@ public class ChatManager {
                     return false;
                 }
                 Friend sender = message.getSender();
+                String friendMacString = Utils.bytesToHex(sender.getMac());
+
+                FriendOnlineHashMap friendOnlineHashMap = FriendOnlineHashMap.getInstance();
+                sender.setLastOnlineTimeStamp(new Timestamp(System.currentTimeMillis()));
+                friendOnlineHashMap.put(friendMacString, sender);
+
                 if (DaoError.NO_ERROR == fd.add(sender)){
                     return true;
                 } else

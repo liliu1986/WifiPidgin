@@ -62,7 +62,7 @@ public class ChatMessageTest extends AndroidTestCase {
         int bPort = 57;
         Friend bFriend = new Friend(bMac, bIp, bPort);
 
-        ChatMessage chatMessage = new ChatMessage(aFriend, "12345", "hahaha");
+        ChatMessage chatMessage = new ChatMessage(aFriend, "12345", "hahaha", getContext());
         Log.v(MESSAGE_TEST, chatMessage.convertMessageToJson());
 
         /*
@@ -115,7 +115,7 @@ public class ChatMessageTest extends AndroidTestCase {
         int aPort = 55;
         Friend aFriend = new Friend(aMac, aIp, aPort);
 
-        ChatMessage chatMessage = new ChatMessage(aFriend, "12345", "hahaha");
+        ChatMessage chatMessage = new ChatMessage(aFriend, "12345", "hahaha", getContext());
         assertEquals("Can't get proper chatMessage body", "hahaha", chatMessage.getMessageBody());
 
     }
@@ -126,7 +126,7 @@ public class ChatMessageTest extends AndroidTestCase {
         int aPort = 55;
         Friend aFriend = new Friend(aMac, aIp, aPort);
 
-        ChatMessage chatMessage = new ChatMessage(aFriend, "12345", "hahaha");
+        ChatMessage chatMessage = new ChatMessage(aFriend, "12345", "hahaha", getContext());
         chatMessage.setMessageBody("this is insane!");
         assertEquals("Can't set chatMessage body properly", "this is insane!", chatMessage.getMessageBody());
 
@@ -139,7 +139,7 @@ public class ChatMessageTest extends AndroidTestCase {
         int aPort = 55;
         Friend aFriend = new Friend(aMac, aIp, aPort);
 
-        ChatMessage chatMessage = new ChatMessage(aFriend, "12345", "hahaha");
+        ChatMessage chatMessage = new ChatMessage(aFriend, "12345", "hahaha", getContext());
 
         assertEquals("channelIdentifier not match", "12345", chatMessage.getChannelIdentifier());
     }
@@ -150,7 +150,7 @@ public class ChatMessageTest extends AndroidTestCase {
         int aPort = 55;
         Friend aFriend = new Friend(aMac, aIp, aPort);
 
-        ChatMessage chatMessage = new ChatMessage(aFriend, "12345", "hahaha");
+        ChatMessage chatMessage = new ChatMessage(aFriend, "12345", "hahaha", getContext());
         assertTrue(chatMessage.getTimestamp().toString().matches("^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d{3}(?: [AP]M)?(?: [+-]\\d{4})?$"));
     }
 
@@ -160,7 +160,7 @@ public class ChatMessageTest extends AndroidTestCase {
         int aPort = 55;
         Friend aFriend = new Friend(aMac, aIp, aPort);
 
-        ChatMessage chatMessage = new ChatMessage(aFriend, "12345", "hahaha");
+        ChatMessage chatMessage = new ChatMessage(aFriend, "12345", "hahaha", getContext());
         String json = chatMessage.convertMessageToJson();
         Log.v(MESSAGE_TEST, json);
 

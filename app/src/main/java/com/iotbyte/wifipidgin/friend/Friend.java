@@ -3,6 +3,7 @@ package com.iotbyte.wifipidgin.friend;
 import com.iotbyte.wifipidgin.utils.Utils;
 
 import java.net.InetAddress;
+import java.sql.Timestamp;
 
 /**
  * Data object to store information about a friend.
@@ -61,6 +62,7 @@ public class Friend {
         this.isFavourite = false;
         this.nameDescriptionHash = UNINIT_STRING;
         this.imageHash = UNINIT_STRING;
+        this.lastOnlineTimeStamp = new Timestamp(System.currentTimeMillis());
     }
 
     public long getId() {
@@ -144,6 +146,13 @@ public class Friend {
         return imageHash;
     }
 
+    public Timestamp getLastOnlineTimeStamp(){
+        return lastOnlineTimeStamp;
+    }
+
+    public void setLastOnlineTimeStamp(Timestamp ts){
+        lastOnlineTimeStamp = ts;
+    }
     static private final String UNINIT_STRING = "Un-init";
 
     /** Number of bytes used to calcuate image hash */
@@ -206,6 +215,8 @@ public class Friend {
      * When remote client detects a hash change, it will request the updated image.
      */
     private String imageHash;
+
+    private Timestamp lastOnlineTimeStamp;
 
     @Override
     public String toString() {
