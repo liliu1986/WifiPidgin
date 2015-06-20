@@ -5,7 +5,6 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.util.Log;
-import android.view.View;
 
 import com.iotbyte.wifipidgin.dao.DaoFactory;
 import com.iotbyte.wifipidgin.dao.FriendDao;
@@ -88,7 +87,7 @@ public class MessageServer   {
                         Log.d(MSG_SERVER_TAG, "Server IP: " + myIP);
                         self.setIp(myIP);
                         self.setPort(myPort);
-                        self.setMac(Utils.hexStringToByteArray(macString.replaceAll(":", "")));
+                        self.setMac(Utils.macAddressHexStringToByte(macString));
 
                         fd.update(self);
                     }

@@ -9,23 +9,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 
 import com.iotbyte.wifipidgin.R;
-import com.iotbyte.wifipidgin.dao.DaoFactory;
-import com.iotbyte.wifipidgin.dao.FriendDao;
 import com.iotbyte.wifipidgin.friend.Friend;
-import com.iotbyte.wifipidgin.user.User;
 import com.iotbyte.wifipidgin.utils.Utils;
 import com.iotbyte.wifipidgin.ui.DisplayNamecardActivity;
 
 import java.io.File;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -104,7 +97,7 @@ public class DiscoverListAdapter extends ArrayAdapter<Friend> {
             private void sendUserID(View convertView){
                 //getContext() return this.converView.
                 Intent intent = new Intent(getContext(), DisplayNamecardActivity.class);
-                intent.putExtra(EXTRA_MESSAGE, Utils.bytesToHex(friend.getMac()));
+                intent.putExtra(EXTRA_MESSAGE, Utils.macAddressByteToHexString(friend.getMac()));
                 getContext().startActivity(intent);
             }
         });

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -25,7 +24,6 @@ import com.iotbyte.wifipidgin.friend.Friend;
 import com.iotbyte.wifipidgin.utils.Utils;
 
 import java.io.File;
-import java.net.URISyntaxException;
 
 public class DisplayNamecardActivity extends ActionBarActivity implements View.OnClickListener {
 
@@ -60,7 +58,7 @@ public class DisplayNamecardActivity extends ActionBarActivity implements View.O
         userMac = intent.getStringExtra(EXTRA_MESSAGE);
         fd = DaoFactory.getInstance().getFriendDao(this.getApplicationContext(), DaoFactory.DaoType.SQLITE_DAO, null);
         Log.d(TAG, "Use MAC: "+ userMac);
-        inFriend = fd.findByMacAddress(Utils.hexStringToByteArray(userMac));
+        inFriend = fd.findByMacAddress(Utils.macAddressHexStringToByte(userMac));
 
         if (inFriend != null) {
             userName = inFriend.getName();

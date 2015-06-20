@@ -70,12 +70,17 @@ public class Utils {
      * @param bytes
      * @return
      */
+    @Deprecated
     public static String bytesToHex(byte[] bytes) {
         StringBuilder sbuf = new StringBuilder();
         for (int idx = 0; idx < bytes.length; idx++) {
             //int intVal = bytes[idx] & 0xff;
-            //if (intVal < 0x10) sbuf.append("0");
-            sbuf.append(String.format("%1X", bytes[idx]));
+            if ( bytes[idx] == 0x0) {
+                sbuf.append("0");
+            }
+            else {
+                sbuf.append(String.format("%1X", bytes[idx]));
+            }
         }
         return sbuf.toString();
     }
@@ -86,6 +91,7 @@ public class Utils {
      * @param s
      * @return
      */
+    @Deprecated
     public static byte[] hexStringToByteArray(String s) {
         int len = s.length();
         byte[] data = new byte[len / 2];
