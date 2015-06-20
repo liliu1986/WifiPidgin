@@ -65,6 +65,24 @@ public class Friend {
         this.lastOnlineTimeStamp = new Timestamp(System.currentTimeMillis());
     }
 
+    /**
+     * Copy constructor. Performs a deep copy of the other friend.
+     * @param other the other friend to be copy-constructed.
+     */
+    public Friend(Friend other) {
+        this.id = other.getId();
+        this.ip = other.getIp();
+        this.port = other.getPort();
+        this.mac = other.getMac();
+        this.name = other.getName();
+        this.description = other.getDescription();
+        this.status = other.getStatus();
+        this.imagePath = other.getImagePath();
+        this.isFavourite = other.isFavourite();
+        this.nameDescriptionHash = other.getNameDescriptionHash();
+        this.imageHash = other.getImageHash();
+    }
+
     public long getId() {
         return id;
     }

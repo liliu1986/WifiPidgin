@@ -74,15 +74,7 @@ public class MessageServer   {
                 FriendDao fd = DaoFactory.getInstance()
                         .getFriendDao(mContext, DaoFactory.DaoType.SQLITE_DAO, null);
                 Friend selfFriend = fd.findById(Myself.SELF_ID);
-
-                //--TODO this is a walk around for now!!!!
-                Myself self = new Myself(selfFriend.getMac(), selfFriend.getIp(), selfFriend.getPort());
-                self.setDescription(selfFriend.getDescription());
-                self.setStatus(selfFriend.getStatus());
-                self.setId(selfFriend.getId());
-                self.setImagePath(selfFriend.getImagePath());
-                self.setName(selfFriend.getName());
-
+                Myself self = new Myself(selfFriend);
 
                 InetAddress myIP = null;
                 WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);

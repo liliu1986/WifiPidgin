@@ -18,6 +18,21 @@ public class Myself extends Friend {
      */
     public Myself(byte[] mac, InetAddress ip, int port) {
         super(mac, ip, port);
+        this.mac = mac;
+    }
+
+
+    /**
+     * Constructor that converts a friend into Myself.
+     * @param self Friend that's self.
+     * @throws RuntimeException If self passed in does not have id equal to SELF_ID
+     */
+    public Myself(Friend self) throws RuntimeException {
+        super(self);
+        if (self.getId() != SELF_ID) {
+            throw new RuntimeException("Try to construct Myself from a Friend with id != " + SELF_ID);
+        }
+        this.mac = self.getMac();
     }
 
     /**
@@ -36,7 +51,8 @@ public class Myself extends Friend {
         mac = inMac;
     }
 
+    /** Mac is not final in this case, because when self is populated in the db at installation,
+     *  the mac is unknown yet. Once the program initialize self mac will be saved into the db.
+     */
     private byte[] mac;
-
-
 }
