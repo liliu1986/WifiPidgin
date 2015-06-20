@@ -10,7 +10,6 @@ import com.iotbyte.wifipidgin.dao.DaoError;
 import com.iotbyte.wifipidgin.dao.FriendDao;
 import com.iotbyte.wifipidgin.dao.event.DaoEvent;
 import com.iotbyte.wifipidgin.dao.event.DaoEventBoard;
-import com.iotbyte.wifipidgin.dao.event.DaoEventSubscriber;
 import com.iotbyte.wifipidgin.datasource.sqlite.WifiPidginSqliteHelper;
 import com.iotbyte.wifipidgin.friend.Friend;
 import com.iotbyte.wifipidgin.utils.Utils;
@@ -147,7 +146,7 @@ public class FriendSqliteDao implements FriendDao {
         SQLiteDatabase db = sqliteHelper.getReadableDatabase();
         Cursor c = null;
         try {
-            String[] whereArgs = {Utils.bytesToHex(mac)};
+            String[] whereArgs = {Utils.macAddressByteToHexString(mac)};
             c = db.query(FRIEND_TABLE, ALL_COLUMNS, MAC_ADDR_FIELD + " = ?", whereArgs, null, null, null);
             List<Friend> fl = getFriendsFromCursor(c);
             assert fl.size() <= 1;
@@ -234,7 +233,7 @@ public class FriendSqliteDao implements FriendDao {
      */
     private ContentValues friendToContentValues(Friend f) {
         ContentValues values = new ContentValues();
-        values.put(MAC_ADDR_FIELD, Utils.bytesToHex(f.getMac()));
+        values.put(MAC_ADDR_FIELD, Utils.macAddressByteToHexString(f.getMac()));
         values.put(IP_FIELD, f.getIp().getHostAddress());
         values.put(NAME_FIELD, f.getName());
         values.put(PORT_FIELD, f.getPort());
@@ -265,7 +264,8 @@ public class FriendSqliteDao implements FriendDao {
     private Friend getFriendFromCursor(Cursor c) {
         long id = c.getLong(c.getColumnIndex(FriendSqliteDao.ID_FIELD));
         String macAddrStr = c.getString(c.getColumnIndex(FriendSqliteDao.MAC_ADDR_FIELD));
-        byte[] macAddr = Utils.hexStringToByteArray(macAddrStr);
+        Log.d("AAA", macAddrStr);
+        byte[] macAddr = Utils.macAddressHexStringToByte(macAddrStr);
         InetAddress ip = null;
         String ipHost = c.getString(c.getColumnIndex(FriendSqliteDao.IP_FIELD));
         try {

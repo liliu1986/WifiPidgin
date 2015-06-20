@@ -16,10 +16,12 @@ public class UtilsTest extends TestCase {
     static final String UTILS_LOG_TAG = "Utils log";
 
     public void testMacAddressByteToHexString() throws Exception {
-        byte[] mac = {0xf,0xc,0xa,0xa,0x1,0x4,0x7,0x9,0xa,0xe,0xb,0xf};
+        byte[] mac = {0xb,0x4,0x3,0x0,0x5,0x2,0x0,0x2,0xb,0x5,0x2,0x1};
         String macString = macAddressByteToHexString(mac);
-        Log.v(UTILS_LOG_TAG,macString);
-        assertEquals("mac does not match string", "FC:AA:14:79:AE:BF", macString);
+        Log.d(UTILS_LOG_TAG, macString);
+        byte[] mac2 = macAddressHexStringToByte(macString);
+        macString = macAddressByteToHexString(mac2);
+        assertEquals("mac does not match string", "B4305202B521", macString);
      }
 
     public void testMacAddressHexStringToByte() throws Exception {
