@@ -33,7 +33,7 @@ import com.iotbyte.wifipidgin.chat.IncomingMessageHandlingService;
 import com.iotbyte.wifipidgin.chat.OutgoingMessageHandlingService;
 import com.iotbyte.wifipidgin.commmodule.CommModuleBroadcastReceiver;
 import com.iotbyte.wifipidgin.commmodule.MessageServerService;
-import com.iotbyte.wifipidgin.nsdmodule.FriendCreationService;
+import com.iotbyte.wifipidgin.nsdmodule.FriendStatusTrackingService;
 import com.iotbyte.wifipidgin.nsdmodule.NsdClient;
 import com.iotbyte.wifipidgin.nsdmodule.NsdWrapper;
 
@@ -159,7 +159,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         Context context = getApplicationContext();
         context.stopService(messageServerServiceIntent);
         mNsdClient.stopDiscovery();
-        context.stopService(friendCreationServiceIntent);
+        context.stopService(friendStatusTrackingService);
         context.stopService(incomingMessageHandlingServicesIntent);
         context.stopService(outGoingMessageHandlingServicesIntent);
 
@@ -179,9 +179,9 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         mNsdClient.initializeNsdClient();
         mNsdClient.discoverServices();
 
-        //Start FriendCreationService
-        friendCreationServiceIntent = new Intent(context, FriendCreationService.class);
-        context.startService(friendCreationServiceIntent);
+        //Start FriendStatusTrackingService
+        friendStatusTrackingService = new Intent(context, FriendStatusTrackingService.class);
+        context.startService(friendStatusTrackingService);
 
         //Start IncomingMessageHandlingService
         incomingMessageHandlingServicesIntent = new Intent(context, IncomingMessageHandlingService.class);
@@ -193,7 +193,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     }
     NsdClient mNsdClient;
     private Intent messageServerServiceIntent;
-    private Intent friendCreationServiceIntent;
+    private Intent friendStatusTrackingService;
     private Intent incomingMessageHandlingServicesIntent;
     private Intent outGoingMessageHandlingServicesIntent;
 }
