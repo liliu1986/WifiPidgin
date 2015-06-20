@@ -81,13 +81,20 @@ public class Utils {
     }
 
     /**
-     * Convert string to hex byte array
+     * Convert string to hex byte array. For example:
+     *  Input "deadbeef"
+     *  Output {0xDE, 0xAD, 0xBE, 0xEF}
      *
-     * @param s
-     * @return
+     * @param s String to be converted into hex array.
+     * @return The result hex string. Empty array byte[0] if input string in malformated.
      */
     public static byte[] hexStringToByteArray(String s) {
         int len = s.length();
+
+        if (len == 0) {
+            return new byte[0];
+        }
+
         byte[] data = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {
             data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
@@ -117,16 +124,19 @@ public class Utils {
         return sbuf.toString();
     }
 
-
+    /**
+     * Converts a string of mac address into byte array.
+     * @param s Mac address string. Mac address can be either column separated (12:34:56:78:90:ab),
+     *          or non column separated (1234567890ab)
+     * @return byte array of the mac address. Empty byte array (byte[0]) if input is mal-formatted.
+     */
     public static byte[] macAddressHexStringToByte(String s) {
-        int len = s.length();
-        byte[] data = new byte[12]; //a mac address is always 12 hex numbers
-        for (int i = 0, j = 0; i < len; i++) {
-            if (s.charAt(i) == ':') continue;
-            data[j] = (byte) Character.digit(s.charAt(i), 16);
-            j++;
+        String noColumnStr = s.replaceAll(":", "");
+        // check against mac address length
+        if (noColumnStr.length() != 12) {
+            return new byte[0];
         }
-        return data;
+        return hexStringToByteArray(s);
     }
 
     /**
@@ -210,7 +220,7 @@ public class Utils {
     }
 
     /**
-     * ipFormater()
+     * ipFormatter()
      * <p/>
      * The format with InetAddress.getByName() will produce a format of string with
      * (for example) /192.168.2.2 the backslash is not needed for other process
@@ -219,7 +229,7 @@ public class Utils {
      * @param ipAddress the ip address string with unwanted backslash
      * @return a proper ip address without backslash
      */
-    public static String ipFormater(String ipAddress) {
+    public static String ipFormatter(String ipAddress) {
         StringBuilder ip = new StringBuilder();
 
         for (int i =0; i<ipAddress.length(); i++){
