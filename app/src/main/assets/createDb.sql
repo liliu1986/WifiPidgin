@@ -39,4 +39,4 @@ CREATE TABLE channel_friend_list
 
 -- Create self in database
 INSERT INTO friend (_id, mac_addr, ip, port, name, description, status, image_path)
- VALUES (0, "", "127.0.0.1", 65535, "Self", "", 0, "");
+ VALUES (0, "ff:ff:ff:ff:ff:ff", "127.0.0.1", 65535, "Self", "", 0, "");
