@@ -5,7 +5,6 @@ import android.util.Log;
 
 import com.iotbyte.wifipidgin.friend.Friend;
 
-import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -74,7 +73,8 @@ public class Channel {
     }
 
     /**
-     * Single variable Constructor for database data recovery
+     * Single variable Constructor for database data recovery and Channel creation based of
+     * a channelCreationMessage
      *
      * @param channelIdentifier the ChannelIdentifier of the channel
      *
