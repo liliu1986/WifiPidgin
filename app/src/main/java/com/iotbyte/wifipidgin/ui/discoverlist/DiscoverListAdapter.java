@@ -104,7 +104,7 @@ public class DiscoverListAdapter extends ArrayAdapter<Friend> {
             private void sendUserID(View convertView){
                 //getContext() return this.converView.
                 Intent intent = new Intent(getContext(), DisplayNamecardActivity.class);
-                intent.putExtra(EXTRA_MESSAGE, Utils.bytesToHex(friend.getMac()));
+                intent.putExtra(EXTRA_MESSAGE, Utils.macAddressByteToHexString(friend.getMac()));
                 getContext().startActivity(intent);
             }
         });

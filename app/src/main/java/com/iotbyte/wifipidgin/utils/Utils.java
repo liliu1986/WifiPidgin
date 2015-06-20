@@ -70,7 +70,7 @@ public class Utils {
      * @param bytes
      * @return
      */
-    public static String bytesToHex(byte[] bytes) {
+    private static String bytesToHex(byte[] bytes) {
         StringBuilder sbuf = new StringBuilder();
         for (int idx = 0; idx < bytes.length; idx++) {
             //int intVal = bytes[idx] & 0xff;
@@ -88,9 +88,9 @@ public class Utils {
      * @param s String to be converted into hex array.
      * @return The result hex string. Empty array byte[0] if input string in malformated.
      */
-    public static byte[] hexStringToByteArray(String s) {
+    private static byte[] hexStringToByteArray(String s) {
         int len = s.length();
-
+        Log.d("AAA", s);
         if (len == 0) {
             return new byte[0];
         }
@@ -136,7 +136,7 @@ public class Utils {
         if (noColumnStr.length() != 12) {
             return new byte[0];
         }
-        return hexStringToByteArray(s);
+        return hexStringToByteArray(noColumnStr);
     }
 
     /**

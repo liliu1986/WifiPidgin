@@ -74,6 +74,10 @@ public class MessageServer   {
                 FriendDao fd = DaoFactory.getInstance()
                         .getFriendDao(mContext, DaoFactory.DaoType.SQLITE_DAO, null);
                 Friend selfFriend = fd.findById(Myself.SELF_ID);
+                if (selfFriend == null){
+                    Log.d(MSG_SERVER_TAG, "Self in null");
+
+                }
                 Myself self = new Myself(selfFriend);
 
                 InetAddress myIP = null;
@@ -88,7 +92,7 @@ public class MessageServer   {
                         Log.d(MSG_SERVER_TAG, "Server IP: " + myIP);
                         self.setIp(myIP);
                         self.setPort(myPort);
-                        self.setMac(Utils.hexStringToByteArray(macString.replaceAll(":", "")));
+                        self.setMac(Utils.macAddressHexStringToByte(macString));
 
                         fd.update(self);
                     }
