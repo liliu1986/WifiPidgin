@@ -220,7 +220,7 @@ public class Utils {
     }
 
     /**
-     * ipFormater()
+     * ipFormatter()
      * <p/>
      * The format with InetAddress.getByName() will produce a format of string with
      * (for example) /192.168.2.2 the backslash is not needed for other process
@@ -229,7 +229,7 @@ public class Utils {
      * @param ipAddress the ip address string with unwanted backslash
      * @return a proper ip address without backslash
      */
-    public static String ipFormater(String ipAddress) {
+    public static String ipFormatter(String ipAddress) {
         StringBuilder ip = new StringBuilder();
 
         for (int i =0; i<ipAddress.length(); i++){

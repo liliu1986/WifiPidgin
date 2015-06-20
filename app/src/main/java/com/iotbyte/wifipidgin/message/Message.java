@@ -15,7 +15,7 @@ import java.net.UnknownHostException;
 import java.sql.Timestamp;
 import java.util.Date;
 
-import static com.iotbyte.wifipidgin.utils.Utils.ipFormater;
+import static com.iotbyte.wifipidgin.utils.Utils.ipFormatter;
 import static com.iotbyte.wifipidgin.utils.Utils.macAddressHexStringToByte;
 
 /**
@@ -92,7 +92,7 @@ public abstract class Message {
         String type = json.getString(MESSAGE_TYPE);
         JSONObject sender = json.getJSONObject(MESSAGE_SENDER);
         JSONObject receiver = json.getJSONObject(MESSAGE_RECEIVER);
-        InetAddress senderIp = InetAddress.getByName(ipFormater(sender.getString(MESSAGE_IP)));
+        InetAddress senderIp = InetAddress.getByName(ipFormatter(sender.getString(MESSAGE_IP)));
         byte[] senderMac = macAddressHexStringToByte(sender.getString(MESSAGE_MAC));
         int senderPort = sender.getInt(MESSAGE_PORT);
 
@@ -104,7 +104,7 @@ public abstract class Message {
 
         //TODO:: receiver should be myself, this is mock code,or require to verify if the receiver is correctly myself
 
-        InetAddress receiverIp = InetAddress.getByName(ipFormater(receiver.getString(MESSAGE_IP)));
+        InetAddress receiverIp = InetAddress.getByName(ipFormatter(receiver.getString(MESSAGE_IP)));
         byte[] receiverMac = macAddressHexStringToByte(receiver.getString(MESSAGE_MAC));
         int receiverPort = receiver.getInt(MESSAGE_PORT);
 

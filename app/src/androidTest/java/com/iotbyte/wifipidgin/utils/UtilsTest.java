@@ -4,7 +4,7 @@ import android.util.Log;
 
 import junit.framework.TestCase;
 
-import static com.iotbyte.wifipidgin.utils.Utils.ipFormater;
+import static com.iotbyte.wifipidgin.utils.Utils.ipFormatter;
 import static com.iotbyte.wifipidgin.utils.Utils.macAddressByteToHexString;
 import static com.iotbyte.wifipidgin.utils.Utils.macAddressHexStringToByte;
 
@@ -32,6 +32,6 @@ public class UtilsTest extends TestCase {
     public void testIpFormater() throws Exception{
         String expectedIpAddress = "192.168.0.1";
         String ipAddressToBeProcessed = "/192.168.0.1";
-        assertEquals("ip formater not working",expectedIpAddress,ipFormater(ipAddressToBeProcessed));
+        assertEquals("ip formater not working",expectedIpAddress, ipFormatter(ipAddressToBeProcessed));
     }
 }

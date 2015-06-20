@@ -10,7 +10,7 @@ import org.json.JSONObject;
 
 import java.net.UnknownHostException;
 
-import static com.iotbyte.wifipidgin.utils.Utils.ipFormater;
+import static com.iotbyte.wifipidgin.utils.Utils.ipFormatter;
 import static com.iotbyte.wifipidgin.utils.Utils.macAddressByteToHexString;
 
 /**
@@ -54,12 +54,12 @@ public class FriendCreationRequest extends Message {
 
             JSONObject sender = new JSONObject();
 
-            sender.put(MESSAGE_IP,ipFormater(this.sender.getIp().toString())); // InetAdress.toString() returns in host/ip as format
+            sender.put(MESSAGE_IP, ipFormatter(this.sender.getIp().toString())); // InetAdress.toString() returns in host/ip as format
             sender.put(MESSAGE_PORT,this.sender.getPort());
             sender.put(MESSAGE_MAC, macAddressByteToHexString(this.sender.getMac()));
 
             JSONObject receiver = new JSONObject();
-            receiver.put(MESSAGE_IP, ipFormater(this.receiver.getIp().toString()));
+            receiver.put(MESSAGE_IP, ipFormatter(this.receiver.getIp().toString()));
             receiver.put(MESSAGE_PORT,this.receiver.getPort());
             receiver.put(MESSAGE_MAC,macAddressByteToHexString(this.receiver.getMac()));
 
