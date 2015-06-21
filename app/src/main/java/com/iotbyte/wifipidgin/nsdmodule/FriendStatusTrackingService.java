@@ -55,10 +55,10 @@ public class FriendStatusTrackingService extends Service  {
                         long currentTime = System.currentTimeMillis();
                         if (Math.abs(currentTime - lastOnlineTime) >= onlineTimeoutPeriod){
                             //This user has been offline too long, removing from the hash map
-                            Log.d(TAG, "This user has been offline too long, removing from the hash map " + Utils.bytesToHex(friend.getMac()));
+                            Log.d(TAG, "This user has been offline too long, removing from the hash map " + Utils.macAddressByteToHexString(friend.getMac()));
                             Friend dbFriend = fd.findByMacAddress(friend.getMac());
                             if (dbFriend == null) {
-                                Log.d(TAG, "Couldn't find the friend in db: " + Utils.bytesToHex(friend.getMac()));
+                                Log.d(TAG, "Couldn't find the friend in db: " + Utils.macAddressByteToHexString(friend.getMac()));
                                 continue;
                             }
                             //if (dbFriend.isFavourite()){
@@ -71,7 +71,7 @@ public class FriendStatusTrackingService extends Service  {
                                 Log.d(TAG, "Removing friend from DB");
                                 fd.delete(dbFriend.getId());
                             }
-                            friendOnlineHashMap.removeFriendbyMac(Utils.bytesToHex(friend.getMac()));
+                            friendOnlineHashMap.removeFriendbyMac(Utils.macAddressByteToHexString(friend.getMac()));
 
                         }
                     }

@@ -60,7 +60,7 @@ public class DisplayNamecardActivity extends ActionBarActivity implements View.O
         userMac = intent.getStringExtra(EXTRA_MESSAGE);
         fd = DaoFactory.getInstance().getFriendDao(this.getApplicationContext(), DaoFactory.DaoType.SQLITE_DAO, null);
         Log.d(TAG, "Use MAC: "+ userMac);
-        inFriend = fd.findByMacAddress(Utils.hexStringToByteArray(userMac));
+        inFriend = fd.findByMacAddress(Utils.macAddressHexStringToByte(userMac));
 
         if (inFriend != null) {
             userName = inFriend.getName();
