@@ -97,7 +97,7 @@ public class ChatManager {
             if (outMsg.getType() == MessageType.FRIEND_CREATION_REQUEST){
                 //When the friend creation request is sent out, remove it from the map
                 FriendOnlineHashMap friendOnlineHashMap = FriendOnlineHashMap.getInstance();
-                String friendMacString = Utils.bytesToHex(receiver.getMac());
+                String friendMacString = Utils.macAddressByteToHexString(receiver.getMac());
                 friendOnlineHashMap.removeFriendbyMac(friendMacString);
             }
             messageClient.sendMsg(receiver.getIp(), receiver.getPort(), message);
@@ -167,7 +167,7 @@ public class ChatManager {
                     return false;
                 }
                 Friend sender = message.getSender();
-                String friendMacString = Utils.bytesToHex(sender.getMac());
+                String friendMacString = Utils.macAddressByteToHexString(sender.getMac());
 
                 FriendOnlineHashMap friendOnlineHashMap = FriendOnlineHashMap.getInstance();
                 sender.setLastOnlineTimeStamp(new Timestamp(System.currentTimeMillis()));

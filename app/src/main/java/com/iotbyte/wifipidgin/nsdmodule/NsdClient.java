@@ -100,14 +100,14 @@ public class NsdClient {
                             }
                             Log.d(TAG, "The friend's mac address is " + macString);
 
-                            Friend newFriend = new Friend(Utils.hexStringToByteArray(macString.replaceAll(":", "")), host, Friendport);
+                            Friend newFriend = new Friend(Utils.macAddressHexStringToByte(macString), host, Friendport);
                             newFriend.setIp(host);
                             FriendDao fd = DaoFactory.getInstance()
                                     .getFriendDao(mContext, DaoFactory.DaoType.SQLITE_DAO, null);
 
                             //Try to see if the friend is already being created.
                             FriendOnlineHashMap friendOnlineHashMap = FriendOnlineHashMap.getInstance();
-                            String friendMacString = Utils.bytesToHex(newFriend.getMac());
+                            String friendMacString = Utils.macAddressByteToHexString(newFriend.getMac());
 
                             Friend friendFromOnlineList = friendOnlineHashMap.get(friendMacString);
 

@@ -74,15 +74,11 @@ public class MessageServer   {
                 FriendDao fd = DaoFactory.getInstance()
                         .getFriendDao(mContext, DaoFactory.DaoType.SQLITE_DAO, null);
                 Friend selfFriend = fd.findById(Myself.SELF_ID);
+                if (selfFriend == null){
+                    Log.d(MSG_SERVER_TAG, "Self in null");
 
-                //--TODO this is a walk around for now!!!!
-                Myself self = new Myself(selfFriend.getMac(), selfFriend.getIp(), selfFriend.getPort());
-                self.setDescription(selfFriend.getDescription());
-                self.setStatus(selfFriend.getStatus());
-                self.setId(selfFriend.getId());
-                self.setImagePath(selfFriend.getImagePath());
-                self.setName(selfFriend.getName());
-
+                }
+                Myself self = new Myself(selfFriend);
 
                 InetAddress myIP = null;
                 WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
@@ -96,7 +92,7 @@ public class MessageServer   {
                         Log.d(MSG_SERVER_TAG, "Server IP: " + myIP);
                         self.setIp(myIP);
                         self.setPort(myPort);
-                        self.setMac(Utils.hexStringToByteArray(macString.replaceAll(":", "")));
+                        self.setMac(Utils.macAddressHexStringToByte(macString));
 
                         fd.update(self);
                     }
