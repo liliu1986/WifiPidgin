@@ -3,11 +3,14 @@ package com.iotbyte.wifipidgin.chat;
 import android.content.Context;
 import android.util.Log;
 
+import com.iotbyte.wifipidgin.channel.Channel;
+import com.iotbyte.wifipidgin.channel.ChannelManager;
 import com.iotbyte.wifipidgin.commmodule.MessageClient;
 import com.iotbyte.wifipidgin.dao.DaoError;
 import com.iotbyte.wifipidgin.dao.DaoFactory;
 import com.iotbyte.wifipidgin.dao.FriendDao;
 import com.iotbyte.wifipidgin.friend.Friend;
+import com.iotbyte.wifipidgin.message.ChannelCreationMessage;
 import com.iotbyte.wifipidgin.message.ChatMessage;
 import com.iotbyte.wifipidgin.message.FriendCreationResponse;
 import com.iotbyte.wifipidgin.message.Message;
@@ -179,7 +182,27 @@ public class ChatManager {
                 {
                     return false;
                 }
+            }
+            case CHANNEL_CREATION_MESSAGE:{
+                /*
+                In response to a channel creation message a notification will be push.
+                user will prompted to select to join the channel or not join
 
+                if the user choose to join the channel, the channel will be added into the ChannelMananger
+                 */
+
+                //TODO: adding the invocation of notification to join or decline channel creation
+                //fixme: a mock code to make selection always true;
+                boolean join = true;
+                if (join){
+                    ChannelCreationMessage channelCreationMessage = (ChannelCreationMessage)message;
+                    Channel channel = channelCreationMessage.getChannel();
+                    return ChannelManager.getInstance(context).addChannel(channel);
+                }else
+                {
+                //TODO: add channel blocking logic here
+                    return false;
+                }
             }
             default:
                 return false;

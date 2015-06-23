@@ -3,6 +3,7 @@ package com.iotbyte.wifipidgin.channel;
 
 import android.content.Context;
 
+import com.iotbyte.wifipidgin.chat.ChatManager;
 import com.iotbyte.wifipidgin.dao.ChannelDao;
 import com.iotbyte.wifipidgin.dao.DaoError;
 import com.iotbyte.wifipidgin.dao.DaoFactory;
@@ -10,6 +11,7 @@ import com.iotbyte.wifipidgin.dao.FriendDao;
 import com.iotbyte.wifipidgin.dao.event.DaoEvent;
 import com.iotbyte.wifipidgin.dao.event.DaoEventSubscriber;
 import com.iotbyte.wifipidgin.friend.Friend;
+import com.iotbyte.wifipidgin.message.ChannelCreationMessage;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -306,5 +308,21 @@ public class ChannelManager {
 
     public void setChannelDatabaseChangeListener(ChannelDatabaseChangeListener listener) {
         this.channelDatabaseChangeListener = listener;
+    }
+
+    /**
+     * sendChannelCreationMessageToAll()
+     *
+     * send ChannelCreationMessage to all members of a channel, excluding myself
+     *
+     * @param channel a target channel to be notified to all members
+     */
+    public void sendChannelCreationMessageToAll(Channel channel) {
+        for (Friend friend : channel.getFriendsList()) {
+            if (friend.getId() != Friend.SELF_ID) { //Do not send to myself
+                ChannelCreationMessage message = new ChannelCreationMessage(channel, friend, context);
+                ChatManager.getInstance().enqueueOutGoingMessageQueue(message.convertMessageToJson());
+            }
+        }
     }
 }
