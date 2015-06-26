@@ -13,7 +13,7 @@ public interface ChannelDao {
      * Save a channel to storage. If the channel is not yet in the storage (i.e. id == NO_ID),
      * publish the channel to storage. Else update the channel already in storage.
      *
-     * @param channel Friend to be saved.
+     * @param channel Channel to be saved.
      * @return NO_ERROR upon successfully publishing channel to storage. Otherwise respective error code.
      */
     public DaoError save(Channel channel);
