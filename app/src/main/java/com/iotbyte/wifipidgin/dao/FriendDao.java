@@ -12,6 +12,15 @@ import java.util.List;
 //TODO: some methods throws exceptions.
 public interface FriendDao {
     /**
+     * Save a friend to storage. If the friend is not yet in the storage (i.e. id == NO_ID),
+     * publish the friend to storage. Else update the friend already in storage.
+     *
+     * @param friend Friend to be saved.
+     * @return NO_ERROR upon successfully publishing friend to storage. Otherwise respective error code.
+     */
+    public DaoError save(Friend friend);
+
+    /**
      * Publish a friend to storage.
      * <p/>
      * The id field of friend is updated to the id to find it in the storage after successfully

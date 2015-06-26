@@ -34,6 +34,15 @@ public class ChannelSqliteDao implements ChannelDao {
     }
 
     @Override
+    public DaoError save(Channel channel) {
+        if (channel.getId() == Channel.NO_ID) {
+            return add(channel);
+        } else {
+            return update(channel);
+        }
+    }
+
+    @Override
     public DaoError add(Channel channel) {
         ContentValues channelValues = channelContentValues(channel);
 
