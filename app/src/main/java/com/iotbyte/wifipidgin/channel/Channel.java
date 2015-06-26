@@ -38,7 +38,7 @@ public class Channel {
      * Default constructor create the required channelIdentifier, set id to NO_ID
      * allocate friendList
      */
-
+    //FIXME: need to add myself into the friendList
     public Channel(){
         this.name = DEFAULT_CHANNEL_NAME;
         this.description = DEFAULT_CHANNEL_DESCRIPTION;

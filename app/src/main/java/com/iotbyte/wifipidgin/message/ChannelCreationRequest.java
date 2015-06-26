@@ -19,14 +19,14 @@ import static com.iotbyte.wifipidgin.utils.Utils.macAddressByteToHexString;
 /**
  * Created by yefwen@iotbyte.com on 18/06/15.
  * <p/>
- * ChannelCreationMessage is used when initiate the Channel creation
+ * ChannelCreationRequest is used when initiate the Channel creation
  * <p/>
  * it should include the information of all members of the channel. The friends' information should
  * include MAC, IP, PORT, NAME and DESCRIPTION
  * <p/>
  * Other fields: channelIdentifier, channel's name, channel's description.
  */
-public class ChannelCreationMessage extends Message {
+public class ChannelCreationRequest extends Message {
 
     private final String channelIdentifier;
     private Channel channel;
@@ -45,7 +45,15 @@ public class ChannelCreationMessage extends Message {
     final String FRIEND_LIST = "friend list";
 
 
-    public ChannelCreationMessage(String jsonMessageData) throws JSONException, UnknownHostException {
+    /**
+     * Constructor for ChannelCreationRequest class, it create a new message based on
+     * information received from com-module. It will parse the json format
+     * into a message object
+     *
+     * @param jsonMessageData is the received json format string
+     */
+
+    public ChannelCreationRequest(String jsonMessageData) throws JSONException, UnknownHostException {
         super(jsonMessageData);
         JSONObject json = new JSONObject(jsonMessageData);
         this.channelName = json.getString(MESSAGE_CHANNEL_NAME);
@@ -65,28 +73,28 @@ public class ChannelCreationMessage extends Message {
             friend.setDescription(friendJson.getString(FRIEND_INFO_DESCRIPTION));
             this.channel.addFriend(friend);
         }
-        this.type = MessageType.CHANNEL_CREATION_MESSAGE;
+        this.type = MessageType.CHANNEL_CREATION_REQUEST;
 
 
     }
 
 
     /**
-     * Constructor for ChannelCreationMessage class, it create a new message object based
+     * Constructor for ChannelCreationRequest class, it create a new message object based
      * on input from this client itself. This message object will be send to
      * others
      *
      * @param channel  the channel created by myself to be broadcast to all members of channel
-     * @param receiver a specific member to receive the ChannelCreationMessage
+     * @param receiver a specific member to receive the ChannelCreationRequest
      * @param context  a context
      */
-    public ChannelCreationMessage(Channel channel, Friend receiver, Context context) {
+    public ChannelCreationRequest(Channel channel, Friend receiver, Context context) {
         super(receiver, context);
         this.channel = channel;
         this.channelIdentifier = channel.getChannelIdentifier();
         this.channelName = channel.getName();
         this.channelDescription = channel.getDescription();
-        this.type = MessageType.CHANNEL_CREATION_MESSAGE;
+        this.type = MessageType.CHANNEL_CREATION_REQUEST;
     }
 
 
@@ -147,9 +155,9 @@ public class ChannelCreationMessage extends Message {
 
     /**
      * getChannel()
-     * returns the channel object to be recovered by this ChannelCreationMessage
+     * returns the channel object to be recovered by this ChannelCreationRequest
      *
-     * @return a channel which was described in this ChannelCreationMessage
+     * @return a channel which was described in this ChannelCreationRequest
      */
     public Channel getChannel() {
         return channel;

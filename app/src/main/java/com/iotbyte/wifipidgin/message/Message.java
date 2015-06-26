@@ -135,8 +135,11 @@ public abstract class Message {
                     this.type = MessageType.FRIEND_CREATION_RESPONSE;
                     break;
 
-                case MessageType.MESSAGE_TYPE_CHANNEL_CREATION_MESSAGE:
-                    this.type = MessageType.CHANNEL_CREATION_MESSAGE;
+                case MessageType.MESSAGE_TYPE_CHANNEL_CREATION_REQUEST:
+                    this.type = MessageType.CHANNEL_CREATION_REQUEST;
+                    break;
+                case MessageType.MESSAGE_TYPE_CHANNEL_CREATION_RESPONSE:
+                    this.type = MessageType.CHANNEL_CREATION_RESPONSE;
                     break;
 
                 default:

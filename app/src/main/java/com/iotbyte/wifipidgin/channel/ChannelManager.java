@@ -11,7 +11,7 @@ import com.iotbyte.wifipidgin.dao.FriendDao;
 import com.iotbyte.wifipidgin.dao.event.DaoEvent;
 import com.iotbyte.wifipidgin.dao.event.DaoEventSubscriber;
 import com.iotbyte.wifipidgin.friend.Friend;
-import com.iotbyte.wifipidgin.message.ChannelCreationMessage;
+import com.iotbyte.wifipidgin.message.ChannelCreationRequest;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -127,6 +127,20 @@ public class ChannelManager {
             channelMap.put(channel.getChannelIdentifier(), channel);
             return saveAChannelToDataBase(channel);
         }
+    }
+
+    /**
+     * updateChannel
+     * <p/>
+     * Update/add a channel information and save it into database
+     *
+     * @param channel a channel to be updated
+     * @return true for add/update successfully or false for error on add/update
+     * in database
+     */
+    public boolean updateChannel(Channel channel) {
+        channelMap.put(channel.getChannelIdentifier(), channel);
+        return saveAChannelToDataBase(channel);
     }
 
     /**
@@ -312,15 +326,34 @@ public class ChannelManager {
 
     /**
      * sendChannelCreationMessageToAll()
-     *
-     * send ChannelCreationMessage to all members of a channel, excluding myself
+     * <p/>
+     * send ChannelCreationRequest to all members of a channel, excluding myself
      *
      * @param channel a target channel to be notified to all members
      */
+
     public void sendChannelCreationMessageToAll(Channel channel) {
         for (Friend friend : channel.getFriendsList()) {
             if (friend.getId() != Friend.SELF_ID) { //Do not send to myself
-                ChannelCreationMessage message = new ChannelCreationMessage(channel, friend, context);
+                ChannelCreationRequest message = new ChannelCreationRequest(channel, friend, context);
+                ChatManager.getInstance().enqueueOutGoingMessageQueue(message.convertMessageToJson());
+            }
+        }
+    }
+
+    /**
+     * sendChannelCreationMessageToAll()
+     * <p/>
+     * send ChannelCreationRequest to all friends in the given list. excluding myself
+     *
+     * @param friendList a target list of friends to be notified
+     * @param channel    a target channel to be recreated at receiver end
+     */
+
+    public void sendChannelCreationMessageToAll(Channel channel, List<Friend> friendList) {
+        for (Friend friend : friendList) {
+            if (friend.getId() != Friend.SELF_ID) { //Do not send to myself
+                ChannelCreationRequest message = new ChannelCreationRequest(channel, friend, context);
                 ChatManager.getInstance().enqueueOutGoingMessageQueue(message.convertMessageToJson());
             }
         }

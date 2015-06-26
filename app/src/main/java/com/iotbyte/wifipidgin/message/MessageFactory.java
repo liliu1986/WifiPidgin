@@ -38,8 +38,10 @@ public class MessageFactory {
                   return new FriendCreationRequest(json);
               case MessageType.MESSAGE_TYPE_FRIEND_CREATION_RESPONSE:
                   return new FriendCreationResponse(json);
-              case MessageType.MESSAGE_TYPE_CHANNEL_CREATION_MESSAGE:
-                  return new ChannelCreationMessage(json);
+              case MessageType.MESSAGE_TYPE_CHANNEL_CREATION_REQUEST:
+                  return new ChannelCreationRequest(json);
+              case MessageType.MESSAGE_TYPE_CHANNEL_CREATION_RESPONSE:
+                  return new ChannelCreationResponse(json);
               default:
                   return null;
 
@@ -62,8 +64,11 @@ public class MessageFactory {
              case MessageType.MESSAGE_TYPE_FRIEND_CREATION_RESPONSE:
                  return MessageType.FRIEND_CREATION_RESPONSE;
 
-             case MessageType.MESSAGE_TYPE_CHANNEL_CREATION_MESSAGE:
-                 return MessageType.CHANNEL_CREATION_MESSAGE;
+             case MessageType.MESSAGE_TYPE_CHANNEL_CREATION_REQUEST:
+                 return MessageType.CHANNEL_CREATION_REQUEST;
+
+             case MessageType.MESSAGE_TYPE_CHANNEL_CREATION_RESPONSE:
+                 return MessageType.CHANNEL_CREATION_RESPONSE;
 
             default:
                 return MessageType.ERROR;
