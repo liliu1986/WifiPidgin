@@ -299,7 +299,7 @@ public class ChannelManager {
                 mockList.add(xiaoMing);
                 mockList.add(xiaoPang);
                 String channelName = "xiao channel";
-                Channel mockChannel = new Channel(mockList, channelName, "heiheihei");
+                Channel mockChannel = new Channel(context,mockList, channelName, "heiheihei");
                 //just a work around for mock data:
            /* boolean existFlag = false;
             for(Channel channel : DaoFactory.getInstance().getChannelDao(context, DaoFactory.DaoType.SQLITE_DAO, null).findAll()){

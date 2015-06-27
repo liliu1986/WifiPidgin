@@ -1,8 +1,11 @@
 package com.iotbyte.wifipidgin.channel;
 
 
+import android.content.Context;
 import android.util.Log;
 
+import com.iotbyte.wifipidgin.dao.DaoFactory;
+import com.iotbyte.wifipidgin.dao.FriendDao;
 import com.iotbyte.wifipidgin.friend.Friend;
 
 import java.sql.Timestamp;
@@ -36,10 +39,11 @@ public class Channel {
 
     /**
      * Default constructor create the required channelIdentifier, set id to NO_ID
-     * allocate friendList
+     * allocate friendList.
+     * Always add myself to the friend list
      */
-    //FIXME: need to add myself into the friendList
-    public Channel(){
+
+    public Channel(Context context){
         this.name = DEFAULT_CHANNEL_NAME;
         this.description = DEFAULT_CHANNEL_DESCRIPTION;
         this.id = NO_ID;
@@ -63,13 +67,19 @@ public class Channel {
         this.channelIdentifier = identifierHolder;
 
         Log.v(CHANNEL_TAG, "the channelIdentifier is " + this.channelIdentifier);
+
+        FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
+        Friend myself = fd.findById(Friend.SELF_ID);
+        friendList.add(myself);
     }
 
-    public Channel(List<Friend> friendList, String name, String description) {
-        this();
+    public Channel(Context context,List<Friend> friendList, String name, String description) {
+        this(context);
         this.name = name;
         this.description = description;
-        this.friendList = friendList;
+        for(Friend friend : friendList){
+            this.addFriend(friend);
+        }
     }
 
     /**
