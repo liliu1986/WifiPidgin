@@ -38,6 +38,10 @@ public class MessageFactory {
                   return new FriendCreationRequest(json);
               case MessageType.MESSAGE_TYPE_FRIEND_CREATION_RESPONSE:
                   return new FriendCreationResponse(json);
+              case MessageType.MESSAGE_TYPE_FRIEND_IMAGE_REQUEST:
+                  return new FriendImageRequest(json);
+              case MessageType.MESSAGE_TYPE_FRIEND_IMAGE_RESPONSE:
+                  return new FriendImageResponse(json);
               default:
                   return null;
 
@@ -60,6 +64,11 @@ public class MessageFactory {
              case MessageType.MESSAGE_TYPE_FRIEND_CREATION_RESPONSE:
                  return MessageType.FRIEND_CREATION_RESPONSE;
 
+             case MessageType.MESSAGE_TYPE_FRIEND_IMAGE_REQUEST:
+                 return MessageType.FRIEND_IMAGE_REQUEST;
+
+             case MessageType.MESSAGE_TYPE_FRIEND_IMAGE_RESPONSE:
+                 return MessageType.FRIEND_IMAGE_RESPONSE;
             default:
                 return MessageType.ERROR;
         }

@@ -4,11 +4,13 @@ package com.iotbyte.wifipidgin.message;
  * Created by dev on 06/05/15.
  */
 public enum MessageType {
-    CHAT_MESSAGE,FRIEND_CREATION_REQUEST,FRIEND_CREATION_RESPONSE,ERROR;
+    CHAT_MESSAGE,FRIEND_CREATION_REQUEST,FRIEND_CREATION_RESPONSE,FRIEND_IMAGE_REQUEST,FRIEND_IMAGE_RESPONSE,ERROR;
 
     public static final String MESSAGE_TYPE_CHAT_MESSAGE = "chat message";
     public static final String MESSAGE_TYPE_FRIEND_CREATION_REQUEST = "friend creation request";
     public static final String MESSAGE_TYPE_FRIEND_CREATION_RESPONSE = "friend creation response";
+    public static final String MESSAGE_TYPE_FRIEND_IMAGE_REQUEST = "friend image file request";
+    public static final String MESSAGE_TYPE_FRIEND_IMAGE_RESPONSE = "friend image file response";
     public static final String MESSAGE_TYPE_ERROR = "error";
 
     @Override
@@ -20,6 +22,10 @@ public enum MessageType {
                 return MESSAGE_TYPE_FRIEND_CREATION_REQUEST;
             case FRIEND_CREATION_RESPONSE:
                 return MESSAGE_TYPE_FRIEND_CREATION_RESPONSE;
+            case FRIEND_IMAGE_REQUEST:
+                return MESSAGE_TYPE_FRIEND_IMAGE_REQUEST;
+            case FRIEND_IMAGE_RESPONSE:
+                return MESSAGE_TYPE_FRIEND_IMAGE_RESPONSE;
             case ERROR:
                 return MESSAGE_TYPE_ERROR;
             default:throw new IllegalArgumentException();

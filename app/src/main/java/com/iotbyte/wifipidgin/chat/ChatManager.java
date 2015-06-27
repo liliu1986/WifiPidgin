@@ -1,6 +1,7 @@
 package com.iotbyte.wifipidgin.chat;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.iotbyte.wifipidgin.commmodule.MessageClient;
@@ -8,8 +9,10 @@ import com.iotbyte.wifipidgin.dao.DaoError;
 import com.iotbyte.wifipidgin.dao.DaoFactory;
 import com.iotbyte.wifipidgin.dao.FriendDao;
 import com.iotbyte.wifipidgin.friend.Friend;
+import com.iotbyte.wifipidgin.friend.Myself;
 import com.iotbyte.wifipidgin.message.ChatMessage;
 import com.iotbyte.wifipidgin.message.FriendCreationResponse;
+import com.iotbyte.wifipidgin.message.FriendImageResponse;
 import com.iotbyte.wifipidgin.message.Message;
 import com.iotbyte.wifipidgin.message.MessageFactory;
 import com.iotbyte.wifipidgin.message.MessageType;
@@ -18,6 +21,9 @@ import com.iotbyte.wifipidgin.utils.Utils;
 
 import org.json.JSONException;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.net.UnknownHostException;
 import java.sql.Timestamp;
 import java.util.HashMap;
@@ -177,6 +183,52 @@ public class ChatManager {
                     return true;
                 } else
                 {
+                    return false;
+                }
+
+            }
+            case FRIEND_IMAGE_REQUEST: {
+                Log.d("test chat", "Got a FRIEND_IMAGE_REQUEST" );
+                FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
+                Friend myself = fd.findById(Myself.SELF_ID);
+                String imageBase64 = Utils.convertImgToBase64(myself.getImagePath());
+                FriendImageResponse friendImageResponse = new FriendImageResponse(message.getSender(),context, imageBase64);
+                return this.enqueueOutGoingMessageQueue(friendImageResponse.convertMessageToJson());
+            }
+            case FRIEND_IMAGE_RESPONSE:{
+                FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
+                if (null == fd){
+                    return false;
+                }
+
+                Friend sender = fd.findByMacAddress(message.getSender().getMac());
+                if (sender != null){
+                    Log.d("test chat", "Got the sender from db" );
+                    String imageBase64Encode = ((FriendImageResponse)message).getImageBase64Encode();
+                    Bitmap imageBitmap = Utils.convertBase64toBitmap(imageBase64Encode);
+
+                    //The absoluste path that the friend image will be stored at.
+                    String imagePath = context.getExternalFilesDir(null).toString()+
+                            File.separator+"userImage"+Utils.macAddressByteToHexString(sender.getMac());
+                    File file = new File(imagePath);
+                    if (file.exists()) {
+                        file.delete();
+                        file = new File(imagePath);
+                    }
+                    try {
+                        OutputStream outStream = new FileOutputStream(file);
+                        imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, outStream);
+                        outStream.flush();
+                        outStream.close();
+                        sender.setImagePath(imagePath);
+                        fd.update(sender);
+
+                    }catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }else{
+                    Log.d("CCC", "NO SENDER INFORMATION" );
                     return false;
                 }
 

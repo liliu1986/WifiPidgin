@@ -134,6 +134,12 @@ public abstract class Message {
                 case MessageType.MESSAGE_TYPE_FRIEND_CREATION_RESPONSE:
                     this.type = MessageType.FRIEND_CREATION_RESPONSE;
                     break;
+                case MessageType.MESSAGE_TYPE_FRIEND_IMAGE_REQUEST:
+                    this.type = MessageType.FRIEND_IMAGE_REQUEST;
+                    break;
+                case MessageType.MESSAGE_TYPE_FRIEND_IMAGE_RESPONSE:
+                    this.type = MessageType.FRIEND_IMAGE_RESPONSE;
+                    break;
                 default:
                     this.type = MessageType.ERROR;
             }
@@ -142,7 +148,7 @@ public abstract class Message {
     public abstract String convertMessageToJson();
 
     public Friend getReceiver() {
-        return receiver;
+        return this.receiver;
     }
 
     public void setReceiver(Friend receiver) {

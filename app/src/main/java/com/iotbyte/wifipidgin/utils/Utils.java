@@ -2,8 +2,11 @@ package com.iotbyte.wifipidgin.utils;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 
 import org.apache.http.conn.util.InetAddressUtils;
@@ -14,6 +17,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URISyntaxException;
@@ -325,4 +329,42 @@ public class Utils {
     public static String getFileHash(String filePath) {
         return getFileHash(filePath, 0);
     }
+
+    /**
+     * Calculate file base64 encode from a image file.
+     * @param path Absolute path of the image.
+     * @return file base64 encoding.
+     */
+    public static String convertImgToBase64(String path){
+        String base64Image = null;
+        try {
+            InputStream inputStream = new FileInputStream(path);//You can get an inputStream using any IO API
+            byte[] bytes;
+            byte[] buffer = new byte[102400];
+            int bytesRead;
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                output.write(buffer, 0, bytesRead);
+            }
+            bytes = output.toByteArray();
+            base64Image = Base64.encodeToString(bytes, Base64.DEFAULT);
+            return base64Image;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            return base64Image;
+        }
+    }
+    /**
+     * Concert file from base64 encode to a image bitmap.
+     * @param encodedBase64String file's encoded base64 format
+     * @return file bitmap format
+     */
+    public static Bitmap convertBase64toBitmap(String encodedBase64String){
+        byte[] decodedString = Base64.decode(encodedBase64String, Base64.DEFAULT);
+        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        return decodedByte;
+    }
+
 }
