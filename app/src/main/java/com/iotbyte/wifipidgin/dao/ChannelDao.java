@@ -10,6 +10,15 @@ import java.util.List;
  */
 public interface ChannelDao {
     /**
+     * Save a channel to storage. If the channel is not yet in the storage (i.e. id == NO_ID),
+     * publish the channel to storage. Else update the channel already in storage.
+     *
+     * @param channel Channel to be saved.
+     * @return NO_ERROR upon successfully publishing channel to storage. Otherwise respective error code.
+     */
+    public DaoError save(Channel channel);
+
+    /**
      * Publish a channel to storage.
      * <p/>
      * The id field of channel is updated to the id to find it in the storage after successfully

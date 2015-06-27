@@ -35,6 +35,15 @@ public class FriendSqliteDao implements FriendDao {
     }
 
     @Override
+    public DaoError save(Friend friend) {
+        if (friend.getId() == Friend.NO_ID) {
+            return add(friend);
+        } else {
+            return update(friend);
+        }
+    }
+
+    @Override
     public DaoError add(Friend friend) {
         Log.d(TAG, "About to add friend. mac:" + friend.getMac().toString() +
                    " ip:" + friend.getIp().getHostAddress());
