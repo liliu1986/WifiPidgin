@@ -1,7 +1,6 @@
 package com.iotbyte.wifipidgin.commmodule;
 
 import android.util.Log;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -89,6 +88,7 @@ public class MessageClient {
     }
 
     private void sendMessage(String msg, Socket inSocket) {
+
         try {
             Socket socket = inSocket;
             if (socket == null || socket.isClosed()) {
@@ -101,6 +101,7 @@ public class MessageClient {
                                 new OutputStreamWriter(socket.getOutputStream())), true);
                 out.println(msg);
                 out.flush();
+
                 socket.close();
                 Log.d(MSG_CLIENT_TAG, "Client sent message: " + msg);
             }

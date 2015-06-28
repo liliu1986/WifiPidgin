@@ -14,9 +14,11 @@ import com.iotbyte.wifipidgin.friend.Myself;
 import com.iotbyte.wifipidgin.nsdmodule.NsdServer;
 import com.iotbyte.wifipidgin.utils.Utils;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.InetAddress;
@@ -74,10 +76,6 @@ public class MessageServer   {
                 FriendDao fd = DaoFactory.getInstance()
                         .getFriendDao(mContext, DaoFactory.DaoType.SQLITE_DAO, null);
                 Friend selfFriend = fd.findById(Myself.SELF_ID);
-                if (selfFriend == null){
-                    Log.d(MSG_SERVER_TAG, "Self in null");
-
-                }
                 Myself self = new Myself(selfFriend);
 
                 InetAddress myIP = null;
@@ -167,19 +165,34 @@ public class MessageServer   {
                 int bytesRead;
                 //String messageStr = null;
                 InputStream inputStream = hostThreadSocket.getInputStream();
+                InputStreamReader is = new InputStreamReader(inputStream);
+                StringBuilder sb=new StringBuilder();
+                BufferedReader br = new BufferedReader(is);
+                String read = br.readLine();
+                while(read != null) {
+                    //System.out.println(read);
+                    sb.append(read);
+                    read =br.readLine();
+
+                }
+                inputStream.close();
+                /*
                 msgRec = new StringBuffer();
 
 
                 bytesRead = inputStream.read(buffer);
+                Log.d(MSG_SERVER_TAG, "bytesRead: " + bytesRead);
+
                 byteArrayOutputStream.write(buffer, 0, bytesRead);
                 msgRec.append(byteArrayOutputStream.toString("UTF-8"));
 
                 inputStream.close();
                 Log.d(MSG_SERVER_TAG, "Got msg from client " + msgRec);
-
+                */
                 //TODO - After the message is received, need to handle it/have a custom listener.
                 if(mMsgRecListenerForThread != null){
-                    mMsgRecListenerForThread.onMessageReceived(msgRec.toString());
+                    mMsgRecListenerForThread.onMessageReceived(sb.toString());
+                    //mMsgRecListenerForThread.onMessageReceived(msgRec.toString());
                 }else{
                     Log.e(MSG_SERVER_TAG, "ChatMessage Receiving Listener is not set");
                 }
@@ -278,6 +291,6 @@ public class MessageServer   {
     Thread mThread = null;
     private MessageReceivingListener mMessageReceivingListener;
 
-    private int MAX_MSG_SIZE = 1024;
+    private int MAX_MSG_SIZE = 102400;
 }
 
