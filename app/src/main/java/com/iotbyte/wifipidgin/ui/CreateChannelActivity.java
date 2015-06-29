@@ -25,9 +25,11 @@ import java.util.List;
 public class CreateChannelActivity extends Activity {
 
     final String CREATE_CHANNEL_ACT = "Create Channel Activity";
+    final String DEFAULT_CHANNEL_NAME = "Default Channel Name";
     final Context context = this;
     ListView lv;
-    TextView tv;
+    TextView tvChannelName;
+    TextView tvChannelDescription;
     ChannelManager channelManager;
 
     @Override
@@ -40,7 +42,8 @@ public class CreateChannelActivity extends Activity {
         Button buttonCreateChannel = (Button) findViewById(R.id.buttonCreateChannel);
         Button buttonCancel = (Button) findViewById(R.id.buttonCancel);
 
-        tv = (TextView) findViewById(R.id.enterChannelName);
+        tvChannelName = (TextView) findViewById(R.id.enterChannelName);
+        tvChannelDescription = (TextView) findViewById(R.id.enterChannelDescription);
         // populate list view
         ArrayAdapter<Friend> aa = (new ArrayAdapter<>(this, android.R.layout.simple_list_item_multiple_choice, DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null).findAll()));
         lv = (ListView) findViewById(android.R.id.list);
@@ -51,7 +54,7 @@ public class CreateChannelActivity extends Activity {
             public void onClick(View v) {
 
                 List<Friend> channelFriendList = new ArrayList<>();
-                String channelName;
+                String channelName, channelDescription;
                 Friend currentFriend;
 
                 Log.d(CREATE_CHANNEL_ACT, "create channel confirm button clicked");
@@ -68,10 +71,15 @@ public class CreateChannelActivity extends Activity {
                     }
                 }
 
-                channelName = tv.getText().toString();
-                Log.d(CREATE_CHANNEL_ACT, "Channel Name: " + channelName);
+                channelName = tvChannelName.getText().toString();
+                channelDescription = tvChannelDescription.getText().toString();
+                Log.d(CREATE_CHANNEL_ACT, "Channel Name: " + channelName + channelName.length()+", Channel Description: " + channelDescription);
 
-                Channel newChannel = new Channel(channelFriendList, channelName, channelName);
+                if (channelName.equals("")) {
+                    channelName = DEFAULT_CHANNEL_NAME;
+                }
+
+                Channel newChannel = new Channel(channelFriendList, channelName, channelDescription);
                 //save new channel;
                 if (!channelManager.addChannel(newChannel)) {
                     Log.e(CREATE_CHANNEL_ACT, "Error occurred during creating Channel" + newChannel.toString());
