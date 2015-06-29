@@ -21,6 +21,8 @@ import com.iotbyte.wifipidgin.R;
 import com.iotbyte.wifipidgin.dao.DaoFactory;
 import com.iotbyte.wifipidgin.dao.FriendDao;
 import com.iotbyte.wifipidgin.friend.Friend;
+import com.iotbyte.wifipidgin.friend.Myself;
+import com.iotbyte.wifipidgin.utils.Utils;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -43,6 +45,7 @@ public class EditUserProfileActivity extends ActionBarActivity implements View.O
 
     private String userMac = null;
     private Friend inFriend = null;
+    private Myself self = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -60,53 +63,57 @@ public class EditUserProfileActivity extends ActionBarActivity implements View.O
         //Get the user Self from DB
         inFriend = fd.findById(0);
 
+
         if (inFriend != null) {
-            userName = inFriend.getName();
-            //Display the user name card title
-            actionBar.setTitle("Name Card: [" + userName +"]");
+            self = new Myself(inFriend);
+            if (self != null){
+                userName = self.getName();
+                //Display the user name card title
+                actionBar.setTitle("Name Card: [" + userName +"]");
 
-            userDescription = inFriend.getDescription();
-            //Set the user image
-            File imgFile = new  File(inFriend.getImagePath());
-            ImageView myImage = (ImageView) findViewById(R.id.user_image);
-            myImage.setOnClickListener(this);
+                userDescription = self.getDescription();
+                //Set the user image
+                File imgFile = new  File(self.getImagePath());
+                ImageView myImage = (ImageView) findViewById(R.id.user_image);
+                myImage.setOnClickListener(this);
 
-            //if image file exist, present it in the convertView.
-            if(imgFile.exists()){
-                Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                myImage = (ImageView) findViewById(R.id.user_image);
-                myImage.setImageBitmap(myBitmap);
+                //if image file exist, present it in the convertView.
+                if(imgFile.exists()){
+                    Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                    myImage = (ImageView) findViewById(R.id.user_image);
+                    myImage.setImageBitmap(myBitmap);
 
-            } else {
-                //if image file doesn't exist, present the default image.
-                myImage.setImageResource(R.drawable.default_user_image);
+                } else {
+                    //if image file doesn't exist, present the default image.
+                    myImage.setImageResource(R.drawable.default_user_image);
+                }
+
+
+                //Set the description in textView
+                TextView userDescriptionTextView = (TextView) findViewById(R.id.user_description);
+                if (null == userDescription){
+                    userDescriptionTextView.setText("This is my description");
+                }else{
+                    userDescriptionTextView.setText(userDescription);
+                }
+
+
+
+                TextView userNameTextView = (TextView) findViewById(R.id.user_name);
+                if (null == userName){
+                    userNameTextView.setText("User Name");
+                }else{
+                    userNameTextView.setText(userName);
+                }
+
+
+                Button saveProfileButton = (Button) findViewById(R.id.save_user_profile);
+                saveProfileButton.setOnClickListener(this);
+
+                Button cancelProfileButton = (Button) findViewById(R.id.cancel_edit);
+                cancelProfileButton.setOnClickListener(this);
+
             }
-
-
-            //Set the description in textView
-            TextView userDescriptionTextView = (TextView) findViewById(R.id.user_description);
-            if (null == userDescription){
-                userDescriptionTextView.setText("This is my description");
-            }else{
-                userDescriptionTextView.setText(userDescription);
-            }
-
-
-
-            TextView userNameTextView = (TextView) findViewById(R.id.user_name);
-            if (null == userName){
-                userNameTextView.setText("User Name");
-            }else{
-                userNameTextView.setText(userName);
-            }
-
-
-            Button saveProfileButton = (Button) findViewById(R.id.save_user_profile);
-            saveProfileButton.setOnClickListener(this);
-
-            Button cancelProfileButton = (Button) findViewById(R.id.cancel_edit);
-            cancelProfileButton.setOnClickListener(this);
-
 
         }else{
             Log.e(TAG, "Couldn't find the user");
@@ -155,12 +162,14 @@ public class EditUserProfileActivity extends ActionBarActivity implements View.O
                 //Grab the content in text fields and save them to user.
                 TextView userNameTextView = (TextView) findViewById(R.id.user_name);
                 String newUserName = userNameTextView.getText().toString();
-                inFriend.setName(newUserName);
+                self.setName(newUserName);
 
                 TextView userDescTextView = (TextView) findViewById(R.id.user_description);
                 String newUserDesc = userDescTextView.getText().toString();
-                inFriend.setDescription(newUserDesc);
-                fd.update(inFriend);
+                self.setDescription(newUserDesc);
+                Log.d(TAG, "Mac: " + Utils.macAddressByteToHexString(self.getMac()));
+                Log.d(TAG, "Mac: " + Utils.macAddressByteToHexString(inFriend.getMac()));
+                fd.update(self);
                 super.onBackPressed();
                 break;
             case R.id.cancel_edit :
@@ -218,7 +227,7 @@ public class EditUserProfileActivity extends ActionBarActivity implements View.O
                     File imgFile = new  File(path);
                     //if image file exist, present it in the convertView.
                     if(imgFile.exists()){
-                        inFriend.setImagePath(path);
+                        self.setImagePath(path);
                         Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
                         ImageView myImage = (ImageView) findViewById(R.id.user_image);
                         myImage.setImageBitmap(myBitmap);
