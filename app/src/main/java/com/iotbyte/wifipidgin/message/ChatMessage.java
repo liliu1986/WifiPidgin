@@ -38,13 +38,12 @@ public class ChatMessage extends Message {
      */
 
     public ChatMessage(String jsonMessageData) throws JSONException, UnknownHostException {
-
-            super(jsonMessageData);
-            JSONObject json = new JSONObject(jsonMessageData);
-            this.messageBody = json.getString(MESSAGE_MESSAGE_BODY);
-            this.channelIdentifier = json.getString(MESSAGE_CHANNEL_IDENTIFIER);
-            this.isMyself = false;
-
+        super(jsonMessageData);
+        assert this.type == MessageType.CHAT_MESSAGE;
+        JSONObject json = new JSONObject(jsonMessageData);
+        this.messageBody = json.getString(MESSAGE_MESSAGE_BODY);
+        this.channelIdentifier = json.getString(MESSAGE_CHANNEL_IDENTIFIER);
+        this.isMyself = false;
     }
 
     /**
@@ -59,9 +58,9 @@ public class ChatMessage extends Message {
     public ChatMessage(Friend receiver, String channelIdentifier, String messageBody,Context context) {
 
         super(receiver,context);
+        this.type = MessageType.CHAT_MESSAGE;
         this.channelIdentifier = channelIdentifier;
         this.messageBody = messageBody;
-        this.type = MessageType.CHAT_MESSAGE;
         this.isMyself = true;
     }
 

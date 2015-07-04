@@ -40,6 +40,7 @@ public class FriendCreationResponse extends Message {
      */
     public FriendCreationResponse (String jsonMessageData) throws JSONException, UnknownHostException{
         super(jsonMessageData);
+        assert this.type == MessageType.FRIEND_CREATION_RESPONSE;
     }
     
     @Override
