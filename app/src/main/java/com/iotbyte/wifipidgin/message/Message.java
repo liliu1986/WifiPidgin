@@ -54,7 +54,12 @@ public abstract class Message {
         this.type = type;
     }
 
-    public Message (Friend receiver,Context context){
+    /**
+     * Base constructor. This constructor does not initialize message type.
+     * @param receiver Intended receiver of this message
+     * @param context context
+     */
+    public Message (Friend receiver, Context context){
         this.receiver = receiver;
 
         // Get Timestamp
@@ -76,9 +81,10 @@ public abstract class Message {
         myself.setName("myself");
         myself.setDescription("I am who I am");
 */
-        Log.d(MESSAGE_DEBUG,"myself IP from DB:"+myself.getIp());
+        Log.d(MESSAGE_DEBUG, "myself IP from DB:" + myself.getIp());
         this.sender = myself;
-
+        // child class is responsible for setting the type.
+        this.type = MessageType.ERROR;
     }
 
     public Message (String jsonMessageData) throws JSONException, UnknownHostException
@@ -89,7 +95,7 @@ public abstract class Message {
 
 
         JSONObject json = new JSONObject(jsonMessageData);
-        String type = json.getString(MESSAGE_TYPE);
+        String typeString = json.getString(MESSAGE_TYPE);
         JSONObject sender = json.getJSONObject(MESSAGE_SENDER);
         JSONObject receiver = json.getJSONObject(MESSAGE_RECEIVER);
         InetAddress senderIp = InetAddress.getByName(ipFormatter(sender.getString(MESSAGE_IP)));
@@ -112,46 +118,8 @@ public abstract class Message {
         myself.setDescription(receiver.optString(MESSAGE_DESCRIPTION));
         myself.setName(receiver.optString(MESSAGE_NAME));
         this.receiver = myself;
-
         this.timestamp = Timestamp.valueOf(json.optString(MESSAGE_TIMESTAMP));
-
-        setMessageType(type);
-
-
-
-    }
-
-    public void setMessageType(String type) {
-            switch (type){
-                case MessageType.MESSAGE_TYPE_CHAT_MESSAGE:
-                    this.type = MessageType.CHAT_MESSAGE;
-                    break;
-
-                case MessageType.MESSAGE_TYPE_FRIEND_CREATION_REQUEST:
-                    this.type = MessageType.FRIEND_CREATION_REQUEST;
-                    break;
-
-                case MessageType.MESSAGE_TYPE_FRIEND_CREATION_RESPONSE:
-                    this.type = MessageType.FRIEND_CREATION_RESPONSE;
-                    break;
-
-                case MessageType.MESSAGE_TYPE_CHANNEL_CREATION_REQUEST:
-                    this.type = MessageType.CHANNEL_CREATION_REQUEST;
-                    break;
-                case MessageType.MESSAGE_TYPE_CHANNEL_CREATION_RESPONSE:
-                    this.type = MessageType.CHANNEL_CREATION_RESPONSE;
-                    break;
-
-                case MessageType.MESSAGE_TYPE_FRIEND_IMAGE_REQUEST:
-                    this.type = MessageType.FRIEND_IMAGE_REQUEST;
-                    break;
-                case MessageType.MESSAGE_TYPE_FRIEND_IMAGE_RESPONSE:
-                    this.type = MessageType.FRIEND_IMAGE_RESPONSE;
-                    break;
-               
-                default:
-                    this.type = MessageType.ERROR;
-            }
+        this.type = MessageType.fromString(typeString);
     }
 
     public abstract String convertMessageToJson();

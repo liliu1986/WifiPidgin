@@ -38,7 +38,7 @@ public class FriendImageRequest extends Message {
      */
     public FriendImageRequest(String jsonMessageData) throws JSONException, UnknownHostException {
         super(jsonMessageData);
-
+        assert this.type == MessageType.FRIEND_IMAGE_REQUEST;
     }
     @Override
     public String convertMessageToJson() {
