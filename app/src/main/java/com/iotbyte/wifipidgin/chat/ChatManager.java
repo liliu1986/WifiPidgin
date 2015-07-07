@@ -13,6 +13,7 @@ import com.iotbyte.wifipidgin.friend.Myself;
 import com.iotbyte.wifipidgin.message.ChatMessage;
 import com.iotbyte.wifipidgin.message.FriendCreationResponse;
 import com.iotbyte.wifipidgin.message.FriendImageResponse;
+import com.iotbyte.wifipidgin.message.FriendInfoUpdateResponse;
 import com.iotbyte.wifipidgin.message.Message;
 import com.iotbyte.wifipidgin.message.MessageFactory;
 import com.iotbyte.wifipidgin.message.MessageType;
@@ -42,20 +43,21 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class ChatManager {
     private static ChatManager instance = null;
 
-    private Queue<String> outGoingMessageQueue; //store the outGoingMessage in it's JSON format
-
-    private Queue<Message> incomingMessageQueue; //Store incomingMessage in it's message object
-
-    private HashMap<String, Chat> chatMap; // map channelIdentifier with Chat object
+    /** store the outGoingMessage in it's JSON format */
+    private Queue<String> outGoingMessageQueue;
+    /** Store incomingMessage in it's message object */
+    private Queue<Message> incomingMessageQueue;
+    /** map channelIdentifier with Chat object */
+    private HashMap<String, Chat> chatMap;
 
     private MessageClient messageClient;
 
-   // private Context context;
+    private static final String TAG = "ChannelManager";
 
     private ChatManager() {
-        outGoingMessageQueue = new ConcurrentLinkedQueue<>();
-        incomingMessageQueue = new ConcurrentLinkedQueue<>();
-        chatMap = new HashMap<>();
+        outGoingMessageQueue = new ConcurrentLinkedQueue();
+        incomingMessageQueue = new ConcurrentLinkedQueue();
+        chatMap = new HashMap();
         messageClient = new MessageClient();
     }
 
@@ -185,7 +187,41 @@ public class ChatManager {
                 {
                     return false;
                 }
+            }
+            case FRIEND_INFO_UPDATE_REQUEST: {
+                FriendDao fd = DaoFactory.getInstance().getFriendDao(context,
+                                                                     DaoFactory.DaoType.SQLITE_DAO,
+                                                                     null);
+                if (null == fd) {
+                    return false;
+                }
+                Friend myself = fd.findById(Myself.SELF_ID);
+                assert null != myself;
 
+                FriendInfoUpdateResponse response =
+                        new FriendInfoUpdateResponse(message.getSender(), context,
+                                                     myself.getDescription());
+                return this.enqueueOutGoingMessageQueue(response.convertMessageToJson());
+            }
+            case FRIEND_INFO_UPDATE_RESPONSE: {
+                FriendDao fd = DaoFactory.getInstance().getFriendDao(context,
+                                                                     DaoFactory.DaoType.SQLITE_DAO,
+                                                                     null);
+                if (null == fd) {
+                    return false;
+                }
+
+                Friend sender = fd.findByMacAddress(message.getSender().getMac());
+                if (null != sender) {
+                    String description = ((FriendInfoUpdateResponse)message).getDescription();
+                    sender.setDescription(description);
+                    fd.update(sender);
+                    return true;
+                } else {
+                    Log.d(TAG, "Received a FRIEND_INFO_UPDATE_RESPONSE from unknown sender " +
+                               "with mac:" + message.getSender().getMac());
+                    return false;
+                }
             }
             case FRIEND_IMAGE_REQUEST: {
                 Log.d("test chat", "Got a FRIEND_IMAGE_REQUEST" );
@@ -207,7 +243,7 @@ public class ChatManager {
                     String imageBase64Encode = ((FriendImageResponse)message).getImageBase64Encode();
                     Bitmap imageBitmap = Utils.convertBase64toBitmap(imageBase64Encode);
 
-                    //The absoluste path that the friend image will be stored at.
+                    //The absolute path that the friend image will be stored at.
                     String imagePath = context.getExternalFilesDir(null).toString()+
                             File.separator+"userImage"+Utils.macAddressByteToHexString(sender.getMac());
                     File file = new File(imagePath);
@@ -222,7 +258,7 @@ public class ChatManager {
                         outStream.close();
                         sender.setImagePath(imagePath);
                         fd.update(sender);
-
+                        return true;
                     }catch (Exception e) {
                         e.printStackTrace();
                     }

@@ -173,7 +173,7 @@ public class Friend {
     }
     static private final String UNINIT_STRING = "Un-init";
 
-    /** Number of bytes used to calcuate image hash */
+    /** Number of bytes used to calculate image hash */
     static private final int IMAGE_HASHABLE_BYTES = 100;
 
     /**
