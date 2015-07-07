@@ -226,13 +226,21 @@ public class ChannelManager {
         for (Channel channel : channels) {
             for (Friend friend : channel.getFriendsList()) {
                 if (friend.NO_ID == friend.getId()) {
-                    fd.add(friend);
+                    if (DaoError.ERROR_SAVE == fd.add(friend)) {
+                        Friend dbFriend = fd.findByMacAddress(friend.getMac());
+                        friend.setId(dbFriend.getId());
+                        fd.update(friend);
+                    }
                 } else {
                     fd.update(friend); //TODO:: might need to change this depends on how to handles friend update
                 }
             }
             if (channel.NO_ID == channel.getId()) {
-                cd.add(channel);
+                if (DaoError.ERROR_SAVE == cd.add(channel)){
+                    Channel dbChannel = cd.findByChannelIdentifier(channel.getChannelIdentifier());
+                    channel.setId(dbChannel.getId());
+                    cd.update(channel);
+                }
             } else {
                 cd.update(channel);   //TODO:: might need to change this depends on how to handles channel update
             }
@@ -258,13 +266,30 @@ public class ChannelManager {
 
         for (Friend friend : channel.getFriendsList()) {
             if (friend.NO_ID == friend.getId()) {
-                fd.add(friend);
+                /*
+                when a friend does not have a assigned Id value, there are two possibilities:
+                a. the friend does not exist, then just add this friend
+                b. the friend actually exist in DB,but since the friends in Channel might came from a
+                channelCreationRequest, so there is no id value been assigned from friend constructor,
+                so we need to find the actual ID of the friend and update the values in channel friend list
+                and update other values other than the id in DB
+                 */
+                if (DaoError.ERROR_SAVE == fd.add(friend)) {
+                    Friend dbFriend = fd.findByMacAddress(friend.getMac());
+                    friend.setId(dbFriend.getId());
+                    fd.update(friend);
+                }
+
             } else {
                 fd.update(friend); //TODO:: might need to change this depends on how to handles friend update
             }
         }
         if (channel.NO_ID == channel.getId()) {
-            cd.add(channel);
+            if (DaoError.ERROR_SAVE == cd.add(channel)){
+             Channel dbChannel = cd.findByChannelIdentifier(channel.getChannelIdentifier());
+                channel.setId(dbChannel.getId());
+                cd.update(channel);
+            }
         } else {
             cd.update(channel);   //TODO:: might need to change this depends on how to handles channel update
         }
@@ -299,7 +324,7 @@ public class ChannelManager {
                 mockList.add(xiaoMing);
                 mockList.add(xiaoPang);
                 String channelName = "xiao channel";
-                Channel mockChannel = new Channel(context,mockList, channelName, "heiheihei");
+                Channel mockChannel = new Channel(context, mockList, channelName, "heiheihei");
                 //just a work around for mock data:
            /* boolean existFlag = false;
             for(Channel channel : DaoFactory.getInstance().getChannelDao(context, DaoFactory.DaoType.SQLITE_DAO, null).findAll()){

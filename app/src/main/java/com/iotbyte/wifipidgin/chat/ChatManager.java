@@ -204,6 +204,7 @@ public class ChatManager {
                 //local channel information
                 if (null != ChannelManager.getInstance(context).getChannelByIdentifier(channel.getChannelIdentifier())) {
                     ChannelManager.getInstance(context).updateChannel(channel);
+                    return true;
                 } else {
                     //as the channel does not exist, it is a creation request
 
