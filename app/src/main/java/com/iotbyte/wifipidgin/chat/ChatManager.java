@@ -44,11 +44,17 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class ChatManager {
     private static ChatManager instance = null;
 
-    /** store the outGoingMessage in it's JSON format */
+    /**
+     * store the outGoingMessage in it's JSON format
+     */
     private Queue<String> outGoingMessageQueue;
-    /** Store incomingMessage in it's message object */
+    /**
+     * Store incomingMessage in it's message object
+     */
     private Queue<Message> incomingMessageQueue;
-    /** map channelIdentifier with Chat object */
+    /**
+     * map channelIdentifier with Chat object
+     */
     private HashMap<String, Chat> chatMap;
 
     private MessageClient messageClient;
@@ -104,7 +110,7 @@ public class ChatManager {
         try {
             Message outMsg = MessageFactory.buildMessageByJson(message);
             Friend receiver = outMsg.getReceiver();
-            if (outMsg.getType() == MessageType.FRIEND_CREATION_REQUEST){
+            if (outMsg.getType() == MessageType.FRIEND_CREATION_REQUEST) {
                 //When the friend creation request is sent out, remove it from the map
                 FriendOnlineHashMap friendOnlineHashMap = FriendOnlineHashMap.getInstance();
                 String friendMacString = Utils.macAddressByteToHexString(receiver.getMac());
@@ -158,7 +164,7 @@ public class ChatManager {
                     Friend sender = message.getSender();
                     Friend dbSender = fd.findByMacAddress(sender.getMac());
                     if (dbSender != null) {
-                        if ( !(dbSender.getImageHash().equals(sender.getImageHash())) ){
+                        if (!(dbSender.getImageHash().equals(((ChatMessage) message).getImageHashCode()))) {
                             sendFriendImageRequest(sender, context);
                         }
                     }
@@ -173,7 +179,7 @@ public class ChatManager {
                  */
 
                 //TODO:: try to use MessageFactory here later
-                FriendCreationResponse friendCreationResponse = new FriendCreationResponse(message.getSender(),context);
+                FriendCreationResponse friendCreationResponse = new FriendCreationResponse(message.getSender(), context);
                 return this.enqueueOutGoingMessageQueue(friendCreationResponse.convertMessageToJson());
             }
             case FRIEND_CREATION_RESPONSE: {
@@ -181,7 +187,7 @@ public class ChatManager {
                 In response to a friendCreationResponse, the sender of the response is saved into the database
                  */
                 FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
-                if (null == fd){
+                if (null == fd) {
                     return false;
                 }
                 Friend sender = message.getSender();
@@ -191,17 +197,16 @@ public class ChatManager {
                 sender.setLastOnlineTimeStamp(new Timestamp(System.currentTimeMillis()));
                 friendOnlineHashMap.put(friendMacString, sender);
 
-                if (DaoError.NO_ERROR == fd.add(sender)){
+                if (DaoError.NO_ERROR == fd.add(sender)) {
                     return true;
-                } else
-                {
+                } else {
                     return false;
                 }
             }
             case FRIEND_INFO_UPDATE_REQUEST: {
                 FriendDao fd = DaoFactory.getInstance().getFriendDao(context,
-                                                                     DaoFactory.DaoType.SQLITE_DAO,
-                                                                     null);
+                        DaoFactory.DaoType.SQLITE_DAO,
+                        null);
                 if (null == fd) {
                     return false;
                 }
@@ -210,52 +215,52 @@ public class ChatManager {
 
                 FriendInfoUpdateResponse response =
                         new FriendInfoUpdateResponse(message.getSender(), context,
-                                                     myself.getDescription());
+                                myself.getDescription());
                 return this.enqueueOutGoingMessageQueue(response.convertMessageToJson());
             }
             case FRIEND_INFO_UPDATE_RESPONSE: {
                 FriendDao fd = DaoFactory.getInstance().getFriendDao(context,
-                                                                     DaoFactory.DaoType.SQLITE_DAO,
-                                                                     null);
+                        DaoFactory.DaoType.SQLITE_DAO,
+                        null);
                 if (null == fd) {
                     return false;
                 }
 
                 Friend sender = fd.findByMacAddress(message.getSender().getMac());
                 if (null != sender) {
-                    String description = ((FriendInfoUpdateResponse)message).getDescription();
+                    String description = ((FriendInfoUpdateResponse) message).getDescription();
                     sender.setDescription(description);
                     fd.update(sender);
                     return true;
                 } else {
                     Log.d(TAG, "Received a FRIEND_INFO_UPDATE_RESPONSE from unknown sender " +
-                               "with mac:" + message.getSender().getMac());
+                            "with mac:" + message.getSender().getMac());
                     return false;
                 }
             }
             case FRIEND_IMAGE_REQUEST: {
-                Log.d("test chat", "Got a FRIEND_IMAGE_REQUEST" );
+                Log.d("test chat", "Got a FRIEND_IMAGE_REQUEST");
                 FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
                 Friend myself = fd.findById(Myself.SELF_ID);
                 String imageBase64 = Utils.convertImgToBase64(myself.getImagePath());
-                FriendImageResponse friendImageResponse = new FriendImageResponse(message.getSender(),context, imageBase64);
+                FriendImageResponse friendImageResponse = new FriendImageResponse(message.getSender(), context, imageBase64);
                 return this.enqueueOutGoingMessageQueue(friendImageResponse.convertMessageToJson());
             }
-            case FRIEND_IMAGE_RESPONSE:{
+            case FRIEND_IMAGE_RESPONSE: {
                 FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
-                if (null == fd){
+                if (null == fd) {
                     return false;
                 }
 
                 Friend sender = fd.findByMacAddress(message.getSender().getMac());
-                if (sender != null){
-                    Log.d("test chat", "Got the sender from db" );
-                    String imageBase64Encode = ((FriendImageResponse)message).getImageBase64Encode();
+                if (sender != null) {
+                    Log.d("test chat", "Got the sender from db");
+                    String imageBase64Encode = ((FriendImageResponse) message).getImageBase64Encode();
                     Bitmap imageBitmap = Utils.convertBase64toBitmap(imageBase64Encode);
 
                     //The absolute path that the friend image will be stored at.
-                    String imagePath = context.getExternalFilesDir(null).toString()+
-                            File.separator+"userImage"+Utils.macAddressByteToHexString(sender.getMac());
+                    String imagePath = context.getExternalFilesDir(null).toString() +
+                            File.separator + "userImage" + Utils.macAddressByteToHexString(sender.getMac());
                     File file = new File(imagePath);
                     if (file.exists()) {
                         file.delete();
@@ -269,12 +274,12 @@ public class ChatManager {
                         sender.setImagePath(imagePath);
                         fd.update(sender);
                         return true;
-                    }catch (Exception e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
 
-                }else{
-                    Log.d("CCC", "NO SENDER INFORMATION" );
+                } else {
+                    Log.d("CCC", "NO SENDER INFORMATION");
                     return false;
                 }
 
@@ -363,7 +368,7 @@ public class ChatManager {
         return outGoingMessageQueue.isEmpty();
     }
 
-    private void sendFriendImageRequest( Friend receiver, Context context ){
+    private void sendFriendImageRequest(Friend receiver, Context context) {
         FriendImageRequest friendImageRequest = new FriendImageRequest(receiver, context);
         ChatManager chatManager = ChatManager.getInstance();
         chatManager.enqueueOutGoingMessageQueue(friendImageRequest.convertMessageToJson());
