@@ -12,6 +12,7 @@ import com.iotbyte.wifipidgin.friend.Friend;
 import com.iotbyte.wifipidgin.friend.Myself;
 import com.iotbyte.wifipidgin.message.ChatMessage;
 import com.iotbyte.wifipidgin.message.FriendCreationResponse;
+import com.iotbyte.wifipidgin.message.FriendImageRequest;
 import com.iotbyte.wifipidgin.message.FriendImageResponse;
 import com.iotbyte.wifipidgin.message.FriendInfoUpdateResponse;
 import com.iotbyte.wifipidgin.message.Message;
@@ -52,6 +53,7 @@ public class ChatManager {
 
     private MessageClient messageClient;
 
+    // private Context context;
     private static final String TAG = "ChannelManager";
 
     private ChatManager() {
@@ -152,6 +154,14 @@ public class ChatManager {
                 if (!chatMap.containsKey(((ChatMessage) message).getChannelIdentifier())) {
                     return false;
                 } else {
+                    FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
+                    Friend sender = message.getSender();
+                    Friend dbSender = fd.findByMacAddress(sender.getMac());
+                    if (dbSender != null) {
+                        if ( !(dbSender.getImageHash().equals(sender.getImageHash())) ){
+                            sendFriendImageRequest(sender, context);
+                        }
+                    }
                     Chat chat = getChatByChannelIdentifier(((ChatMessage) message).getChannelIdentifier());
                     return chat.pushMessage((ChatMessage) message);
                 }
@@ -352,5 +362,12 @@ public class ChatManager {
     public boolean isOutGoingMessageQueueEmpty() {
         return outGoingMessageQueue.isEmpty();
     }
+
+    private void sendFriendImageRequest( Friend receiver, Context context ){
+        FriendImageRequest friendImageRequest = new FriendImageRequest(receiver, context);
+        ChatManager chatManager = ChatManager.getInstance();
+        chatManager.enqueueOutGoingMessageQueue(friendImageRequest.convertMessageToJson());
+    }
+
 
 }
