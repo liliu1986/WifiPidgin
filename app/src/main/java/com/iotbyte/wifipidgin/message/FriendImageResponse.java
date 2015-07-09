@@ -34,7 +34,7 @@ public class FriendImageResponse extends Message{
 
     public FriendImageResponse(Friend receiver,Context context, String imageBase64){
         super(receiver,context);
-        imageBase64Encode = imageBase64;
+        this.imageBase64Encode = imageBase64;
         this.type = MessageType.FRIEND_IMAGE_RESPONSE;
     }
     /**
@@ -46,35 +46,11 @@ public class FriendImageResponse extends Message{
      * @throws UnknownHostException
      */
     public FriendImageResponse (String jsonMessageData) throws JSONException, UnknownHostException{
-        //super(jsonMessageData);
+        super(jsonMessageData);
+        assert this.type == MessageType.FRIEND_IMAGE_RESPONSE;
         JSONObject json = new JSONObject(jsonMessageData);
-        String type = json.getString(MESSAGE_TYPE);
         JSONObject sender = json.getJSONObject(MESSAGE_SENDER);
-        JSONObject receiver = json.getJSONObject(MESSAGE_RECEIVER);
-        InetAddress senderIp = InetAddress.getByName(ipFormatter(sender.getString(MESSAGE_IP)));
-        byte[] senderMac = macAddressHexStringToByte(sender.getString(MESSAGE_MAC));
-        int senderPort = sender.getInt(MESSAGE_PORT);
-
-        Friend friend = new Friend(senderMac,senderIp,senderPort);
-        friend.setDescription(sender.optString(MESSAGE_DESCRIPTION));
-        friend.setName(sender.optString(MESSAGE_NAME));
-        this.sender = friend;
-        imageBase64Encode = sender.optString(MESSAGE_IMAGE_BASE64);
-
-        //TODO:: receiver should be myself, this is mock code,or require to verify if the receiver is correctly myself
-
-        InetAddress receiverIp = InetAddress.getByName(ipFormatter(receiver.getString(MESSAGE_IP)));
-        byte[] receiverMac = macAddressHexStringToByte(receiver.getString(MESSAGE_MAC));
-        int receiverPort = receiver.getInt(MESSAGE_PORT);
-
-        Friend myself = new Friend(receiverMac,receiverIp,receiverPort);
-        myself.setDescription(receiver.optString(MESSAGE_DESCRIPTION));
-        myself.setName(receiver.optString(MESSAGE_NAME));
-        this.receiver = myself;
-
-        this.timestamp = Timestamp.valueOf(json.optString(MESSAGE_TIMESTAMP));
-
-        setMessageType(type);
+        this.imageBase64Encode = sender.optString(MESSAGE_IMAGE_BASE64);
     }
 
     @Override
