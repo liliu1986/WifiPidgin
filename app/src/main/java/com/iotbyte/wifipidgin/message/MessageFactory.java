@@ -46,6 +46,11 @@ public class MessageFactory {
                 return new FriendImageRequest(jsonString);
             case FRIEND_IMAGE_RESPONSE:
                 return new FriendImageResponse(jsonString);
+            case CHANNEL_CREATION_REQUEST:
+                return new ChannelCreationRequest(jsonString);
+            case CHANNEL_CREATION_RESPONSE:
+                return new ChannelCreationResponse(jsonString);
+
             default:
                 return null;
         }

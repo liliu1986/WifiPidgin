@@ -3,6 +3,7 @@ package com.iotbyte.wifipidgin.channel;
 
 import android.content.Context;
 
+import com.iotbyte.wifipidgin.chat.ChatManager;
 import com.iotbyte.wifipidgin.dao.ChannelDao;
 import com.iotbyte.wifipidgin.dao.DaoError;
 import com.iotbyte.wifipidgin.dao.DaoFactory;
@@ -10,6 +11,7 @@ import com.iotbyte.wifipidgin.dao.FriendDao;
 import com.iotbyte.wifipidgin.dao.event.DaoEvent;
 import com.iotbyte.wifipidgin.dao.event.DaoEventSubscriber;
 import com.iotbyte.wifipidgin.friend.Friend;
+import com.iotbyte.wifipidgin.message.ChannelCreationRequest;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -128,6 +130,20 @@ public class ChannelManager {
     }
 
     /**
+     * updateChannel
+     * <p/>
+     * Update/add a channel information and save it into database
+     *
+     * @param channel a channel to be updated
+     * @return true for add/update successfully or false for error on add/update
+     * in database
+     */
+    public boolean updateChannel(Channel channel) {
+        channelMap.put(channel.getChannelIdentifier(), channel);
+        return saveAChannelToDataBase(channel);
+    }
+
+    /**
      * deleteChannel()
      * <p/>
      * Remove a channel from ChannelManager
@@ -210,13 +226,21 @@ public class ChannelManager {
         for (Channel channel : channels) {
             for (Friend friend : channel.getFriendsList()) {
                 if (friend.NO_ID == friend.getId()) {
-                    fd.add(friend);
+                    if (DaoError.ERROR_SAVE == fd.add(friend)) {
+                        Friend dbFriend = fd.findByMacAddress(friend.getMac());
+                        friend.setId(dbFriend.getId());
+                        fd.update(friend);
+                    }
                 } else {
                     fd.update(friend); //TODO:: might need to change this depends on how to handles friend update
                 }
             }
             if (channel.NO_ID == channel.getId()) {
-                cd.add(channel);
+                if (DaoError.ERROR_SAVE == cd.add(channel)){
+                    Channel dbChannel = cd.findByChannelIdentifier(channel.getChannelIdentifier());
+                    channel.setId(dbChannel.getId());
+                    cd.update(channel);
+                }
             } else {
                 cd.update(channel);   //TODO:: might need to change this depends on how to handles channel update
             }
@@ -242,13 +266,30 @@ public class ChannelManager {
 
         for (Friend friend : channel.getFriendsList()) {
             if (friend.NO_ID == friend.getId()) {
-                fd.add(friend);
+                /*
+                when a friend does not have a assigned Id value, there are two possibilities:
+                a. the friend does not exist, then just add this friend
+                b. the friend actually exist in DB,but since the friends in Channel might came from a
+                channelCreationRequest, so there is no id value been assigned from friend constructor,
+                so we need to find the actual ID of the friend and update the values in channel friend list
+                and update other values other than the id in DB
+                 */
+                if (DaoError.ERROR_SAVE == fd.add(friend)) {
+                    Friend dbFriend = fd.findByMacAddress(friend.getMac());
+                    friend.setId(dbFriend.getId());
+                    fd.update(friend);
+                }
+
             } else {
                 fd.update(friend); //TODO:: might need to change this depends on how to handles friend update
             }
         }
         if (channel.NO_ID == channel.getId()) {
-            cd.add(channel);
+            if (DaoError.ERROR_SAVE == cd.add(channel)){
+             Channel dbChannel = cd.findByChannelIdentifier(channel.getChannelIdentifier());
+                channel.setId(dbChannel.getId());
+                cd.update(channel);
+            }
         } else {
             cd.update(channel);   //TODO:: might need to change this depends on how to handles channel update
         }
@@ -283,7 +324,7 @@ public class ChannelManager {
                 mockList.add(xiaoMing);
                 mockList.add(xiaoPang);
                 String channelName = "xiao channel";
-                Channel mockChannel = new Channel(mockList, channelName, "heiheihei");
+                Channel mockChannel = new Channel(context, mockList, channelName, "heiheihei");
                 //just a work around for mock data:
            /* boolean existFlag = false;
             for(Channel channel : DaoFactory.getInstance().getChannelDao(context, DaoFactory.DaoType.SQLITE_DAO, null).findAll()){
@@ -306,5 +347,40 @@ public class ChannelManager {
 
     public void setChannelDatabaseChangeListener(ChannelDatabaseChangeListener listener) {
         this.channelDatabaseChangeListener = listener;
+    }
+
+    /**
+     * sendChannelCreationMessageToAll()
+     * <p/>
+     * send ChannelCreationRequest to all members of a channel, excluding myself
+     *
+     * @param channel a target channel to be notified to all members
+     */
+
+    public void sendChannelCreationMessageToAll(Channel channel) {
+        for (Friend friend : channel.getFriendsList()) {
+            if (friend.getId() != Friend.SELF_ID) { //Do not send to myself
+                ChannelCreationRequest message = new ChannelCreationRequest(channel, friend, context);
+                ChatManager.getInstance().enqueueOutGoingMessageQueue(message.convertMessageToJson());
+            }
+        }
+    }
+
+    /**
+     * sendChannelCreationMessageToAll()
+     * <p/>
+     * send ChannelCreationRequest to all friends in the given list. excluding myself
+     *
+     * @param friendList a target list of friends to be notified
+     * @param channel    a target channel to be recreated at receiver end
+     */
+
+    public void sendChannelCreationMessageToAll(Channel channel, List<Friend> friendList) {
+        for (Friend friend : friendList) {
+            if (friend.getId() != Friend.SELF_ID) { //Do not send to myself
+                ChannelCreationRequest message = new ChannelCreationRequest(channel, friend, context);
+                ChatManager.getInstance().enqueueOutGoingMessageQueue(message.convertMessageToJson());
+            }
+        }
     }
 }

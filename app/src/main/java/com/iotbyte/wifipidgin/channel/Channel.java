@@ -1,11 +1,13 @@
 package com.iotbyte.wifipidgin.channel;
 
 
+import android.content.Context;
 import android.util.Log;
 
+import com.iotbyte.wifipidgin.dao.DaoFactory;
+import com.iotbyte.wifipidgin.dao.FriendDao;
 import com.iotbyte.wifipidgin.friend.Friend;
 
-import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,11 +16,11 @@ import java.util.List;
 /**
  * Channel Class defines a channel, includes it's name, description, channelIdentifier
  * and a list of friend. id is what been used to track with the database.
- *
+ * <p/>
  * All channels are managed by ChannelManager. Channel class constructor should be called
  * only by the ChannelManager.addChannel method, due to the weak relationship between Channel
  * and ChannelManager
- *
+ * <p/>
  * Created by yefwen@iotbyte.com on 26/03/15.
  */
 
@@ -37,10 +39,11 @@ public class Channel {
 
     /**
      * Default constructor create the required channelIdentifier, set id to NO_ID
-     * allocate friendList
+     * allocate friendList.
+     * Always add myself to the friend list
      */
 
-    public Channel(){
+    public Channel(Context context) {
         this.name = DEFAULT_CHANNEL_NAME;
         this.description = DEFAULT_CHANNEL_DESCRIPTION;
         this.id = NO_ID;
@@ -64,22 +67,30 @@ public class Channel {
         this.channelIdentifier = identifierHolder;
 
         Log.v(CHANNEL_TAG, "the channelIdentifier is " + this.channelIdentifier);
+
+        FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
+        Friend myself = fd.findById(Friend.SELF_ID);
+        friendList.add(myself);
     }
 
-    public Channel(List<Friend> friendList, String name, String description) {
-        this();
+    public Channel(Context context, List<Friend> friendList, String name, String description) {
+        this(context);
         this.name = name;
         this.description = description;
-        this.friendList = friendList;
+        if (null != friendList) {
+            for (Friend friend : friendList) {
+                this.addFriend(friend);
+            }
+        }
     }
 
     /**
-     * Single variable Constructor for database data recovery
+     * Single variable Constructor for database data recovery and Channel creation based of
+     * a channelCreationMessage
      *
      * @param channelIdentifier the ChannelIdentifier of the channel
-     *
      */
-    public Channel(String channelIdentifier){
+    public Channel(String channelIdentifier) {
         this.channelIdentifier = channelIdentifier;
         this.name = null;
         this.description = null;
@@ -169,9 +180,8 @@ public class Channel {
      */
     public boolean addFriend(Friend friend) {
         if (friendList.contains(friend)) {
-           return false;
-        } else
-        {
+            return false;
+        } else {
             friendList.add(friend);
             return true;
         }
@@ -179,8 +189,8 @@ public class Channel {
 
 
     @Override
-    public String toString(){
-       return this.getName();
+    public String toString() {
+        return this.getName();
     }
 }
 

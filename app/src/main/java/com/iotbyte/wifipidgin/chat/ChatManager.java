@@ -4,11 +4,15 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import com.iotbyte.wifipidgin.channel.Channel;
+import com.iotbyte.wifipidgin.channel.ChannelManager;
 import com.iotbyte.wifipidgin.commmodule.MessageClient;
 import com.iotbyte.wifipidgin.dao.DaoError;
 import com.iotbyte.wifipidgin.dao.DaoFactory;
 import com.iotbyte.wifipidgin.dao.FriendDao;
 import com.iotbyte.wifipidgin.friend.Friend;
+import com.iotbyte.wifipidgin.message.ChannelCreationRequest;
+import com.iotbyte.wifipidgin.message.ChannelCreationResponse;
 import com.iotbyte.wifipidgin.friend.Myself;
 import com.iotbyte.wifipidgin.message.ChatMessage;
 import com.iotbyte.wifipidgin.message.FriendCreationResponse;
@@ -203,6 +207,68 @@ public class ChatManager {
                     return false;
                 }
             }
+            case CHANNEL_CREATION_REQUEST: {
+                /*
+                In response to a channel creation request a notification will be push.
+                user will prompted to select to join the channel or not join
+
+              As ChannelCreationRequest is a dual functional message, if the channel currently is not
+              in local channelManager,it is to request a creation of channel.
+               if the channel already exist, it is a notification to update the channel information
+                 */
+                ChannelCreationRequest channelCreationRequest = (ChannelCreationRequest) message;
+                Channel channel = channelCreationRequest.getChannel();
+                //check if the user is already in the channel, if yes, this is a update message, update the
+                //local channel information
+                if (null != ChannelManager.getInstance(context).getChannelByIdentifier(channel.getChannelIdentifier())) {
+                    ChannelManager.getInstance(context).updateChannel(channel);
+                    return true;
+                } else {
+                    //as the channel does not exist, it is a creation request
+
+                    //TODO: adding the invocation of notification to join or decline channel creation
+                    //fixme: a mock code to make selection always true;
+                    boolean join = true;
+                    if (join) {
+
+                        // if choose to join the channel, user will add himself into the friend list of the channel
+                        // then this channel into his channelManager.
+                        //and send out a channelCreationResponse back to the creator.
+                        FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
+                        channel.addFriend(fd.findById(Friend.SELF_ID)); // add myself back into the channel friend list
+
+                        //send a ChannelCreationResponse back
+                        ChannelCreationResponse channelCreationResponse =
+                                new ChannelCreationResponse(channel.getChannelIdentifier(),
+                                        channelCreationRequest.getSender(),
+                                        context
+                                );
+                        //dequeue is successful if and only if the channel creation response is send and channel
+                        //is added to the channelManager successfully.
+                        return this.enqueueOutGoingMessageQueue(channelCreationResponse.convertMessageToJson()) &&
+                                ChannelManager.getInstance(context).addChannel(channel);
+                    } else {
+                        //If decide to not join the channel, just do nothing
+                        return true;
+                    }
+                }
+            }
+            case CHANNEL_CREATION_RESPONSE: {
+                /*
+                when receive a channel creation response, it means a friend is accept the channel creation actions.
+                user will update his channel friend list to include the sender of this response.
+                and send out a channel creation request(remember it is dual functional message) to update the channel
+                information to all friends in the list
+                 */
+
+                ChannelCreationResponse channelCreationResponse = (ChannelCreationResponse) message;
+                Channel channel = ChannelManager.getInstance(context).
+                        getChannelByIdentifier(channelCreationResponse.getChannelIdentifier());
+                channel.addFriend(channelCreationResponse.getSender());
+                ChannelManager.getInstance(context).updateChannel(channel);//notify the channel is updated, and this will kick in UI update
+                ChannelManager.getInstance(context).sendChannelCreationMessageToAll(channel);//send the message out to notify all members of the channel
+                return true;
+            } 
             case FRIEND_INFO_UPDATE_REQUEST: {
                 FriendDao fd = DaoFactory.getInstance().getFriendDao(context,
                         DaoFactory.DaoType.SQLITE_DAO,

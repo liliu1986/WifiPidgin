@@ -11,11 +11,15 @@ public enum MessageType {
     FRIEND_INFO_UPDATE_RESPONSE,
     FRIEND_IMAGE_REQUEST,
     FRIEND_IMAGE_RESPONSE,
+    CHANNEL_CREATION_REQUEST,
+    CHANNEL_CREATION_RESPONSE,
     ERROR;
 
     public static final String MESSAGE_TYPE_CHAT_MESSAGE = "chat message";
     public static final String MESSAGE_TYPE_FRIEND_CREATION_REQUEST = "friend creation request";
     public static final String MESSAGE_TYPE_FRIEND_CREATION_RESPONSE = "friend creation response";
+    public static final String MESSAGE_TYPE_CHANNEL_CREATION_REQUEST = "channel creation request";
+    public static final String MESSAGE_TYPE_CHANNEL_CREATION_RESPONSE = "channel creation response";
     public static final String MESSAGE_TYPE_FRIEND_INFO_UPDATE_REQUEST = "friend info update request";
     public static final String MESSAGE_TYPE_FRIEND_INFO_UPDATE_RESPONSE = "friend info update response";
     public static final String MESSAGE_TYPE_FRIEND_IMAGE_REQUEST = "friend image file request";
@@ -31,6 +35,10 @@ public enum MessageType {
                 return MESSAGE_TYPE_FRIEND_CREATION_REQUEST;
             case FRIEND_CREATION_RESPONSE:
                 return MESSAGE_TYPE_FRIEND_CREATION_RESPONSE;
+            case CHANNEL_CREATION_REQUEST:
+                return MESSAGE_TYPE_CHANNEL_CREATION_REQUEST;
+            case CHANNEL_CREATION_RESPONSE:
+                return MESSAGE_TYPE_CHANNEL_CREATION_RESPONSE;
             case FRIEND_INFO_UPDATE_REQUEST:
                 return MESSAGE_TYPE_FRIEND_INFO_UPDATE_REQUEST;
             case FRIEND_INFO_UPDATE_RESPONSE:
@@ -61,6 +69,10 @@ public enum MessageType {
                 return FRIEND_IMAGE_REQUEST;
             case MESSAGE_TYPE_FRIEND_IMAGE_RESPONSE:
                 return FRIEND_IMAGE_RESPONSE;
+            case MESSAGE_TYPE_CHANNEL_CREATION_REQUEST:
+                return CHANNEL_CREATION_REQUEST;
+            case MESSAGE_TYPE_CHANNEL_CREATION_RESPONSE:
+                return CHANNEL_CREATION_RESPONSE;
             default:
                 return ERROR;
         }
