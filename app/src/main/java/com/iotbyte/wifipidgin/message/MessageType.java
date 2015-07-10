@@ -69,6 +69,10 @@ public enum MessageType {
                 return FRIEND_IMAGE_REQUEST;
             case MESSAGE_TYPE_FRIEND_IMAGE_RESPONSE:
                 return FRIEND_IMAGE_RESPONSE;
+            case MESSAGE_TYPE_CHANNEL_CREATION_REQUEST:
+                return CHANNEL_CREATION_REQUEST;
+            case MESSAGE_TYPE_CHANNEL_CREATION_RESPONSE:
+                return CHANNEL_CREATION_RESPONSE;
             default:
                 return ERROR;
         }
