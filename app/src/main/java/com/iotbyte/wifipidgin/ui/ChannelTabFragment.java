@@ -92,14 +92,17 @@ public class ChannelTabFragment extends Fragment {
     }
 
     public void refreshChannelList() {
-        this.getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                adapter.clear();
-                adapter.addAll(channelManager.getChannelList());
-                adapter.notifyDataSetChanged();
-            }
-        });
+        if (this.isAdded()) {
+            this.getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    adapter.clear();
+                    adapter.addAll(channelManager.getChannelList());
+                    adapter.notifyDataSetChanged();
+                }
+            });
+        }
+
 
     }
 }

@@ -277,6 +277,7 @@ public class ChannelManager {
                 if (DaoError.ERROR_SAVE == fd.add(friend)) {
                     Friend dbFriend = fd.findByMacAddress(friend.getMac());
                     friend.setId(dbFriend.getId());
+                    friend.setFavourite(true);
                     fd.update(friend);
                 }
 

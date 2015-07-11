@@ -108,6 +108,7 @@ public class NsdClient {
                             //Try to see if the friend is already being created.
                             FriendOnlineHashMap friendOnlineHashMap = FriendOnlineHashMap.getInstance();
                             String friendMacString = Utils.macAddressByteToHexString(newFriend.getMac());
+                            Log.d(TAG, "The friend's mac address is " + friendMacString);
 
                             Friend friendFromOnlineList = friendOnlineHashMap.get(friendMacString);
 

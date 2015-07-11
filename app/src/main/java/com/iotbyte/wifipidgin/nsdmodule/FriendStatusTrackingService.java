@@ -66,17 +66,19 @@ public class FriendStatusTrackingService extends Service  {
                             //    Log.d(TAG, "Setting the friend as offline in database");
                             //    dbFriend.setStatus(Friend.FriendStatus.OFFLINE);
                             //    fd.update(dbFriend);
-                            else {
+                            else if (dbFriend.isFavourite() == false){
                                 //Otherwise, remove the friend from the db
                                 Log.d(TAG, "Removing friend from DB");
                                 fd.delete(dbFriend.getId());
+                            } else {
+                                dbFriend.setStatus(Friend.FriendStatus.OFFLINE);
+                                fd.update(dbFriend);
                             }
                             friendOnlineHashMap.removeFriendbyMac(Utils.macAddressByteToHexString(friend.getMac()));
 
                         }
                     }
                 }
-
             }
         }
     }
@@ -84,6 +86,6 @@ public class FriendStatusTrackingService extends Service  {
     private final String TAG = "StatusTrackingService";
     private Thread mThread;
     private final int delayInterval = 100;
-    private final int onlineTimeoutPeriod = 50000;
+    private final int onlineTimeoutPeriod = 500000;
     private FriendDao fd;
 }
