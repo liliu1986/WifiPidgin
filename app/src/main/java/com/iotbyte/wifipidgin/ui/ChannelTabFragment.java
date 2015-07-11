@@ -92,7 +92,7 @@ public class ChannelTabFragment extends Fragment {
     }
 
     public void refreshChannelList() {
-        if (this.isAdded()) {
+        if (this.isAdded()){
             this.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
