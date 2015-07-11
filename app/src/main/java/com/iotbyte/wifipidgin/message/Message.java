@@ -120,7 +120,7 @@ public abstract class Message {
        */
 
         FriendDao fd = DaoFactory.getInstance().getFriendDao(context,DaoFactory.DaoType.SQLITE_DAO, null);
-        Friend myself = fd.findById(myselfId);
+        Friend myself = fd.findById(Friend.SELF_ID);
         this.receiver = myself;
         this.timestamp = Timestamp.valueOf(json.optString(MESSAGE_TIMESTAMP));
         this.type = MessageType.fromString(typeString);
