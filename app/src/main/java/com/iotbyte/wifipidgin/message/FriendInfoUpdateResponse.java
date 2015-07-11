@@ -1,7 +1,6 @@
 package com.iotbyte.wifipidgin.message;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.iotbyte.wifipidgin.friend.Friend;
 
@@ -30,8 +29,8 @@ public class FriendInfoUpdateResponse extends Message {
         this.description = description;
     }
 
-    public FriendInfoUpdateResponse(String jsonMessageData) throws JSONException, UnknownHostException {
-        super(jsonMessageData);
+    public FriendInfoUpdateResponse(String jsonMessageData, Context context) throws JSONException, UnknownHostException {
+        super(jsonMessageData, context );
         assert this.type == MessageType.FRIEND_INFO_UPDATE_RESPONSE;
         JSONObject json = new JSONObject(jsonMessageData);
         this.description = json.getString(MESSAGE_DESCRIPTION);

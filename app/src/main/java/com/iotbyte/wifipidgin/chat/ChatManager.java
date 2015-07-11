@@ -104,15 +104,16 @@ public class ChatManager {
      *
      * @return true if the message is dequeue properly from outgoingMessageQueue and send via messageClient,
      * return false otherwise
+     * @param context
      */
-    public boolean dequeueOutGoingMessageQueue() {
+    public boolean dequeueOutGoingMessageQueue(Context context) {
         String message = outGoingMessageQueue.poll();
 
         if (null == message) {
             return false;
         }
         try {
-            Message outMsg = MessageFactory.buildMessageByJson(message);
+            Message outMsg = MessageFactory.buildMessageByJson(message, context);
             Friend receiver = outMsg.getReceiver();
             if (outMsg.getType() == MessageType.FRIEND_CREATION_REQUEST) {
                 //When the friend creation request is sent out, remove it from the map
@@ -132,9 +133,9 @@ public class ChatManager {
     }
 
     //TODO:: require exception handling here for corrupted json string
-    public boolean enqueueIncomingMessageQueue(String jsonString) {
+    public boolean enqueueIncomingMessageQueue(String jsonString, Context context) {
         try {
-            return incomingMessageQueue.offer(MessageFactory.buildMessageByJson(jsonString));
+            return incomingMessageQueue.offer(MessageFactory.buildMessageByJson(jsonString, context));
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (UnknownHostException e) {

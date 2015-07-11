@@ -39,10 +39,11 @@ public class ChatMessage extends Message {
      * into a message object
      *
      * @param jsonMessageData is the received json format string
+     * @param context
      */
 
-    public ChatMessage(String jsonMessageData) throws JSONException, UnknownHostException {
-        super(jsonMessageData);
+    public ChatMessage(String jsonMessageData, Context context) throws JSONException, UnknownHostException {
+        super(jsonMessageData,context );
         assert this.type == MessageType.CHAT_MESSAGE;
         JSONObject json = new JSONObject(jsonMessageData);
         this.messageBody = json.getString(MESSAGE_MESSAGE_BODY);
@@ -137,7 +138,7 @@ public class ChatMessage extends Message {
      * Return whether the message original is myself
      *
      * @return true if the message is construct through the multi value constructor
-     * false if message is construct through {@link #ChatMessage(String)}
+     * false if message is construct through {@link #ChatMessage(String, Context)}
      */
     public boolean isFromMyself(){
         return this.isMyself;

@@ -37,11 +37,12 @@ public class FriendCreationRequest extends Message {
      * from com-module. It will parse the json format into a message object.
      *
      * @param jsonMessageData is the received json format string
+     * @param context
      * @throws JSONException
      * @throws UnknownHostException
      */
-    public FriendCreationRequest(String jsonMessageData) throws JSONException, UnknownHostException {
-        super(jsonMessageData);
+    public FriendCreationRequest(String jsonMessageData, Context context) throws JSONException, UnknownHostException {
+        super(jsonMessageData, context);
         assert this.type == MessageType.FRIEND_CREATION_REQUEST;
     }
 

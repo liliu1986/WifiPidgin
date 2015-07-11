@@ -3,21 +3,15 @@ package com.iotbyte.wifipidgin.message;
 import android.content.Context;
 import android.util.Log;
 
-import com.iotbyte.wifipidgin.dao.DaoFactory;
-import com.iotbyte.wifipidgin.dao.FriendDao;
 import com.iotbyte.wifipidgin.friend.Friend;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.sql.Timestamp;
 
 import static com.iotbyte.wifipidgin.utils.Utils.ipFormatter;
-import static com.iotbyte.wifipidgin.utils.Utils.convertImgToBase64;
 import static com.iotbyte.wifipidgin.utils.Utils.macAddressByteToHexString;
-import static com.iotbyte.wifipidgin.utils.Utils.macAddressHexStringToByte;
 
 /**
  * Created by fire on 21/06/15.
@@ -42,11 +36,12 @@ public class FriendImageResponse extends Message{
      * from com-module. It will parse the json format into a message object.
      *
      * @param jsonMessageData is the received json format string
+     * @param context
      * @throws JSONException
      * @throws UnknownHostException
      */
-    public FriendImageResponse (String jsonMessageData) throws JSONException, UnknownHostException{
-        super(jsonMessageData);
+    public FriendImageResponse(String jsonMessageData, Context context) throws JSONException, UnknownHostException{
+        super(jsonMessageData, context);
         assert this.type == MessageType.FRIEND_IMAGE_RESPONSE;
         JSONObject json = new JSONObject(jsonMessageData);
         JSONObject sender = json.getJSONObject(MESSAGE_SENDER);
