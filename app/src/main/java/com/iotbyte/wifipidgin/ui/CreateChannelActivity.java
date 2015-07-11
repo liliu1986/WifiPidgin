@@ -73,8 +73,8 @@ public class CreateChannelActivity extends Activity {
 
                 channelName = tvChannelName.getText().toString();
                 channelDescription = tvChannelDescription.getText().toString();
-                Log.d(CREATE_CHANNEL_ACT, "Channel Name: " + channelName + channelName.length()+", Channel Description: " + channelDescription);
-                
+                Log.d(CREATE_CHANNEL_ACT, "Channel Name: " + channelName + channelName.length() + ", Channel Description: " + channelDescription);
+
                 if (channelName.equals("")) {
                     channelName = DEFAULT_CHANNEL_NAME;
                 }
@@ -84,10 +84,8 @@ public class CreateChannelActivity extends Activity {
                 //save new channel;
                 if (!channelManager.addChannel(newChannel)) {
                     Log.e(CREATE_CHANNEL_ACT, "Error occurred during creating Channel" + newChannel.toString());
-                }
-                else
-                {
-                   channelManager.sendChannelCreationMessageToAll(newChannel,channelFriendList);
+                } else {
+                    channelManager.sendChannelCreationMessageToAll(newChannel, channelFriendList);
                 }
                 finish();
             }
