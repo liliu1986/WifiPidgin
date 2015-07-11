@@ -77,10 +77,14 @@ public class ChatActivity extends Activity {
     }
 
     private void refreshChatList() {
-        chatArrayAdapter.clear();
-        Log.i("TEST", "Count: " + chat.getChatMessageList().size());
-        chatArrayAdapter.addAll(chat.getChatMessageList());
-        chatArrayAdapter.notifyDataSetChanged();
-        listView.setSelection(chatArrayAdapter.getCount() - 1);
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                chatArrayAdapter.clear();
+                chatArrayAdapter.addAll(chat.getChatMessageList());
+                chatArrayAdapter.notifyDataSetChanged();
+                listView.setSelection(chatArrayAdapter.getCount() - 1);
+            }
+        });
     }
 }

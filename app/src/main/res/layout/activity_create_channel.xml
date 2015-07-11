@@ -7,7 +7,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@android:id/list"
-        android:layout_weight="85"
+        android:layout_weight="80"
         android:choiceMode="multipleChoice" />
 
     <EditText
@@ -16,6 +16,13 @@
         android:id="@+id/enterChannelName"
         android:layout_weight="5"
         android:hint="@string/EnterChannelName" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/enterChannelDescription"
+        android:layout_weight="5"
+        android:hint="@string/EnterChannelDesciption" />
 
     <Button
         android:layout_width="match_parent"
