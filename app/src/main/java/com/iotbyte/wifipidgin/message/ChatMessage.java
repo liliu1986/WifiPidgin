@@ -22,12 +22,16 @@ public class ChatMessage extends Message {
 
     private final String channelIdentifier;
     private String messageBody;
+    private String imageHashCode;
+    private String nameDescriptionHashCode;
     private boolean isMyself;
 
 
 
     final String MESSAGE_CHANNEL_IDENTIFIER = "channelidentifier";
     final String MESSAGE_MESSAGE_BODY = "message";
+    final String MESSAGE_IMAGE_HASH = "image hash";
+    final String MESSAGE_NAME_DESCRIPTION_HASH = "name & description hash";
 
     /**
      * Constructor for ChatMessage class, it create a new message based on
@@ -38,13 +42,14 @@ public class ChatMessage extends Message {
      */
 
     public ChatMessage(String jsonMessageData) throws JSONException, UnknownHostException {
-
-            super(jsonMessageData);
-            JSONObject json = new JSONObject(jsonMessageData);
-            this.messageBody = json.getString(MESSAGE_MESSAGE_BODY);
-            this.channelIdentifier = json.getString(MESSAGE_CHANNEL_IDENTIFIER);
-            this.isMyself = false;
-
+        super(jsonMessageData);
+        assert this.type == MessageType.CHAT_MESSAGE;
+        JSONObject json = new JSONObject(jsonMessageData);
+        this.messageBody = json.getString(MESSAGE_MESSAGE_BODY);
+        this.channelIdentifier = json.getString(MESSAGE_CHANNEL_IDENTIFIER);
+        this.imageHashCode = json.getString(MESSAGE_IMAGE_HASH);
+        this.nameDescriptionHashCode = json.getString(MESSAGE_NAME_DESCRIPTION_HASH);
+        this.isMyself = false;
     }
 
     /**
@@ -59,9 +64,11 @@ public class ChatMessage extends Message {
     public ChatMessage(Friend receiver, String channelIdentifier, String messageBody,Context context) {
 
         super(receiver,context);
+        this.type = MessageType.CHAT_MESSAGE;
         this.channelIdentifier = channelIdentifier;
         this.messageBody = messageBody;
-        this.type = MessageType.CHAT_MESSAGE;
+        this.imageHashCode = sender.getImageHash();
+        this.nameDescriptionHashCode = sender.getNameDescriptionHash();
         this.isMyself = true;
     }
 
@@ -81,15 +88,11 @@ public class ChatMessage extends Message {
             json.put(MESSAGE_TYPE,this.type.toString());
 
             JSONObject sender = new JSONObject();
-            sender.put(MESSAGE_NAME,this.sender.getName());
-            sender.put(MESSAGE_DESCRIPTION,this.sender.getDescription());
             sender.put(MESSAGE_IP, ipFormatter(this.sender.getIp().toString())); // InetAdress.toString() returns in host/ip as format
             sender.put(MESSAGE_PORT,this.sender.getPort());
             sender.put(MESSAGE_MAC,macAddressByteToHexString(this.sender.getMac()));
 
             JSONObject receiver = new JSONObject();
-            receiver.put(MESSAGE_NAME,this.receiver.getName());
-            receiver.put(MESSAGE_DESCRIPTION,this.receiver.getDescription());
             receiver.put(MESSAGE_IP, ipFormatter(this.receiver.getIp().toString()));
             receiver.put(MESSAGE_PORT,this.receiver.getPort());
             receiver.put(MESSAGE_MAC,macAddressByteToHexString(this.receiver.getMac()));
@@ -99,6 +102,8 @@ public class ChatMessage extends Message {
             json.put(MESSAGE_MESSAGE_BODY,this.messageBody);
             json.put(MESSAGE_TIMESTAMP,this.timestamp.toString()); //check this out
             json.put(MESSAGE_CHANNEL_IDENTIFIER,this.channelIdentifier);
+            json.put(MESSAGE_IMAGE_HASH,this.imageHashCode);
+            json.put(MESSAGE_NAME_DESCRIPTION_HASH,this.nameDescriptionHashCode);
 
             //TODO:: change to json.toString() to save on transmission space,
             // return json.toString();
@@ -138,5 +143,11 @@ public class ChatMessage extends Message {
         return this.isMyself;
     }
 
+    public String getImageHashCode() {
+        return imageHashCode;
+    }
 
+    public String getNameDescriptionHashCode() {
+        return nameDescriptionHashCode;
+    }
 }

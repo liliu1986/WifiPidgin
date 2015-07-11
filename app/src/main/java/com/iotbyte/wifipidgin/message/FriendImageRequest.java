@@ -14,24 +14,20 @@ import static com.iotbyte.wifipidgin.utils.Utils.ipFormatter;
 import static com.iotbyte.wifipidgin.utils.Utils.macAddressByteToHexString;
 
 /**
- * Created by dev on 08/05/15.
+ * Created by fire on 21/06/15.
  */
-public class FriendCreationRequest extends Message {
-
-    final String FRIEND_CREATION_REQUEST_DEBUG = "FCR_DEBUG";
-
+public class FriendImageRequest extends Message {
 
     /**
-     * Constructor for FriendCreationRequest Class, it create a new message object based on known
+     * Constructor for FriendImageRequest Class, it create a new message object based on known
      * receiver information.  This message object will be send to others.
      *
      * @param receiver     receiver of the message
      */
-    public FriendCreationRequest(Friend receiver,Context context){
+    public FriendImageRequest(Friend receiver,Context context){
         super(receiver,context);
-        this.type = MessageType.FRIEND_CREATION_REQUEST;
+        this.type = MessageType.FRIEND_IMAGE_REQUEST;
     }
-
     /**
      * Constructor for FriendCreationRequest Class, it create a new message based on json received
      * from com-module. It will parse the json format into a message object.
@@ -40,11 +36,10 @@ public class FriendCreationRequest extends Message {
      * @throws JSONException
      * @throws UnknownHostException
      */
-    public FriendCreationRequest(String jsonMessageData) throws JSONException, UnknownHostException {
+    public FriendImageRequest(String jsonMessageData) throws JSONException, UnknownHostException {
         super(jsonMessageData);
-        assert this.type == MessageType.FRIEND_CREATION_REQUEST;
+        assert this.type == MessageType.FRIEND_IMAGE_REQUEST;
     }
-
     @Override
     public String convertMessageToJson() {
         try {
@@ -54,7 +49,7 @@ public class FriendCreationRequest extends Message {
 
             JSONObject sender = new JSONObject();
 
-            sender.put(MESSAGE_IP, ipFormatter(this.sender.getIp().toString())); // InetAdress.toString() returns in host/ip as format
+            sender.put(MESSAGE_IP,ipFormatter(this.sender.getIp().toString())); // InetAdress.toString() returns in host/ip as format
             sender.put(MESSAGE_PORT,this.sender.getPort());
             sender.put(MESSAGE_MAC, macAddressByteToHexString(this.sender.getMac()));
 
@@ -70,14 +65,16 @@ public class FriendCreationRequest extends Message {
 
             //TODO:: change to json.toString() to save on transmission space,
             // return json.toString();
-            Log.d(FRIEND_CREATION_REQUEST_DEBUG,json.toString(4));
+            Log.d(FRIEND_IMAGE_REQUEST_DEBUG, json.toString(4));
 
             return json.toString(4); //this is for easy to visualize/debugging purpose
 
         }catch (JSONException e){
             e.printStackTrace();
         }
-
         return null;
     }
+
+    final String FRIEND_IMAGE_REQUEST_DEBUG = "FCR_DEBUG";
+
 }

@@ -27,43 +27,32 @@ public class MessageFactory {
         return message;
     }
 
-
-    public static Message buildMessageByJson(String json) throws JSONException, UnknownHostException{
-        MessageType type =getMessageType(json);
-        String typeString = type.toString();
-          switch  (typeString){
-              case MessageType.MESSAGE_TYPE_CHAT_MESSAGE:
-                  return new ChatMessage(json);
-              case MessageType.MESSAGE_TYPE_FRIEND_CREATION_REQUEST:
-                  return new FriendCreationRequest(json);
-              case MessageType.MESSAGE_TYPE_FRIEND_CREATION_RESPONSE:
-                  return new FriendCreationResponse(json);
-              default:
-                  return null;
-
-          }
-
-    }
-
-
-    public static MessageType getMessageType(String jsonString) throws JSONException {
+    public static Message buildMessageByJson(String jsonString) throws JSONException, UnknownHostException{
         JSONObject json = new JSONObject(jsonString);
         String typeString = json.getString(MESSAGE_TYPE);
-
-         switch (typeString){
-            case MessageType.MESSAGE_TYPE_CHAT_MESSAGE:
-                return MessageType.CHAT_MESSAGE;
-
-            case MessageType.MESSAGE_TYPE_FRIEND_CREATION_REQUEST:
-                return MessageType.FRIEND_CREATION_REQUEST;
-
-             case MessageType.MESSAGE_TYPE_FRIEND_CREATION_RESPONSE:
-                 return MessageType.FRIEND_CREATION_RESPONSE;
+        MessageType type = MessageType.fromString(typeString);
+        switch  (type) {
+            case CHAT_MESSAGE:
+                return new ChatMessage(jsonString);
+            case FRIEND_CREATION_REQUEST:
+                return new FriendCreationRequest(jsonString);
+            case FRIEND_CREATION_RESPONSE:
+                return new FriendCreationResponse(jsonString);
+            case FRIEND_INFO_UPDATE_REQUEST:
+                return new FriendInfoUpdateRequest(jsonString);
+            case FRIEND_INFO_UPDATE_RESPONSE:
+                return new FriendInfoUpdateResponse(jsonString);
+            case FRIEND_IMAGE_REQUEST:
+                return new FriendImageRequest(jsonString);
+            case FRIEND_IMAGE_RESPONSE:
+                return new FriendImageResponse(jsonString);
+            case CHANNEL_CREATION_REQUEST:
+                return new ChannelCreationRequest(jsonString);
+            case CHANNEL_CREATION_RESPONSE:
+                return new ChannelCreationResponse(jsonString);
 
             default:
-                return MessageType.ERROR;
+                return null;
         }
     }
-
-
 }

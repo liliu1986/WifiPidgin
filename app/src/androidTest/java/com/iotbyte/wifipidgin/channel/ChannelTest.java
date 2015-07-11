@@ -17,7 +17,7 @@ public class ChannelTest extends AndroidTestCase {
 
     public void testGetName() throws Exception {
         final String name= "test string name";
-        Channel mChannel = new Channel(null,name, null);
+        Channel mChannel = new Channel(getContext(),null,name, null);
         assertEquals("name not match",name,mChannel.getName());
     }
 
