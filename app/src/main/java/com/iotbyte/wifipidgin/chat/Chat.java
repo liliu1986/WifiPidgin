@@ -117,12 +117,15 @@ public class Chat {
 
         Channel channel = ChannelManager.getInstance(context).getChannelByIdentifier(this.channelIdentifier);
         ChatMessage chatMessage;
-        for (Friend friend : channel.getFriendsList()) {
-            chatMessage = new ChatMessage(friend, this.getChannelIdentifier(), messageBody,context);
-            ChatManager.getInstance().enqueueOutGoingMessageQueue(chatMessage.convertMessageToJson());
-        }
         FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
         Friend myself = fd.findById(0);
+
+        for (Friend friend : channel.getFriendsList()) {
+            if (Friend.SELF_ID != friend.getId()){
+                chatMessage = new ChatMessage(friend, this.getChannelIdentifier(), messageBody,context);
+                ChatManager.getInstance().enqueueOutGoingMessageQueue(chatMessage.convertMessageToJson());
+            }
+        }
         chatMessage = new ChatMessage(myself, this.channelIdentifier, messageBody,context);
         pushMessage(chatMessage);
     }
