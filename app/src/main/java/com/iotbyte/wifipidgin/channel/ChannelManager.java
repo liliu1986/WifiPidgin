@@ -34,9 +34,11 @@ public class ChannelManager {
 
     private Context context;
 
-    private HashMap<String, Channel> channelMap; // channelIdentifier and Channel pair
+    /** Locally cached channel map, indexed by channelIdentifier */
+    private HashMap<String, Channel> channelMap;
 
     private ChannelDatabaseChangeListener channelDatabaseChangeListener;
+
 
     private ChannelManager(Context context) {
         this.context = context;
@@ -54,7 +56,6 @@ public class ChannelManager {
                 }
             }
         });
-
 
         //Calling database to grep existing channelList
         // or create a new channelList if there is nothing been retrieved
@@ -236,7 +237,7 @@ public class ChannelManager {
                 }
             }
             if (channel.NO_ID == channel.getId()) {
-                if (DaoError.ERROR_SAVE == cd.add(channel)){
+                if (DaoError.ERROR_SAVE == cd.add(channel)) {
                     Channel dbChannel = cd.findByChannelIdentifier(channel.getChannelIdentifier());
                     channel.setId(dbChannel.getId());
                     cd.update(channel);
@@ -286,8 +287,8 @@ public class ChannelManager {
             }
         }
         if (channel.NO_ID == channel.getId()) {
-            if (DaoError.ERROR_SAVE == cd.add(channel)){
-             Channel dbChannel = cd.findByChannelIdentifier(channel.getChannelIdentifier());
+            if (DaoError.ERROR_SAVE == cd.add(channel)) {
+                Channel dbChannel = cd.findByChannelIdentifier(channel.getChannelIdentifier());
                 channel.setId(dbChannel.getId());
                 cd.update(channel);
             }

@@ -23,4 +23,6 @@
     <string name="incoming_message_handler_service">Incoming Message Handler Service</string>
     <string name="outgoing_message_handling_service">Outgoing Message Handling Service</string>
     <string name="EnterChannelDesciption">Enter the channel description here</string>
+    <string name="acceptChannelRequest">Accept</string>
+    <string name="refuseChannelRequest">Refuse</string>
 </resources>
