@@ -114,7 +114,10 @@ public class NsdClient {
 
                             Timestamp tsTemp = new Timestamp(System.currentTimeMillis());
 
-                            if (friendFromOnlineList == null){
+                            //friendOnlineHashMap.printAll();
+
+
+                            if (friendFromOnlineList == null ){
                                 //If the friend is not in the map, put it in the map and send a request for more info.
                                 Log.d(TAG, "This is a new friend coming online");
                                 newFriend.setLastOnlineTimeStamp(tsTemp);
@@ -123,29 +126,50 @@ public class NsdClient {
                                 ChatManager chatManager = ChatManager.getInstance();
                                 chatManager.enqueueOutGoingMessageQueue(creationRequest);
 
+                                friendOnlineHashMap.put(friendMacString, newFriend);
+                                Log.d(TAG, "Adding " + friendMacString + " to hashmap 1");
+                                //friendOnlineHashMap.printAll();
+
                             } else {
-                                //Otherwise, update the friend's time stamp. and update the ip and port
-                                Log.d(TAG, "The friend is in the online list");
+                                Friend dbFriend = fd.findByMacAddress(friendFromOnlineList.getMac());
+                                if ( dbFriend == null){
+                                    Log.d(TAG, "This is not in DB yet.");
+                                    newFriend.setLastOnlineTimeStamp(tsTemp);
+                                    //friendOnlineHashMap.put(friendMacString, newFriend);
+                                    FriendCreationRequest creationRequest = new FriendCreationRequest(newFriend, mContext);
+                                    ChatManager chatManager = ChatManager.getInstance();
+                                    chatManager.enqueueOutGoingMessageQueue(creationRequest);
 
-                                if ((!friendFromOnlineList.getIp().equals(host))
-                                        || friendFromOnlineList.getPort() != Friendport){
-                                    Log.d(TAG, "Updating the friend's ip and port");
+                                    friendOnlineHashMap.put(friendMacString, newFriend);
+                                    Log.d(TAG, "Adding " + friendMacString + " to hashmap 2");
+                                    friendOnlineHashMap.printAll();
+                                } else {
+                                    //Otherwise, update the friend's time stamp. and update the ip and port
+                                    Log.d(TAG, "The friend is in the online list");
 
-                                    //If the ip or port is changed, update them in DB
-                                    friendFromOnlineList.setIp(host);
-                                    friendFromOnlineList.setPort(Friendport);
-                                    Friend dbFriend = fd.findByMacAddress(friendFromOnlineList.getMac());
-                                    if (dbFriend != null){
-                                        dbFriend.setIp(host);
-                                        dbFriend.setPort(Friendport);
-                                        dbFriend.setStatus(Friend.FriendStatus.ONLINE);
-                                        fd.update(dbFriend);
+                                    if ((!friendFromOnlineList.getIp().equals(host))
+                                            || friendFromOnlineList.getPort() != Friendport){
+                                        Log.d(TAG, "Updating the friend's ip and port");
+
+                                        //If the ip or port is changed, update them in DB
+                                        friendFromOnlineList.setIp(host);
+                                        friendFromOnlineList.setPort(Friendport);
+                                        //Friend dbFriend = fd.findByMacAddress(friendFromOnlineList.getMac());
+                                        if (dbFriend != null){
+                                            dbFriend.setIp(host);
+                                            dbFriend.setPort(Friendport);
+                                            dbFriend.setStatus(Friend.FriendStatus.ONLINE);
+                                            fd.update(dbFriend);
+                                        }
+
                                     }
-
+                                    friendFromOnlineList.setLastOnlineTimeStamp(tsTemp);
+                                    friendOnlineHashMap.put(friendMacString, friendFromOnlineList);
+                                    Log.d(TAG, "Adding " + friendMacString + " to hashmap 3");
+                                    //friendOnlineHashMap.printAll();
                                 }
-                                friendFromOnlineList.setLastOnlineTimeStamp(tsTemp);
-                                friendOnlineHashMap.put(friendMacString, friendFromOnlineList);
                             }
+
                         }
                     });
                 }
