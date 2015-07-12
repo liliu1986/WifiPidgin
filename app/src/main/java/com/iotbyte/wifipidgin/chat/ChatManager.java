@@ -51,7 +51,7 @@ public class ChatManager {
     /**
      * store the outGoingMessage in it's JSON format
      */
-    private Queue<String> outGoingMessageQueue;
+    private Queue<Message> outGoingMessageQueue;
     /**
      * Store incomingMessage in it's message object
      */
@@ -90,11 +90,11 @@ public class ChatManager {
      * <p/>
      * push the json format string into outgoing queue
      *
-     * @param jsonString the json format string
+     * @param message the message object to be send out
      * @return true if success otherwise false
      */
-    public boolean enqueueOutGoingMessageQueue(String jsonString) {
-        return outGoingMessageQueue.offer(jsonString);
+    public boolean enqueueOutGoingMessageQueue(Message message) {
+        return outGoingMessageQueue.offer(message);
     }
 
     /**
@@ -107,29 +107,20 @@ public class ChatManager {
      * @param context
      */
     public boolean dequeueOutGoingMessageQueue(Context context) {
-        String message = outGoingMessageQueue.poll();
+        Message message = outGoingMessageQueue.poll();
 
         if (null == message) {
             return false;
         }
-        try {
-            Message outMsg = MessageFactory.buildMessageByJson(message, context);
-            Friend receiver = outMsg.getReceiver();
-            if (outMsg.getType() == MessageType.FRIEND_CREATION_REQUEST) {
+            Friend receiver = message.getReceiver();
+            if (message.getType() == MessageType.FRIEND_CREATION_REQUEST) {
                 //When the friend creation request is sent out, remove it from the map
                 FriendOnlineHashMap friendOnlineHashMap = FriendOnlineHashMap.getInstance();
                 String friendMacString = Utils.macAddressByteToHexString(receiver.getMac());
                 friendOnlineHashMap.removeFriendbyMac(friendMacString);
             }
-            messageClient.sendMsg(receiver.getIp(), receiver.getPort(), message);
+            messageClient.sendMsg(receiver.getIp(), receiver.getPort(), message.convertMessageToJson());
             return true;
-        } catch (JSONException ex) {  //FIXME:: require better exception handle!!!
-            ex.printStackTrace();
-        } catch (UnknownHostException ex) {
-            ex.printStackTrace();
-        }
-
-        return false;
     }
 
     //TODO:: require exception handling here for corrupted json string
@@ -185,7 +176,7 @@ public class ChatManager {
 
                 //TODO:: try to use MessageFactory here later
                 FriendCreationResponse friendCreationResponse = new FriendCreationResponse(message.getSender(), context);
-                return this.enqueueOutGoingMessageQueue(friendCreationResponse.convertMessageToJson());
+                return this.enqueueOutGoingMessageQueue(friendCreationResponse);
             }
             case FRIEND_CREATION_RESPONSE: {
                 /*
@@ -246,7 +237,7 @@ public class ChatManager {
                                 );
                         //dequeue is successful if and only if the channel creation response is send and channel
                         //is added to the channelManager successfully.
-                        return this.enqueueOutGoingMessageQueue(channelCreationResponse.convertMessageToJson()) &&
+                        return this.enqueueOutGoingMessageQueue(channelCreationResponse) &&
                                 ChannelManager.getInstance(context).addChannel(channel);
                     } else {
                         //If decide to not join the channel, just do nothing
@@ -283,7 +274,7 @@ public class ChatManager {
                 FriendInfoUpdateResponse response =
                         new FriendInfoUpdateResponse(message.getSender(), context,
                                 myself.getDescription());
-                return this.enqueueOutGoingMessageQueue(response.convertMessageToJson());
+                return this.enqueueOutGoingMessageQueue(response);
             }
             case FRIEND_INFO_UPDATE_RESPONSE: {
                 FriendDao fd = DaoFactory.getInstance().getFriendDao(context,
@@ -311,7 +302,7 @@ public class ChatManager {
                 Friend myself = fd.findById(Myself.SELF_ID);
                 String imageBase64 = Utils.convertImgToBase64(myself.getImagePath());
                 FriendImageResponse friendImageResponse = new FriendImageResponse(message.getSender(), context, imageBase64);
-                return this.enqueueOutGoingMessageQueue(friendImageResponse.convertMessageToJson());
+                return this.enqueueOutGoingMessageQueue(friendImageResponse);
             }
             case FRIEND_IMAGE_RESPONSE: {
                 FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
@@ -438,7 +429,7 @@ public class ChatManager {
     private void sendFriendImageRequest(Friend receiver, Context context) {
         FriendImageRequest friendImageRequest = new FriendImageRequest(receiver, context);
         ChatManager chatManager = ChatManager.getInstance();
-        chatManager.enqueueOutGoingMessageQueue(friendImageRequest.convertMessageToJson());
+        chatManager.enqueueOutGoingMessageQueue(friendImageRequest);
     }
 
 

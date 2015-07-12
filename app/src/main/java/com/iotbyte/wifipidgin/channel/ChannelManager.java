@@ -362,7 +362,7 @@ public class ChannelManager {
         for (Friend friend : channel.getFriendsList()) {
             if (friend.getId() != Friend.SELF_ID) { //Do not send to myself
                 ChannelCreationRequest message = new ChannelCreationRequest(channel, friend, context);
-                ChatManager.getInstance().enqueueOutGoingMessageQueue(message.convertMessageToJson());
+                ChatManager.getInstance().enqueueOutGoingMessageQueue(message);
             }
         }
     }
@@ -380,7 +380,7 @@ public class ChannelManager {
         for (Friend friend : friendList) {
             if (friend.getId() != Friend.SELF_ID) { //Do not send to myself
                 ChannelCreationRequest message = new ChannelCreationRequest(channel, friend, context);
-                ChatManager.getInstance().enqueueOutGoingMessageQueue(message.convertMessageToJson());
+                ChatManager.getInstance().enqueueOutGoingMessageQueue(message);
             }
         }
     }

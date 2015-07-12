@@ -121,7 +121,7 @@ public class NsdClient {
                                 //friendOnlineHashMap.put(friendMacString, newFriend);
                                 FriendCreationRequest creationRequest = new FriendCreationRequest(newFriend, mContext);
                                 ChatManager chatManager = ChatManager.getInstance();
-                                chatManager.enqueueOutGoingMessageQueue(creationRequest.convertMessageToJson());
+                                chatManager.enqueueOutGoingMessageQueue(creationRequest);
 
                             } else {
                                 //Otherwise, update the friend's time stamp. and update the ip and port

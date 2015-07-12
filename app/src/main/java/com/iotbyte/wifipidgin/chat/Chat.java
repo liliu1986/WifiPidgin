@@ -88,7 +88,7 @@ public class Chat {
     public boolean sendMessage(ChatMessage message) {
         return ChatManager
                 .getInstance()
-                .enqueueOutGoingMessageQueue(message.convertMessageToJson()) && this.pushMessage(message);
+                .enqueueOutGoingMessageQueue(message) && this.pushMessage(message);
     }
 
     /**
@@ -123,7 +123,7 @@ public class Chat {
         for (Friend friend : channel.getFriendsList()) {
             if (Friend.SELF_ID != friend.getId()){
                 chatMessage = new ChatMessage(friend, this.getChannelIdentifier(), messageBody,context);
-                ChatManager.getInstance().enqueueOutGoingMessageQueue(chatMessage.convertMessageToJson());
+                ChatManager.getInstance().enqueueOutGoingMessageQueue(chatMessage);
             }
         }
         chatMessage = new ChatMessage(myself, this.channelIdentifier, messageBody,context);

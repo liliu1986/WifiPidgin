@@ -122,7 +122,7 @@ public class testChat extends ActionBarActivity implements View.OnClickListener{
                     ChatMessage chatmessage = new ChatMessage(aFriend,"e2qjseahfwo3i",msgTextView.getText().toString(),getApplicationContext());
 
                     ChatManager chatManager = ChatManager.getInstance();
-                    chatManager.enqueueOutGoingMessageQueue(chatmessage.convertMessageToJson());
+                    chatManager.enqueueOutGoingMessageQueue(chatmessage);
 
 
 
