@@ -23,6 +23,7 @@ import com.iotbyte.wifipidgin.message.Message;
 import com.iotbyte.wifipidgin.message.MessageFactory;
 import com.iotbyte.wifipidgin.message.MessageType;
 import com.iotbyte.wifipidgin.nsdmodule.FriendOnlineHashMap;
+import com.iotbyte.wifipidgin.ui.notification.UiNotificationHelper;
 import com.iotbyte.wifipidgin.utils.Utils;
 
 import org.json.JSONException;
@@ -165,7 +166,10 @@ public class ChatManager {
                         }
                     }
                     Chat chat = getChatByChannelIdentifier(((ChatMessage) message).getChannelIdentifier());
-                    return chat.pushMessage((ChatMessage) message);
+                    boolean ret = chat.pushMessage((ChatMessage) message);
+                    if (ret) {
+                        UiNotificationHelper.notifyChatMessage((ChatMessage)message, context);
+                    }
                 }
             }
             case FRIEND_CREATION_REQUEST: {
@@ -204,45 +208,22 @@ public class ChatManager {
                 In response to a channel creation request a notification will be push.
                 user will prompted to select to join the channel or not join
 
-              As ChannelCreationRequest is a dual functional message, if the channel currently is not
-              in local channelManager,it is to request a creation of channel.
-               if the channel already exist, it is a notification to update the channel information
-                 */
+                As ChannelCreationRequest is a dual functional message, if the channel currently is
+                not in local channelManager,it is to request a creation of channel.
+                if the channel already exist, it is a notification to update the channel information
+                */
                 ChannelCreationRequest channelCreationRequest = (ChannelCreationRequest) message;
                 Channel channel = channelCreationRequest.getChannel();
-                //check if the user is already in the channel, if yes, this is a update message, update the
-                //local channel information
-                if (null != ChannelManager.getInstance(context).getChannelByIdentifier(channel.getChannelIdentifier())) {
-                    ChannelManager.getInstance(context).updateChannel(channel);
+                ChannelManager channelManager = ChannelManager.getInstance(context);
+                // check if the user is already in the channel, if yes, this is a update message,
+                // update the local channel information
+                if (null != channelManager.getChannelByIdentifier(channel.getChannelIdentifier())) {
+                    channelManager.updateChannel(channel);
                     return true;
                 } else {
-                    //as the channel does not exist, it is a creation request
-
-                    //TODO: adding the invocation of notification to join or decline channel creation
-                    //fixme: a mock code to make selection always true;
-                    boolean join = true;
-                    if (join) {
-
-                        // if choose to join the channel, user will add himself into the friend list of the channel
-                        // then this channel into his channelManager.
-                        //and send out a channelCreationResponse back to the creator.
-                        FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
-                        channel.addFriend(fd.findById(Friend.SELF_ID)); // add myself back into the channel friend list
-
-                        //send a ChannelCreationResponse back
-                        ChannelCreationResponse channelCreationResponse =
-                                new ChannelCreationResponse(channel.getChannelIdentifier(),
-                                        channelCreationRequest.getSender(),
-                                        context
-                                );
-                        //dequeue is successful if and only if the channel creation response is send and channel
-                        //is added to the channelManager successfully.
-                        return this.enqueueOutGoingMessageQueue(channelCreationResponse) &&
-                                ChannelManager.getInstance(context).addChannel(channel);
-                    } else {
-                        //If decide to not join the channel, just do nothing
-                        return true;
-                    }
+                    // the channel does not exist, create the channel
+                    UiNotificationHelper.notifyChannelCreationRequest(channelCreationRequest, context);
+                    return true;
                 }
             }
             case CHANNEL_CREATION_RESPONSE: {
