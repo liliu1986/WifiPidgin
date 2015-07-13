@@ -70,6 +70,7 @@ public class FriendStatusTrackingService extends Service  {
                                 //Otherwise, remove the friend from the db
                                 Log.d(TAG, "Removing friend from DB");
                                 fd.delete(dbFriend.getId());
+
                             } else {
                                 dbFriend.setStatus(Friend.FriendStatus.OFFLINE);
                                 fd.update(dbFriend);

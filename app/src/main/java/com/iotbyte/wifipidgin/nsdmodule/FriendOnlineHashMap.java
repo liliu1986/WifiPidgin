@@ -1,5 +1,7 @@
 package com.iotbyte.wifipidgin.nsdmodule;
 
+import android.util.Log;
+
 import com.iotbyte.wifipidgin.friend.Friend;
 
 import java.util.Collection;
@@ -43,6 +45,7 @@ public class FriendOnlineHashMap {
     }
 
     public void removeFriendbyMac (String mac){
+        Log.d("HAHA", "Removing " + mac + " from the FriendOnlineHashMap" );
         friendOnlineMap.remove(mac);
     }
 
@@ -51,5 +54,13 @@ public class FriendOnlineHashMap {
     }
     public Collection<Friend> getValues(){
         return friendOnlineMap.values();
+    }
+    public void printAll(){
+        Iterator it = friendOnlineMap.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            Log.d("HAHA", pair.getKey() + " = " + pair.getValue());
+            //it.remove(); // avoids a ConcurrentModificationException
+        }
     }
 }
