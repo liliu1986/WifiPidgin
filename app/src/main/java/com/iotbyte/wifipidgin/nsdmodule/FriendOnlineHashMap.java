@@ -59,7 +59,6 @@ public class FriendOnlineHashMap {
         Iterator it = friendOnlineMap.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
-            Log.d("HAHA", pair.getKey() + " = " + pair.getValue());
             //it.remove(); // avoids a ConcurrentModificationException
         }
     }
