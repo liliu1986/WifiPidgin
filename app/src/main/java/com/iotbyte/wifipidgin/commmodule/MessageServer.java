@@ -5,7 +5,6 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.util.Log;
-import android.view.View;
 
 import com.iotbyte.wifipidgin.dao.DaoFactory;
 import com.iotbyte.wifipidgin.dao.FriendDao;
@@ -192,6 +191,7 @@ public class MessageServer   {
                 //TODO - After the message is received, need to handle it/have a custom listener.
                 if(mMsgRecListenerForThread != null){
                     mMsgRecListenerForThread.onMessageReceived(sb.toString());
+                    Log.v(MSG_SERVER_TAG,sb.toString());
                     //mMsgRecListenerForThread.onMessageReceived(msgRec.toString());
                 }else{
                     Log.e(MSG_SERVER_TAG, "ChatMessage Receiving Listener is not set");

@@ -103,9 +103,9 @@ public class ChatManager {
      * <p/>
      * It remove the message from the outgoingMessageQueue and send it via messageClient.
      *
+     * @param context
      * @return true if the message is dequeue properly from outgoingMessageQueue and send via messageClient,
      * return false otherwise
-     * @param context
      */
     public boolean dequeueOutGoingMessageQueue(Context context) {
         Message message = outGoingMessageQueue.poll();
@@ -113,15 +113,22 @@ public class ChatManager {
         if (null == message) {
             return false;
         }
-            Friend receiver = message.getReceiver();
-            if (message.getType() == MessageType.FRIEND_CREATION_REQUEST) {
-                //When the friend creation request is sent out, remove it from the map
-                FriendOnlineHashMap friendOnlineHashMap = FriendOnlineHashMap.getInstance();
-                String friendMacString = Utils.macAddressByteToHexString(receiver.getMac());
-                //friendOnlineHashMap.removeFriendbyMac(friendMacString);
-            }
-            messageClient.sendMsg(receiver.getIp(), receiver.getPort(), message.convertMessageToJson());
-            return true;
+        Friend receiver = message.getReceiver();
+        if (message.getType() == MessageType.FRIEND_CREATION_REQUEST) {
+            //When the friend creation request is sent out, remove it from the map
+            FriendOnlineHashMap friendOnlineHashMap = FriendOnlineHashMap.getInstance();
+            String friendMacString = Utils.macAddressByteToHexString(receiver.getMac());
+            //friendOnlineHashMap.removeFriendbyMac(friendMacString);
+        }
+
+        //TODO: there might be performance impact when sending message to lookout DB to update the ip and port
+        FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
+        // Don't need to update sender information, it has been taken cared in receiver end
+        Friend receiverLookUp = fd.findById(receiver.getId());
+        receiver.setIp(receiverLookUp.getIp());
+        receiver.setPort(receiverLookUp.getPort());
+        messageClient.sendMsg(receiver.getIp(), receiver.getPort(), message.convertMessageToJson());
+        return true;
     }
 
     //TODO:: require exception handling here for corrupted json string
@@ -168,7 +175,7 @@ public class ChatManager {
                     Chat chat = getChatByChannelIdentifier(((ChatMessage) message).getChannelIdentifier());
                     boolean ret = chat.pushMessage((ChatMessage) message);
                     if (ret) {
-                        UiNotificationHelper.notifyChatMessage((ChatMessage)message, context);
+                        UiNotificationHelper.notifyChatMessage((ChatMessage) message, context);
                     }
                 }
             }
@@ -244,7 +251,7 @@ public class ChatManager {
                 ChannelManager.getInstance(context).updateChannel(channel);//notify the channel is updated, and this will kick in UI update
                 ChannelManager.getInstance(context).sendChannelCreationMessageToAll(channel);//send the message out to notify all members of the channel
                 return true;
-            } 
+            }
             case FRIEND_INFO_UPDATE_REQUEST: {
                 FriendDao fd = DaoFactory.getInstance().getFriendDao(context,
                         DaoFactory.DaoType.SQLITE_DAO,

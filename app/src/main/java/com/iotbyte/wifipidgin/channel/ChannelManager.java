@@ -34,7 +34,9 @@ public class ChannelManager {
 
     private Context context;
 
-    /** Locally cached channel map, indexed by channelIdentifier */
+    /**
+     * Locally cached channel map, indexed by channelIdentifier
+     */
     private HashMap<String, Channel> channelMap;
 
     private ChannelDatabaseChangeListener channelDatabaseChangeListener;
@@ -50,10 +52,13 @@ public class ChannelManager {
         channelDao.getDaoEventBoard().registerEventSubscriber(new DaoEventSubscriber() {
             @Override
             public void onEvent(DaoEvent event) {
-                updateChannelInfoFromDatabase();
-                if (null != channelDatabaseChangeListener) {
-                    channelDatabaseChangeListener.onChannelDatabaseChange();
+                if (DaoEvent.FRIEND_LIST_CHANGED == event || DaoEvent.CHANNEL_LIST_CHANGED == event) {
+                    updateChannelInfoFromDatabase();
+                    if (null != channelDatabaseChangeListener) {
+                        channelDatabaseChangeListener.onChannelDatabaseChange();
+                    }
                 }
+
             }
         });
 
