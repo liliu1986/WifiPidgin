@@ -77,7 +77,8 @@ public class NsdClient {
                             }
 
                             InetAddress host = mService.getHost();
-                            int Friendport = serviceInfo.getPort();
+                            int friendPort = serviceInfo.getPort();
+                            boolean ipPortChanged = false;
 
                             Log.d(TAG, "The friend's ip is " + host.getHostAddress());
                             Log.d(TAG, "The ip for my current device is " + Utils.getIPAddress(true));
@@ -100,7 +101,7 @@ public class NsdClient {
                             }
                             Log.d(TAG, "The friend's mac address is " + macString);
 
-                            Friend newFriend = new Friend(Utils.macAddressHexStringToByte(macString), host, Friendport);
+                            Friend newFriend = new Friend(Utils.macAddressHexStringToByte(macString), host, friendPort);
                             newFriend.setIp(host);
                             FriendDao fd = DaoFactory.getInstance()
                                     .getFriendDao(mContext, DaoFactory.DaoType.SQLITE_DAO, null);
@@ -113,10 +114,7 @@ public class NsdClient {
                             Friend friendFromOnlineList = friendOnlineHashMap.get(friendMacString);
 
                             Timestamp tsTemp = new Timestamp(System.currentTimeMillis());
-
-                            //friendOnlineHashMap.printAll();
-
-
+                            
                             if (friendFromOnlineList == null ){
                                 //If the friend is not in the map, put it in the map and send a request for more info.
                                 Log.d(TAG, "This is a new friend coming online");
@@ -131,42 +129,31 @@ public class NsdClient {
                                 //friendOnlineHashMap.printAll();
 
                             } else {
+                                if ((!friendFromOnlineList.getIp().equals(host))
+                                        || friendFromOnlineList.getPort() != friendPort){
+                                    Log.d(TAG, "Updating the friend's ip and port");
+                                    ipPortChanged = true;
+                                    friendFromOnlineList.setIp(host);
+                                    friendFromOnlineList.setPort(friendPort);
+                                }
+
+                                friendFromOnlineList.setLastOnlineTimeStamp(tsTemp);
+                                friendOnlineHashMap.put(friendMacString, friendFromOnlineList);
+                                Log.d(TAG, "Adding " + friendMacString + " to hashmap");
+
                                 Friend dbFriend = fd.findByMacAddress(friendFromOnlineList.getMac());
-                                if ( dbFriend == null){
-                                    Log.d(TAG, "This is not in DB yet.");
-                                    newFriend.setLastOnlineTimeStamp(tsTemp);
-                                    //friendOnlineHashMap.put(friendMacString, newFriend);
+
+                                if (dbFriend == null){
+                                    Log.d(TAG, "This is not in DB yet. send the creation request.");
                                     FriendCreationRequest creationRequest = new FriendCreationRequest(newFriend, mContext);
                                     ChatManager chatManager = ChatManager.getInstance();
                                     chatManager.enqueueOutGoingMessageQueue(creationRequest);
-
-                                    friendOnlineHashMap.put(friendMacString, newFriend);
-                                    Log.d(TAG, "Adding " + friendMacString + " to hashmap 2");
-                                    friendOnlineHashMap.printAll();
-                                } else {
-                                    //Otherwise, update the friend's time stamp. and update the ip and port
-                                    Log.d(TAG, "The friend is in the online list");
-
-                                    if ((!friendFromOnlineList.getIp().equals(host))
-                                            || friendFromOnlineList.getPort() != Friendport){
-                                        Log.d(TAG, "Updating the friend's ip and port");
-
-                                        //If the ip or port is changed, update them in DB
-                                        friendFromOnlineList.setIp(host);
-                                        friendFromOnlineList.setPort(Friendport);
-                                        //Friend dbFriend = fd.findByMacAddress(friendFromOnlineList.getMac());
-                                        if (dbFriend != null){
-                                            dbFriend.setIp(host);
-                                            dbFriend.setPort(Friendport);
-                                            dbFriend.setStatus(Friend.FriendStatus.ONLINE);
-                                            fd.update(dbFriend);
-                                        }
-
-                                    }
-                                    friendFromOnlineList.setLastOnlineTimeStamp(tsTemp);
-                                    friendOnlineHashMap.put(friendMacString, friendFromOnlineList);
-                                    Log.d(TAG, "Adding " + friendMacString + " to hashmap 3");
-                                    //friendOnlineHashMap.printAll();
+                                } else if (ipPortChanged){
+                                    Log.d(TAG, "Updating the friend's ip and port in DB");
+                                    dbFriend.setIp(host);
+                                    dbFriend.setPort(friendPort);
+                                    dbFriend.setStatus(Friend.FriendStatus.ONLINE);
+                                    fd.update(dbFriend);
                                 }
                             }
 
