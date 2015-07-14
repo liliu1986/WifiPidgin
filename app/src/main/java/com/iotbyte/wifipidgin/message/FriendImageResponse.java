@@ -52,7 +52,7 @@ public class FriendImageResponse extends Message{
     public String convertMessageToJson() {
         try {
             JSONObject json = new JSONObject();
-            Log.d("AAA", "Creating FriendImageResponse");
+            Log.d(TAG, "Creating FriendImageResponse");
             json.put(MESSAGE_TYPE, this.type.toString());
 
             JSONObject sender = new JSONObject();
@@ -94,4 +94,6 @@ public class FriendImageResponse extends Message{
     }
     final private String MESSAGE_IMAGE_BASE64 = "imageBase64";
     private String imageBase64Encode = null;
+    private static final String TAG = "FriendImageResponse";
+
 }
