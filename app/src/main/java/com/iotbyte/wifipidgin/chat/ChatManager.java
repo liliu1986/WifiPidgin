@@ -114,19 +114,18 @@ public class ChatManager {
             return false;
         }
         Friend receiver = message.getReceiver();
-        if (message.getType() == MessageType.FRIEND_CREATION_REQUEST) {
-            //When the friend creation request is sent out, remove it from the map
-            FriendOnlineHashMap friendOnlineHashMap = FriendOnlineHashMap.getInstance();
-            String friendMacString = Utils.macAddressByteToHexString(receiver.getMac());
-            //friendOnlineHashMap.removeFriendbyMac(friendMacString);
+        //In case of Friend creation request/response, the database does not have these friends' record, so
+        //don't need to lookup in database
+        if (MessageType.FRIEND_CREATION_REQUEST != message.getType() &&
+                MessageType.FRIEND_CREATION_RESPONSE != message.getType()) {
+            //TODO: there might be performance impact when sending message to lookout DB to update the ip and port
+            FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
+            // Don't need to update sender information, it has been taken cared in receiver end
+            Friend receiverLookUp = fd.findById(receiver.getId());
+            receiver.setIp(receiverLookUp.getIp());
+            receiver.setPort(receiverLookUp.getPort());
         }
 
-        //TODO: there might be performance impact when sending message to lookout DB to update the ip and port
-        FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
-        // Don't need to update sender information, it has been taken cared in receiver end
-        Friend receiverLookUp = fd.findById(receiver.getId());
-        receiver.setIp(receiverLookUp.getIp());
-        receiver.setPort(receiverLookUp.getPort());
         messageClient.sendMsg(receiver.getIp(), receiver.getPort(), message.convertMessageToJson());
         return true;
     }
