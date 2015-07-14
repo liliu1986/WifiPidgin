@@ -114,7 +114,7 @@ public class NsdClient {
                             Friend friendFromOnlineList = friendOnlineHashMap.get(friendMacString);
 
                             Timestamp tsTemp = new Timestamp(System.currentTimeMillis());
-                            
+
                             if (friendFromOnlineList == null ){
                                 //If the friend is not in the map, put it in the map and send a request for more info.
                                 Log.d(TAG, "This is a new friend coming online");
@@ -148,7 +148,8 @@ public class NsdClient {
                                     FriendCreationRequest creationRequest = new FriendCreationRequest(newFriend, mContext);
                                     ChatManager chatManager = ChatManager.getInstance();
                                     chatManager.enqueueOutGoingMessageQueue(creationRequest);
-                                } else if (ipPortChanged){
+                                } else if ((!dbFriend.getIp().equals(host))
+                                        || dbFriend.getPort() != friendPort){
                                     Log.d(TAG, "Updating the friend's ip and port in DB");
                                     dbFriend.setIp(host);
                                     dbFriend.setPort(friendPort);
