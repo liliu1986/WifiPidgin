@@ -121,9 +121,16 @@ public class ChatManager {
             //TODO: there might be performance impact when sending message to lookout DB to update the ip and port
             FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
             // Don't need to update sender information, it has been taken cared in receiver end
-            Friend receiverLookUp = fd.findById(receiver.getId());
-            receiver.setIp(receiverLookUp.getIp());
-            receiver.setPort(receiverLookUp.getPort());
+            Friend receiverLookUp = fd.findByMacAddress(receiver.getMac());
+            if (null != receiverLookUp) {
+                if (null != receiverLookUp.getIp()) {
+                    receiver.setIp(receiverLookUp.getIp());
+                }
+                if (0 != receiverLookUp.getPort()) {
+                    receiver.setPort(receiverLookUp.getPort());
+                }
+            }
+
         }
 
         messageClient.sendMsg(receiver.getIp(), receiver.getPort(), message.convertMessageToJson());
