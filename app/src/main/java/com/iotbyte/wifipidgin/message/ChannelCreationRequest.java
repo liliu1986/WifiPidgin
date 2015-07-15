@@ -51,10 +51,11 @@ public class ChannelCreationRequest extends Message {
      * into a message object
      *
      * @param jsonMessageData is the received json format string
+     * @param context
      */
 
-    public ChannelCreationRequest(String jsonMessageData) throws JSONException, UnknownHostException {
-        super(jsonMessageData);
+    public ChannelCreationRequest(String jsonMessageData, Context context) throws JSONException, UnknownHostException {
+        super(jsonMessageData,context);
         JSONObject json = new JSONObject(jsonMessageData);
         this.channelName = json.getString(MESSAGE_CHANNEL_NAME);
         this.channelDescription = json.getString(MESSAGE_CHANNEL_DESCRIPTION);

@@ -274,7 +274,6 @@ public class FriendSqliteDao implements FriendDao {
     private Friend getFriendFromCursor(Cursor c) {
         long id = c.getLong(c.getColumnIndex(FriendSqliteDao.ID_FIELD));
         String macAddrStr = c.getString(c.getColumnIndex(FriendSqliteDao.MAC_ADDR_FIELD));
-        Log.d("AAA", macAddrStr);
         byte[] macAddr = Utils.macAddressHexStringToByte(macAddrStr);
         InetAddress ip = null;
         String ipHost = c.getString(c.getColumnIndex(FriendSqliteDao.IP_FIELD));

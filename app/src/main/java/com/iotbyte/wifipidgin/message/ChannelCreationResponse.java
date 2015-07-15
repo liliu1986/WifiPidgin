@@ -27,10 +27,11 @@ public class ChannelCreationResponse extends Message {
      * into a message object
      *
      * @param jsonMessageData is the received json format string
+     * @param context
      */
 
-    public ChannelCreationResponse(String jsonMessageData) throws JSONException, UnknownHostException {
-        super(jsonMessageData);
+    public ChannelCreationResponse(String jsonMessageData, Context context) throws JSONException, UnknownHostException {
+        super(jsonMessageData, context);
         JSONObject json = new JSONObject(jsonMessageData);
         this.channelIdentifier = json.getString(MESSAGE_CHANNEL_IDENTIFIER);
         this.type = MessageType.CHANNEL_CREATION_RESPONSE;

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/channelRequestInfo"
+        android:layout_weight="80" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/acceptChannelRequest"
+        android:id="@+id/buttonAcceptChannelRequest"
+        android:layout_weight="5" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/refuseChannelRequest"
+        android:id="@+id/buttonRefuseChannelRequest"
+        android:layout_weight="5" />
+</LinearLayout>

@@ -87,7 +87,7 @@ public abstract class Message {
         this.type = MessageType.ERROR;
     }
 
-    public Message (String jsonMessageData) throws JSONException, UnknownHostException
+    public Message(String jsonMessageData, Context context) throws JSONException, UnknownHostException
     {
         //TODO:: NOTE, the receiver here should be myself
         //TODO:: discussion, what happens if the json is corrupted?, message will not be completely
@@ -108,15 +108,19 @@ public abstract class Message {
         this.sender = friend;
 
 
-        //TODO:: receiver should be myself, this is mock code,or require to verify if the receiver is correctly myself
+        // receiver should be myself: kick in with the most up-to-date myself value from DB
 
-        InetAddress receiverIp = InetAddress.getByName(ipFormatter(receiver.getString(MESSAGE_IP)));
+       /* InetAddress receiverIp = InetAddress.getByName(ipFormatter(receiver.getString(MESSAGE_IP)));
         byte[] receiverMac = macAddressHexStringToByte(receiver.getString(MESSAGE_MAC));
         int receiverPort = receiver.getInt(MESSAGE_PORT);
 
         Friend myself = new Friend(receiverMac,receiverIp,receiverPort);
         myself.setDescription(receiver.optString(MESSAGE_DESCRIPTION));
         myself.setName(receiver.optString(MESSAGE_NAME));
+       */
+
+        FriendDao fd = DaoFactory.getInstance().getFriendDao(context,DaoFactory.DaoType.SQLITE_DAO, null);
+        Friend myself = fd.findById(Friend.SELF_ID);
         this.receiver = myself;
         this.timestamp = Timestamp.valueOf(json.optString(MESSAGE_TIMESTAMP));
         this.type = MessageType.fromString(typeString);

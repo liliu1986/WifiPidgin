@@ -34,9 +34,13 @@ public class ChannelManager {
 
     private Context context;
 
-    private HashMap<String, Channel> channelMap; // channelIdentifier and Channel pair
+    /**
+     * Locally cached channel map, indexed by channelIdentifier
+     */
+    private HashMap<String, Channel> channelMap;
 
     private ChannelDatabaseChangeListener channelDatabaseChangeListener;
+
 
     private ChannelManager(Context context) {
         this.context = context;
@@ -48,13 +52,15 @@ public class ChannelManager {
         channelDao.getDaoEventBoard().registerEventSubscriber(new DaoEventSubscriber() {
             @Override
             public void onEvent(DaoEvent event) {
-                updateChannelInfoFromDatabase();
-                if (null != channelDatabaseChangeListener) {
-                    channelDatabaseChangeListener.onChannelDatabaseChange();
+                if (DaoEvent.FRIEND_LIST_CHANGED == event || DaoEvent.CHANNEL_LIST_CHANGED == event) {
+                    updateChannelInfoFromDatabase();
+                    if (null != channelDatabaseChangeListener) {
+                        channelDatabaseChangeListener.onChannelDatabaseChange();
+                    }
                 }
+
             }
         });
-
 
         //Calling database to grep existing channelList
         // or create a new channelList if there is nothing been retrieved
@@ -236,7 +242,7 @@ public class ChannelManager {
                 }
             }
             if (channel.NO_ID == channel.getId()) {
-                if (DaoError.ERROR_SAVE == cd.add(channel)){
+                if (DaoError.ERROR_SAVE == cd.add(channel)) {
                     Channel dbChannel = cd.findByChannelIdentifier(channel.getChannelIdentifier());
                     channel.setId(dbChannel.getId());
                     cd.update(channel);
@@ -277,6 +283,7 @@ public class ChannelManager {
                 if (DaoError.ERROR_SAVE == fd.add(friend)) {
                     Friend dbFriend = fd.findByMacAddress(friend.getMac());
                     friend.setId(dbFriend.getId());
+                    friend.setFavourite(true);
                     fd.update(friend);
                 }
 
@@ -285,8 +292,8 @@ public class ChannelManager {
             }
         }
         if (channel.NO_ID == channel.getId()) {
-            if (DaoError.ERROR_SAVE == cd.add(channel)){
-             Channel dbChannel = cd.findByChannelIdentifier(channel.getChannelIdentifier());
+            if (DaoError.ERROR_SAVE == cd.add(channel)) {
+                Channel dbChannel = cd.findByChannelIdentifier(channel.getChannelIdentifier());
                 channel.setId(dbChannel.getId());
                 cd.update(channel);
             }
@@ -361,7 +368,7 @@ public class ChannelManager {
         for (Friend friend : channel.getFriendsList()) {
             if (friend.getId() != Friend.SELF_ID) { //Do not send to myself
                 ChannelCreationRequest message = new ChannelCreationRequest(channel, friend, context);
-                ChatManager.getInstance().enqueueOutGoingMessageQueue(message.convertMessageToJson());
+                ChatManager.getInstance().enqueueOutGoingMessageQueue(message);
             }
         }
     }
@@ -379,7 +386,7 @@ public class ChannelManager {
         for (Friend friend : friendList) {
             if (friend.getId() != Friend.SELF_ID) { //Do not send to myself
                 ChannelCreationRequest message = new ChannelCreationRequest(channel, friend, context);
-                ChatManager.getInstance().enqueueOutGoingMessageQueue(message.convertMessageToJson());
+                ChatManager.getInstance().enqueueOutGoingMessageQueue(message);
             }
         }
     }

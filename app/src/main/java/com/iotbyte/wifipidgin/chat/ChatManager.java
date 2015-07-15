@@ -23,6 +23,7 @@ import com.iotbyte.wifipidgin.message.Message;
 import com.iotbyte.wifipidgin.message.MessageFactory;
 import com.iotbyte.wifipidgin.message.MessageType;
 import com.iotbyte.wifipidgin.nsdmodule.FriendOnlineHashMap;
+import com.iotbyte.wifipidgin.ui.notification.UiNotificationHelper;
 import com.iotbyte.wifipidgin.utils.Utils;
 
 import org.json.JSONException;
@@ -51,7 +52,7 @@ public class ChatManager {
     /**
      * store the outGoingMessage in it's JSON format
      */
-    private Queue<String> outGoingMessageQueue;
+    private Queue<Message> outGoingMessageQueue;
     /**
      * Store incomingMessage in it's message object
      */
@@ -90,11 +91,11 @@ public class ChatManager {
      * <p/>
      * push the json format string into outgoing queue
      *
-     * @param jsonString the json format string
+     * @param message the message object to be send out
      * @return true if success otherwise false
      */
-    public boolean enqueueOutGoingMessageQueue(String jsonString) {
-        return outGoingMessageQueue.offer(jsonString);
+    public boolean enqueueOutGoingMessageQueue(Message message) {
+        return outGoingMessageQueue.offer(message);
     }
 
     /**
@@ -102,39 +103,37 @@ public class ChatManager {
      * <p/>
      * It remove the message from the outgoingMessageQueue and send it via messageClient.
      *
+     * @param context
      * @return true if the message is dequeue properly from outgoingMessageQueue and send via messageClient,
      * return false otherwise
      */
-    public boolean dequeueOutGoingMessageQueue() {
-        String message = outGoingMessageQueue.poll();
+    public boolean dequeueOutGoingMessageQueue(Context context) {
+        Message message = outGoingMessageQueue.poll();
 
         if (null == message) {
             return false;
         }
-        try {
-            Message outMsg = MessageFactory.buildMessageByJson(message);
-            Friend receiver = outMsg.getReceiver();
-            if (outMsg.getType() == MessageType.FRIEND_CREATION_REQUEST) {
-                //When the friend creation request is sent out, remove it from the map
-                FriendOnlineHashMap friendOnlineHashMap = FriendOnlineHashMap.getInstance();
-                String friendMacString = Utils.macAddressByteToHexString(receiver.getMac());
-                friendOnlineHashMap.removeFriendbyMac(friendMacString);
-            }
-            messageClient.sendMsg(receiver.getIp(), receiver.getPort(), message);
-            return true;
-        } catch (JSONException ex) {  //FIXME:: require better exception handle!!!
-            ex.printStackTrace();
-        } catch (UnknownHostException ex) {
-            ex.printStackTrace();
+        Friend receiver = message.getReceiver();
+        //In case of Friend creation request/response, the database does not have these friends' record, so
+        //don't need to lookup in database
+        if (MessageType.FRIEND_CREATION_REQUEST != message.getType() &&
+                MessageType.FRIEND_CREATION_RESPONSE != message.getType()) {
+            //TODO: there might be performance impact when sending message to lookout DB to update the ip and port
+            FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
+            // Don't need to update sender information, it has been taken cared in receiver end
+            Friend receiverLookUp = fd.findById(receiver.getId());
+            receiver.setIp(receiverLookUp.getIp());
+            receiver.setPort(receiverLookUp.getPort());
         }
 
-        return false;
+        messageClient.sendMsg(receiver.getIp(), receiver.getPort(), message.convertMessageToJson());
+        return true;
     }
 
     //TODO:: require exception handling here for corrupted json string
-    public boolean enqueueIncomingMessageQueue(String jsonString) {
+    public boolean enqueueIncomingMessageQueue(String jsonString, Context context) {
         try {
-            return incomingMessageQueue.offer(MessageFactory.buildMessageByJson(jsonString));
+            return incomingMessageQueue.offer(MessageFactory.buildMessageByJson(jsonString, context));
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (UnknownHostException e) {
@@ -173,7 +172,10 @@ public class ChatManager {
                         }
                     }
                     Chat chat = getChatByChannelIdentifier(((ChatMessage) message).getChannelIdentifier());
-                    return chat.pushMessage((ChatMessage) message);
+                    boolean ret = chat.pushMessage((ChatMessage) message);
+                    if (ret) {
+                        UiNotificationHelper.notifyChatMessage((ChatMessage) message, context);
+                    }
                 }
             }
             case FRIEND_CREATION_REQUEST: {
@@ -184,7 +186,7 @@ public class ChatManager {
 
                 //TODO:: try to use MessageFactory here later
                 FriendCreationResponse friendCreationResponse = new FriendCreationResponse(message.getSender(), context);
-                return this.enqueueOutGoingMessageQueue(friendCreationResponse.convertMessageToJson());
+                return this.enqueueOutGoingMessageQueue(friendCreationResponse);
             }
             case FRIEND_CREATION_RESPONSE: {
                 /*
@@ -201,6 +203,9 @@ public class ChatManager {
                 sender.setLastOnlineTimeStamp(new Timestamp(System.currentTimeMillis()));
                 friendOnlineHashMap.put(friendMacString, sender);
 
+                Log.d(TAG, "Adding " + friendMacString + " to hashmap");
+                //friendOnlineHashMap.printAll();
+
                 if (DaoError.NO_ERROR == fd.add(sender)) {
                     return true;
                 } else {
@@ -212,45 +217,22 @@ public class ChatManager {
                 In response to a channel creation request a notification will be push.
                 user will prompted to select to join the channel or not join
 
-              As ChannelCreationRequest is a dual functional message, if the channel currently is not
-              in local channelManager,it is to request a creation of channel.
-               if the channel already exist, it is a notification to update the channel information
-                 */
+                As ChannelCreationRequest is a dual functional message, if the channel currently is
+                not in local channelManager,it is to request a creation of channel.
+                if the channel already exist, it is a notification to update the channel information
+                */
                 ChannelCreationRequest channelCreationRequest = (ChannelCreationRequest) message;
                 Channel channel = channelCreationRequest.getChannel();
-                //check if the user is already in the channel, if yes, this is a update message, update the
-                //local channel information
-                if (null != ChannelManager.getInstance(context).getChannelByIdentifier(channel.getChannelIdentifier())) {
-                    ChannelManager.getInstance(context).updateChannel(channel);
+                ChannelManager channelManager = ChannelManager.getInstance(context);
+                // check if the user is already in the channel, if yes, this is a update message,
+                // update the local channel information
+                if (null != channelManager.getChannelByIdentifier(channel.getChannelIdentifier())) {
+                    channelManager.updateChannel(channel);
                     return true;
                 } else {
-                    //as the channel does not exist, it is a creation request
-
-                    //TODO: adding the invocation of notification to join or decline channel creation
-                    //fixme: a mock code to make selection always true;
-                    boolean join = true;
-                    if (join) {
-
-                        // if choose to join the channel, user will add himself into the friend list of the channel
-                        // then this channel into his channelManager.
-                        //and send out a channelCreationResponse back to the creator.
-                        FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
-                        channel.addFriend(fd.findById(Friend.SELF_ID)); // add myself back into the channel friend list
-
-                        //send a ChannelCreationResponse back
-                        ChannelCreationResponse channelCreationResponse =
-                                new ChannelCreationResponse(channel.getChannelIdentifier(),
-                                        channelCreationRequest.getSender(),
-                                        context
-                                );
-                        //dequeue is successful if and only if the channel creation response is send and channel
-                        //is added to the channelManager successfully.
-                        return this.enqueueOutGoingMessageQueue(channelCreationResponse.convertMessageToJson()) &&
-                                ChannelManager.getInstance(context).addChannel(channel);
-                    } else {
-                        //If decide to not join the channel, just do nothing
-                        return true;
-                    }
+                    // the channel does not exist, create the channel
+                    UiNotificationHelper.notifyChannelCreationRequest(channelCreationRequest, context);
+                    return true;
                 }
             }
             case CHANNEL_CREATION_RESPONSE: {
@@ -268,7 +250,7 @@ public class ChatManager {
                 ChannelManager.getInstance(context).updateChannel(channel);//notify the channel is updated, and this will kick in UI update
                 ChannelManager.getInstance(context).sendChannelCreationMessageToAll(channel);//send the message out to notify all members of the channel
                 return true;
-            } 
+            }
             case FRIEND_INFO_UPDATE_REQUEST: {
                 FriendDao fd = DaoFactory.getInstance().getFriendDao(context,
                         DaoFactory.DaoType.SQLITE_DAO,
@@ -282,7 +264,7 @@ public class ChatManager {
                 FriendInfoUpdateResponse response =
                         new FriendInfoUpdateResponse(message.getSender(), context,
                                 myself.getDescription());
-                return this.enqueueOutGoingMessageQueue(response.convertMessageToJson());
+                return this.enqueueOutGoingMessageQueue(response);
             }
             case FRIEND_INFO_UPDATE_RESPONSE: {
                 FriendDao fd = DaoFactory.getInstance().getFriendDao(context,
@@ -310,7 +292,7 @@ public class ChatManager {
                 Friend myself = fd.findById(Myself.SELF_ID);
                 String imageBase64 = Utils.convertImgToBase64(myself.getImagePath());
                 FriendImageResponse friendImageResponse = new FriendImageResponse(message.getSender(), context, imageBase64);
-                return this.enqueueOutGoingMessageQueue(friendImageResponse.convertMessageToJson());
+                return this.enqueueOutGoingMessageQueue(friendImageResponse);
             }
             case FRIEND_IMAGE_RESPONSE: {
                 FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
@@ -437,7 +419,7 @@ public class ChatManager {
     private void sendFriendImageRequest(Friend receiver, Context context) {
         FriendImageRequest friendImageRequest = new FriendImageRequest(receiver, context);
         ChatManager chatManager = ChatManager.getInstance();
-        chatManager.enqueueOutGoingMessageQueue(friendImageRequest.convertMessageToJson());
+        chatManager.enqueueOutGoingMessageQueue(friendImageRequest);
     }
 
 

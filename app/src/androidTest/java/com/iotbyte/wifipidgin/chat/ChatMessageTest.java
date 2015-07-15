@@ -165,7 +165,7 @@ public class ChatMessageTest extends AndroidTestCase {
         Log.v(MESSAGE_TEST, json);
 
 
-        ChatMessage sameChatMessage = new ChatMessage(json);
+        ChatMessage sameChatMessage = new ChatMessage(json, getContext());
 
         assertEquals("timestamp does not convert properly", chatMessage.getTimestamp().toString(), sameChatMessage.getTimestamp().toString());
     }

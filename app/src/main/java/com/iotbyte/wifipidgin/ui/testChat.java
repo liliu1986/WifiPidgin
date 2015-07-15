@@ -16,12 +16,14 @@ import android.widget.TextView;
 import com.iotbyte.wifipidgin.R;
 import com.iotbyte.wifipidgin.chat.ChatManager;
 import com.iotbyte.wifipidgin.chat.IncomingMessageHandlingService;
+import com.iotbyte.wifipidgin.chat.OutgoingMessageHandlingService;
 import com.iotbyte.wifipidgin.commmodule.CommModuleBroadcastReceiver;
 import com.iotbyte.wifipidgin.commmodule.MessageClient;
 import com.iotbyte.wifipidgin.commmodule.MessageServer;
 import com.iotbyte.wifipidgin.commmodule.MessageServerService;
 import com.iotbyte.wifipidgin.friend.Friend;
 import com.iotbyte.wifipidgin.message.ChatMessage;
+import com.iotbyte.wifipidgin.nsdmodule.FriendStatusTrackingService;
 import com.iotbyte.wifipidgin.nsdmodule.NsdClient;
 import com.iotbyte.wifipidgin.nsdmodule.NsdWrapper;
 
@@ -60,46 +62,7 @@ public class testChat extends ActionBarActivity implements View.OnClickListener{
         intentFilter.addAction(MessageServerService.MY_ACTION);
         registerReceiver(myReceiver, intentFilter);
 
-        //Start message Server service and NSD Service
-        Intent i= new Intent(getApplicationContext(), MessageServerService.class);
-        i.putExtra("KEY1", "Value to be used by the service");
-        context.startService(i);
-
-        //Start message Server service and NSD Service
-        Intent incomingMessageHandlingServicesIntent= new Intent(getApplicationContext(), IncomingMessageHandlingService.class);
-       // incomingMessageHandlingServicesIntent.putExtra("KEY1", "Value to be used by the service");
-        context.startService(incomingMessageHandlingServicesIntent);
-
-
-        //Start the service discovery
-        NsdClient mNsdClient = new NsdClient(this);
-        mNsdClient.initializeNsdClient();
-        mNsdClient.discoverServices();
-
-        /*
-        mUpdateHandler = new Handler() {
-            @Override
-            public void handleMessage(ChatMessage msg) {
-                String chatLine = msg.getData().getString("msg");
-                Log.d(TAG, "Got message !!! : " + chatLine);
-            }
-        };
-
-        mMessageServer = new MessageServer(mUpdateHandler);
-        */
-        /*
-        mMessageServer.setMessageReceivingListener(new MessageReceivingListener(){
-            @Override
-            public void onMessageReceived(String msg){
-                int duration = Toast.LENGTH_SHORT;
-                Toast toast = Toast.makeText(getBaseContext(), msg, duration);
-                toast.show();
-            }
-        });
-        */
-        //mMessageServer.startServer();
-
-
+        startServices();
     }
 
 
@@ -159,7 +122,7 @@ public class testChat extends ActionBarActivity implements View.OnClickListener{
                     ChatMessage chatmessage = new ChatMessage(aFriend,"e2qjseahfwo3i",msgTextView.getText().toString(),getApplicationContext());
 
                     ChatManager chatManager = ChatManager.getInstance();
-                    chatManager.enqueueOutGoingMessageQueue(chatmessage.convertMessageToJson());
+                    chatManager.enqueueOutGoingMessageQueue(chatmessage);
 
 
 
@@ -181,6 +144,49 @@ public class testChat extends ActionBarActivity implements View.OnClickListener{
 
         }
     }
+    //TODO need to destroy the NSD
+    @Override
+    protected void onDestroy() {
+        Context context = getApplicationContext();
+        context.stopService(messageServerServiceIntent);
+        mNsdClient.stopDiscovery();
+        context.stopService(friendStatusTrackingServiceIntent);
+        context.stopService(incomingMessageHandlingServicesIntent);
+        context.stopService(outGoingMessageHandlingServicesIntent);
+
+        super.onDestroy();
+    }
+
+
+    private void startServices(){
+        Context context = getApplicationContext();
+        //Start message Server service and NSD Service
+        messageServerServiceIntent= new Intent(context, MessageServerService.class);
+        context.startService(messageServerServiceIntent);
+
+        //Start NSD Client here
+        //Start the service discovery
+        mNsdClient = new NsdClient(this);
+        mNsdClient.initializeNsdClient();
+        mNsdClient.discoverServices();
+
+        //Start FriendCreationService
+        friendStatusTrackingServiceIntent = new Intent(context, FriendStatusTrackingService.class);
+        context.startService(friendStatusTrackingServiceIntent);
+
+        //Start IncomingMessageHandlingService
+        incomingMessageHandlingServicesIntent = new Intent(context, IncomingMessageHandlingService.class);
+        context.startService(incomingMessageHandlingServicesIntent);
+
+        //Start OutGoingMessageHandlingService
+        outGoingMessageHandlingServicesIntent = new Intent(context, OutgoingMessageHandlingService.class);
+        context.startService(outGoingMessageHandlingServicesIntent);
+    }
+    NsdClient mNsdClient;
+    private Intent messageServerServiceIntent;
+    private Intent friendStatusTrackingServiceIntent;
+    private Intent incomingMessageHandlingServicesIntent;
+    private Intent outGoingMessageHandlingServicesIntent;
     @Override
     protected void onStop()
     {

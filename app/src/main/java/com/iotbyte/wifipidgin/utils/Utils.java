@@ -94,7 +94,6 @@ public class Utils {
      */
     private static byte[] hexStringToByteArray(String s) {
         int len = s.length();
-        Log.d("AAA", s);
         if (len == 0) {
             return new byte[0];
         }

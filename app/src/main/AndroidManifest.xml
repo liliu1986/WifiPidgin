@@ -72,6 +72,9 @@
         <activity
             android:name=".ui.ChatActivity"
             android:label="Chat"></activity>
+        <activity
+            android:name=".ui.notification.AcceptChannelInviteActivity"
+            android:label="Accept Channel Invitation"></activity>
 
 
         <service
