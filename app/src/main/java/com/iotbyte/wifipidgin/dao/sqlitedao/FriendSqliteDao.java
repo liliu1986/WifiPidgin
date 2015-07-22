@@ -301,7 +301,7 @@ public class FriendSqliteDao implements FriendDao {
             return null;
         }
         String imagePath = c.getString(c.getColumnIndex(FriendSqliteDao.IMAGE_PATH_FIELD));
-        boolean isFavourite = c.getInt(c.getColumnIndex(FriendSqliteDao.IS_FAVOURITE_FIELD)) == 0;
+        boolean isFavourite = c.getInt(c.getColumnIndex(FriendSqliteDao.IS_FAVOURITE_FIELD)) == 1;
 
         Friend f = new Friend(macAddr, ip, port);
         f.setId(id);
