@@ -183,6 +183,7 @@ public class ChatManager {
                     if (ret) {
                         UiNotificationHelper.notifyChatMessage((ChatMessage) message, context);
                     }
+                    return ret;
                 }
             }
             case FRIEND_CREATION_REQUEST: {
@@ -331,10 +332,11 @@ public class ChatManager {
                         return true;
                     } catch (Exception e) {
                         e.printStackTrace();
+                        return false;
                     }
 
                 } else {
-                    Log.d("CCC", "NO SENDER INFORMATION");
+                    Log.d(TAG, "NO SENDER INFORMATION");
                     return false;
                 }
 

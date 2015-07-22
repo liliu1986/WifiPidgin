@@ -14,7 +14,9 @@ import com.iotbyte.wifipidgin.message.FriendCreationRequest;
 import com.iotbyte.wifipidgin.utils.Utils;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -31,7 +33,7 @@ public class FriendStatusTrackingService extends Service  {
         Log.d(TAG, "FriendStatusTrackingService Started !!!");
         fd = DaoFactory.getInstance()
                 .getFriendDao(getApplicationContext(), DaoFactory.DaoType.SQLITE_DAO, null);
-
+        clearDBFriend();
         mThread = new Thread(new FriendStatusTrackingServiceThread());
         mThread.start();
 
@@ -84,6 +86,20 @@ public class FriendStatusTrackingService extends Service  {
         }
     }
 
+    private void clearDBFriend(){
+        List<Friend> dbFriendList = null;
+        if (null != fd){
+            dbFriendList = fd.findAll();
+            for (Friend dbFriend: dbFriendList){
+                if (dbFriend.getId() != Friend.SELF_ID && dbFriend.isFavourite() == false){
+                    //dbFriend.setStatus(Friend.FriendStatus.OFFLINE);
+                    Log.d(TAG, "Removing " + dbFriend.getId() + " " + dbFriend.isFavourite());
+                    fd.delete(dbFriend.getId());
+                }
+            }
+
+        }
+    }
     private final String TAG = "StatusTrackingService";
     private Thread mThread;
     private final int delayInterval = 100;

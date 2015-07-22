@@ -2,6 +2,7 @@ package com.iotbyte.wifipidgin.channel;
 
 
 import android.content.Context;
+import android.util.Log;
 
 import com.iotbyte.wifipidgin.chat.ChatManager;
 import com.iotbyte.wifipidgin.dao.ChannelDao;
@@ -280,13 +281,19 @@ public class ChannelManager {
                 so we need to find the actual ID of the friend and update the values in channel friend list
                 and update other values other than the id in DB
                  */
-                if (DaoError.ERROR_SAVE == fd.add(friend)) {
-                    Friend dbFriend = fd.findByMacAddress(friend.getMac());
+                Friend dbFriend = fd.findByMacAddress(friend.getMac());
+                if (dbFriend != null) {
+                    //The friend is in the database, update the friend
+                    Log.d("ChannelManager", "Updating friend in DB");
                     friend.setId(dbFriend.getId());
                     friend.setFavourite(true);
                     fd.update(friend);
+                } else {
+                    //The friend does not exist in DB, add him/her
+                    Log.d("ChannelManager", "Adding friend in DB");
+                    friend.setFavourite(true);
+                    fd.add(friend);
                 }
-
             } else {
                 fd.update(friend); //TODO:: might need to change this depends on how to handles friend update
             }
@@ -320,13 +327,14 @@ public class ChannelManager {
                 Friend xiaoMing = new Friend(xiaoMingMac, xiaoMingIP, xiaoMingPort);
                 xiaoMing.setDescription("wo shi huang xiao ming");
                 xiaoMing.setName("HXM");
-
+                xiaoMing.setFavourite(true);
                 InetAddress xiaoPangIP = InetAddress.getByName("192.168.1.179");
                 byte[] xiaoPangMac = {0x5, 0xc, 0x0, 0xa, 0x5, 0xb, 0xa, 0xa, 0xc, 0xa, 0xc, 0x5};
                 int xiaoPangPort = 55;
                 Friend xiaoPang = new Friend(xiaoPangMac, xiaoPangIP, xiaoPangPort);
                 xiaoPang.setDescription("wo shi xiao pang");
                 xiaoPang.setName("stackHeap");
+                xiaoPang.setFavourite(true);
                 List<Friend> mockList = new ArrayList<>();
                 mockList.add(xiaoMing);
                 mockList.add(xiaoPang);

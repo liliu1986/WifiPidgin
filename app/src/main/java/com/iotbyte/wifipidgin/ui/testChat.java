@@ -113,7 +113,7 @@ public class testChat extends ActionBarActivity implements View.OnClickListener{
                 TextView msgTextView = (TextView) findViewById(R.id.msgField);
 
 
-               // msg = msgTextView.getText().toString();
+                // msg = msgTextView.getText().toString();
                 try {
                     destIP = InetAddress.getByName(ipString);
                     byte[] aMac = {0xf,0xc,0xa,0xa,0x1,0x4,0x7,0x9,0xa,0xe,0xb,0xd}; //fc:aa:14:79:ae:bd
@@ -132,7 +132,7 @@ public class testChat extends ActionBarActivity implements View.OnClickListener{
 
                     if (mMessageClient != null){
                         Log.d(TAG, "Sending the msg Now!!!");
-                       // mMessageClient.sendMsg(destIP, port, chatManager.dequeueOutGoingMessageQueue());
+                        // mMessageClient.sendMsg(destIP, port, chatManager.dequeueOutGoingMessageQueue());
                     } else {
                         Log.e(TAG, "The message client has not been initialized yet!!!");
                     }
@@ -149,11 +149,11 @@ public class testChat extends ActionBarActivity implements View.OnClickListener{
     protected void onDestroy() {
         Context context = getApplicationContext();
         context.stopService(messageServerServiceIntent);
-        mNsdClient.stopDiscovery();
+        //mNsdClient.stopDiscovery();
         context.stopService(friendStatusTrackingServiceIntent);
         context.stopService(incomingMessageHandlingServicesIntent);
         context.stopService(outGoingMessageHandlingServicesIntent);
-
+        unregisterReceiver(myReceiver);
         super.onDestroy();
     }
 
@@ -166,9 +166,9 @@ public class testChat extends ActionBarActivity implements View.OnClickListener{
 
         //Start NSD Client here
         //Start the service discovery
-        mNsdClient = new NsdClient(this);
-        mNsdClient.initializeNsdClient();
-        mNsdClient.discoverServices();
+        //mNsdClient = new NsdClient(this);
+        //mNsdClient.initializeNsdClient();
+        //mNsdClient.discoverServices();
 
         //Start FriendCreationService
         friendStatusTrackingServiceIntent = new Intent(context, FriendStatusTrackingService.class);
@@ -190,7 +190,7 @@ public class testChat extends ActionBarActivity implements View.OnClickListener{
     @Override
     protected void onStop()
     {
-        unregisterReceiver(myReceiver);
+
         super.onStop();
     }
 }
