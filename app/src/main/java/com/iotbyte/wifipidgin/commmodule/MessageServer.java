@@ -55,6 +55,7 @@ public class MessageServer   {
             try {
                 // Since discovery will happen via Nsd, we don't need to care which port is
                 // used.  Just grab an available one  and advertise it via Nsd.
+                // We are using a fixed port from now on.
                 mServerSocket = new ServerSocket(port);
                 setLocalPort(mServerSocket.getLocalPort());
 
