@@ -92,7 +92,7 @@ public class FriendStatusTrackingService extends Service  {
             dbFriendList = fd.findAll();
             for (Friend dbFriend: dbFriendList){
                 if (dbFriend.getId() != Friend.SELF_ID && dbFriend.isFavourite() == false){
-                    dbFriend.setStatus(Friend.FriendStatus.OFFLINE);
+                    //dbFriend.setStatus(Friend.FriendStatus.OFFLINE);
                     Log.d(TAG, "Removing " + dbFriend.getId() + " " + dbFriend.isFavourite());
                     fd.delete(dbFriend.getId());
                 }
