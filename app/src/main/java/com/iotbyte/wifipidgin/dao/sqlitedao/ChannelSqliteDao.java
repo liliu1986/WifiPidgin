@@ -47,6 +47,7 @@ public class ChannelSqliteDao implements ChannelDao {
         ContentValues channelValues = channelContentValues(channel);
 
         SQLiteDatabase db = sqliteHelper.getWritableDatabase();
+        boolean transactionSuccessful = false;
         // wrap everything into a transaction. Everything will be rolled back if
         // something failed in between.
         db.beginTransaction();
@@ -69,10 +70,15 @@ public class ChannelSqliteDao implements ChannelDao {
                 }
             }
             db.setTransactionSuccessful();
-            eventBoard.postEvent(DaoEvent.CHANNEL_LIST_CHANGED);
+            transactionSuccessful = true;
         } finally {
             db.endTransaction();
             db.close();
+        }
+        // change event must be posted AFTER ending db transaction to ensure all data has been
+        // committed to db.
+        if (transactionSuccessful) {
+            eventBoard.postEvent(DaoEvent.CHANNEL_LIST_CHANGED);
         }
         return DaoError.NO_ERROR;
     }
@@ -104,8 +110,8 @@ public class ChannelSqliteDao implements ChannelDao {
             return DaoError.ERROR_RECORD_NEVER_SAVED;
         }
 
-
         SQLiteDatabase db = sqliteHelper.getWritableDatabase();
+        boolean transactionSuccess = false;
         // wrap everything into a transaction. Everything will be rolled back if
         // something failed in between.
         db.beginTransaction();
@@ -169,10 +175,15 @@ public class ChannelSqliteDao implements ChannelDao {
                 }
             }
             db.setTransactionSuccessful();
-            eventBoard.postEvent(DaoEvent.CHANNEL_LIST_CHANGED);
+            transactionSuccess = true;
         } finally {
             db.endTransaction();
             db.close();
+        }
+        // change event must be posted AFTER ending db transaction to ensure all data has been
+        // committed to db.
+        if (transactionSuccess) {
+            eventBoard.postEvent(DaoEvent.CHANNEL_LIST_CHANGED);
         }
         return DaoError.NO_ERROR;
     }
