@@ -50,9 +50,9 @@ public class ChatArrayAdapter extends ArrayAdapter<ChatMessage> {
         senderNameView = (TextView) row.findViewById(R.id.senderName);
         senderNameView.setText(chatMessageObj.getSender().getName());
 
-        singleMessageContainer.setGravity(!self ? Gravity.RIGHT : Gravity.LEFT);
-        chatTextView.setBackgroundResource(!self ? R.drawable.bubble_a : R.drawable.bubble_b);
-        senderNameView.setVisibility(!self ? View.GONE : View.VISIBLE);
+        singleMessageContainer.setGravity(self ? Gravity.RIGHT : Gravity.LEFT);
+        chatTextView.setBackgroundResource(self ? R.drawable.bubble_a : R.drawable.bubble_b);
+        senderNameView.setVisibility(self ? View.GONE : View.VISIBLE);
 
         return row;
     }
