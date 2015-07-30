@@ -16,7 +16,8 @@ import java.util.ArrayList;
 
 public class ChatArrayAdapter extends ArrayAdapter<ChatMessage> {
 
-    private TextView chatText;
+    private TextView chatTextView;
+    private TextView senderNameView;
     private LinearLayout singleMessageContainer;
 
     Context context;
@@ -32,16 +33,27 @@ public class ChatArrayAdapter extends ArrayAdapter<ChatMessage> {
 
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
+        Boolean self;
+
         if (row == null) {
             LayoutInflater inflater = (LayoutInflater) this.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             row = inflater.inflate(R.layout.activity_chat_single_message, parent, false);
         }
         singleMessageContainer = (LinearLayout) row.findViewById(R.id.singleMessageContainer);
         ChatMessage chatMessageObj = data.get(position);
-        chatText = (TextView) row.findViewById(R.id.singleMessage);
-        chatText.setText(chatMessageObj.getMessageBody());
-        chatText.setBackgroundResource(chatMessageObj.isFromMyself() ? R.drawable.bubble_b : R.drawable.bubble_a);
-        singleMessageContainer.setGravity(chatMessageObj.isFromMyself() ? Gravity.RIGHT : Gravity.LEFT);
+
+        self = chatMessageObj.isFromMyself();
+
+        chatTextView = (TextView) row.findViewById(R.id.singleMessage);
+        chatTextView.setText(chatMessageObj.getMessageBody());
+
+        senderNameView = (TextView) row.findViewById(R.id.senderName);
+        senderNameView.setText(chatMessageObj.getSender().getName());
+
+        singleMessageContainer.setGravity(self ? Gravity.RIGHT : Gravity.LEFT);
+        chatTextView.setBackgroundResource(self ? R.drawable.bubble_a : R.drawable.bubble_b);
+        senderNameView.setVisibility(self ? View.GONE : View.VISIBLE);
+
         return row;
     }
 }

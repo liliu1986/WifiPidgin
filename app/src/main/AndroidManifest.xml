@@ -75,6 +75,9 @@
         <activity
             android:name=".ui.notification.AcceptChannelInviteActivity"
             android:label="Accept Channel Invitation"></activity>
+        <activity
+            android:name=".ui.ChannelPropertyActivity"
+            android:label="Channel Property"></activity>
 
 
         <service
