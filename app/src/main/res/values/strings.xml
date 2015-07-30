@@ -25,5 +25,5 @@
     <string name="EnterChannelDesciption">Enter the channel description here</string>
     <string name="acceptChannelRequest">Accept</string>
     <string name="refuseChannelRequest">Refuse</string>
-    <string name="participants">participants</string>
+    <string name="participants">Participants</string>
 </resources>

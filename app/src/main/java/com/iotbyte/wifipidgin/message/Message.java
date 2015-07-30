@@ -100,11 +100,21 @@ public abstract class Message {
         JSONObject receiver = json.getJSONObject(MESSAGE_RECEIVER);
         InetAddress senderIp = InetAddress.getByName(ipFormatter(sender.getString(MESSAGE_IP)));
         byte[] senderMac = macAddressHexStringToByte(sender.getString(MESSAGE_MAC));
+        FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
+        Friend dfFriend = fd.findByMacAddress(senderMac);
+        Friend friend;
         int senderPort = sender.getInt(MESSAGE_PORT);
+        if (dfFriend != null){
+            friend = dfFriend;
+            friend.setPort(senderPort);
+        }else{
+            friend = new Friend(senderMac,senderIp,senderPort);
+            friend.setDescription(sender.optString(MESSAGE_DESCRIPTION));
+            friend.setName(sender.optString(MESSAGE_NAME));
+        }
 
-        Friend friend = new Friend(senderMac,senderIp,senderPort);
-        friend.setDescription(sender.optString(MESSAGE_DESCRIPTION));
-        friend.setName(sender.optString(MESSAGE_NAME));
+
+
         this.sender = friend;
 
 
@@ -119,7 +129,7 @@ public abstract class Message {
         myself.setName(receiver.optString(MESSAGE_NAME));
        */
 
-        FriendDao fd = DaoFactory.getInstance().getFriendDao(context,DaoFactory.DaoType.SQLITE_DAO, null);
+
         Friend myself = fd.findById(Friend.SELF_ID);
         this.receiver = myself;
         this.timestamp = Timestamp.valueOf(json.optString(MESSAGE_TIMESTAMP));
