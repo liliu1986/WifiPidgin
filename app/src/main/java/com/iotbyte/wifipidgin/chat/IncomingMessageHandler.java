@@ -28,8 +28,8 @@ public class IncomingMessageHandler {
         @Override
         public void run() {
             while (!Thread.currentThread().isInterrupted()) {
-                if (!ChatManager.getInstance().isIncomingMessageQueueEmpty()) {
-                    ChatManager.getInstance().dequeueIncomingMessageQueue(context); // handled by ChatManager
+                if (!ChatManager.getInstance(context).isIncomingMessageQueueEmpty()) {
+                    ChatManager.getInstance(context).dequeueIncomingMessageQueue(context); // handled by ChatManager
                 }
 
             }

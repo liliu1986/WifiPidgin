@@ -1,6 +1,14 @@
 package com.iotbyte.wifipidgin.commmodule;
 
+import android.content.Context;
 import android.util.Log;
+
+import com.iotbyte.wifipidgin.chat.ChatManager;
+import com.iotbyte.wifipidgin.message.Message;
+import com.iotbyte.wifipidgin.message.MessageFactory;
+
+import org.json.JSONException;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -15,11 +23,13 @@ import java.net.UnknownHostException;
 public class MessageClient {
 
     private final String MSG_CLIENT_TAG = "MessageClient";
+    private MessageSendingListener messageSendingListener;
 
-    public MessageClient(){
+    private Context mContext;
 
+    public MessageClient(Context context){
+        mContext = context;
     }
-
 
     /**
      * Start msg sending thread
@@ -32,6 +42,37 @@ public class MessageClient {
         this.mAddress = address;
         this.PORT = port;
         this.MSG = msg;
+
+        Thread.UncaughtExceptionHandler h = new Thread.UncaughtExceptionHandler() {
+            public void uncaughtException(Thread th, Throwable ex) {
+                System.out.println("Uncaught exception: " + ex);
+            }
+        };
+
+
+        messageSendingListener = new MessageSendingListener() {
+            @Override
+            public void onMessageNotSent(String msg) {
+                Log.d(MSG_CLIENT_TAG, "The message is not sent, retrying");
+                if (mContext != null){
+                    try {
+                        Message tryMsg = MessageFactory.buildMessageByJson(msg, mContext);
+                        if (tryMsg.canRetry()){
+                            tryMsg.incrementMsgRetyCounter();
+                            ChatManager
+                                    .getInstance(mContext)
+                                    .enqueueOutGoingMessageQueue(tryMsg);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    } catch (UnknownHostException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Log.d(MSG_CLIENT_TAG, "Context is not set");
+                }
+            }
+        };
 
         mSendThread = new Thread(new MessageSendingThread());
         mSendThread.start();
@@ -56,7 +97,13 @@ public class MessageClient {
             if (newSocket != null){
                 //setSocket(newSocket);
                 Log.d(MSG_CLIENT_TAG, "Sending-side socket initialized.");
-                sendMessage(MSG, newSocket);
+                if (sendMessage(MSG, newSocket)){
+                    Log.d (MSG_CLIENT_TAG, "The message has been successfully sent out.");
+                }else{
+                    if (messageSendingListener != null){
+                        messageSendingListener.onMessageNotSent(MSG);
+                    }
+                }
 
                 //Close and delete the socket
                 try {
@@ -70,6 +117,9 @@ public class MessageClient {
 
             } else {
                 Log.w(MSG_CLIENT_TAG, "Sending-side socket cannot be initialized");
+                if (messageSendingListener != null){
+                    messageSendingListener.onMessageNotSent(MSG);
+                }
             }
         }
 
@@ -87,7 +137,9 @@ public class MessageClient {
         return newSocket;
     }
 
-    private void sendMessage(String msg, Socket inSocket) {
+    private boolean sendMessage(String msg, Socket inSocket) {
+
+        boolean sendSuccessfully = false;
 
         try {
             Socket socket = inSocket;
@@ -105,13 +157,18 @@ public class MessageClient {
                 socket.close();
                 Log.d(MSG_CLIENT_TAG, "Client sent message: " + msg);
             }
-
+            sendSuccessfully = true;
         } catch (UnknownHostException e) {
+            sendSuccessfully = false;
             Log.d(MSG_CLIENT_TAG, "Unknown Host", e);
         } catch (IOException e) {
+            sendSuccessfully = false;
             Log.d(MSG_CLIENT_TAG, "I/O Exception", e);
         } catch (Exception e) {
+            sendSuccessfully = false;
             Log.d(MSG_CLIENT_TAG, "Error3", e);
+        } finally {
+            return sendSuccessfully;
         }
 
     }

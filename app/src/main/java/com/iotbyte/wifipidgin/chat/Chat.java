@@ -85,9 +85,9 @@ public class Chat {
      * @return true if send successfully, false otherwise
      */
     @Deprecated
-    public boolean sendMessage(ChatMessage message) {
+    public boolean sendMessage(ChatMessage message, Context context) {
         return ChatManager
-                .getInstance()
+                .getInstance(context)
                 .enqueueOutGoingMessageQueue(message) && this.pushMessage(message);
     }
 
@@ -123,7 +123,7 @@ public class Chat {
         for (Friend friend : channel.getFriendsList()) {
             if (Friend.SELF_ID != friend.getId()){
                 chatMessage = new ChatMessage(friend, this.getChannelIdentifier(), messageBody,context);
-                ChatManager.getInstance().enqueueOutGoingMessageQueue(chatMessage);
+                ChatManager.getInstance(context).enqueueOutGoingMessageQueue(chatMessage);
             }
         }
         chatMessage = new ChatMessage(myself, this.channelIdentifier, messageBody,context);

@@ -41,7 +41,7 @@ public class AcceptChannelInviteActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_accept_channel);
 
-        final String json = getIntent().getStringExtra("channelCreationRequestJson");
+        String json = getIntent().getStringExtra("channelCreationRequestJson");
 
         try {
             request = new ChannelCreationRequest(json, context);
@@ -82,8 +82,10 @@ public class AcceptChannelInviteActivity extends Activity {
                                                     context);
 
                 // if the channel is created successfully, send a response
+                Log.d(ACCEPT_CHANNEL_ACTIVITY, "Sending Channel Creation Response 1 ");
                 if (ChannelManager.getInstance(context).addChannel(channel)) {
-                    ChatManager mgr = ChatManager.getInstance();
+                    Log.d(ACCEPT_CHANNEL_ACTIVITY, "Sending Channel Creation Response 2 ");
+                    ChatManager mgr = ChatManager.getInstance(getApplicationContext());
                     mgr.enqueueOutGoingMessageQueue(channelCreationResponse);
                 }
                 finish();

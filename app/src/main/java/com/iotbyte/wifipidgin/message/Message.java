@@ -6,6 +6,7 @@ import android.util.Log;
 import com.iotbyte.wifipidgin.dao.DaoFactory;
 import com.iotbyte.wifipidgin.dao.FriendDao;
 import com.iotbyte.wifipidgin.friend.Friend;
+import com.iotbyte.wifipidgin.utils.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,9 +41,9 @@ public abstract class Message {
     final protected String MESSAGE_DESCRIPTION = "description";
     final protected String MESSAGE_NAME = "name";
     final protected String MESSAGE_TIMESTAMP = "timestamp";
-
-
-
+    final private int maxTryNumber = 2;
+    final protected String MESSAGE_TRY_TIMES = "number of times the message has been tried to send";
+    protected int retry_number = 0;
 
 
     public Message ()
@@ -102,6 +103,10 @@ public abstract class Message {
         byte[] senderMac = macAddressHexStringToByte(sender.getString(MESSAGE_MAC));
         int senderPort = sender.getInt(MESSAGE_PORT);
 
+        InetAddress receiverIp = InetAddress.getByName(ipFormatter(receiver.getString(MESSAGE_IP)));
+        byte[] receiverMac = macAddressHexStringToByte(receiver.getString(MESSAGE_MAC));
+        int receiverPort = receiver.getInt(MESSAGE_PORT);
+
         Friend friend = new Friend(senderMac,senderIp,senderPort);
         friend.setDescription(sender.optString(MESSAGE_DESCRIPTION));
         friend.setName(sender.optString(MESSAGE_NAME));
@@ -121,9 +126,19 @@ public abstract class Message {
 
         FriendDao fd = DaoFactory.getInstance().getFriendDao(context,DaoFactory.DaoType.SQLITE_DAO, null);
         Friend myself = fd.findById(Friend.SELF_ID);
-        this.receiver = myself;
+
+        Friend receiverJson = new Friend(receiverMac,receiverIp,receiverPort);
+
+        if (receiverMac.equals(myself.getMac())){
+            this.receiver = myself;
+        } else {
+            this.receiver = receiverJson;
+        }
+
         this.timestamp = Timestamp.valueOf(json.optString(MESSAGE_TIMESTAMP));
         this.type = MessageType.fromString(typeString);
+        this.retry_number = Integer.parseInt(json.getString(MESSAGE_TRY_TIMES));
+
     }
 
     public abstract String convertMessageToJson();
@@ -160,5 +175,16 @@ public abstract class Message {
         this.sender = sender;
     }
 
+    public void incrementMsgRetyCounter(){
+        this.retry_number++;
+    }
+
+    public boolean canRetry(){
+        return (this.retry_number < this.maxTryNumber);
+    }
+
+    public int getRetryNumber(){
+        return retry_number;
+    }
 
 }

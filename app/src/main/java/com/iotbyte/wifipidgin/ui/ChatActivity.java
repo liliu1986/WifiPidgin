@@ -37,7 +37,7 @@ public class ChatActivity extends Activity {
 
         ChannelId = (String) getIntent().getExtras().get("ChannelId");
 
-        chatManager = ChatManager.getInstance();
+        chatManager = ChatManager.getInstance(getApplicationContext());
         chat = chatManager.getChatByChannelIdentifier(ChannelId);
         if (null == chat) {
             chat = new Chat(ChannelId);

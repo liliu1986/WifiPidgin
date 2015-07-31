@@ -7,6 +7,7 @@ import android.util.Log;
 import com.iotbyte.wifipidgin.channel.Channel;
 import com.iotbyte.wifipidgin.channel.ChannelManager;
 import com.iotbyte.wifipidgin.commmodule.MessageClient;
+import com.iotbyte.wifipidgin.commmodule.MessageSendingListener;
 import com.iotbyte.wifipidgin.dao.DaoError;
 import com.iotbyte.wifipidgin.dao.DaoFactory;
 import com.iotbyte.wifipidgin.dao.FriendDao;
@@ -64,22 +65,25 @@ public class ChatManager {
 
     private MessageClient messageClient;
 
-    // private Context context;
+    private Context context;
     private static final String TAG = "ChannelManager";
+    private MessageSendingListener messageSendingListener;
 
-    private ChatManager() {
+
+    private ChatManager(Context inContext) {
         outGoingMessageQueue = new ConcurrentLinkedQueue();
         incomingMessageQueue = new ConcurrentLinkedQueue();
         chatMap = new HashMap();
-        messageClient = new MessageClient();
+        messageClient = new MessageClient(inContext);
+        context = inContext;
     }
 
-    public static ChatManager getInstance() {
+    public static ChatManager getInstance(Context inContext) {
         if (instance == null) {
             //Thread Safe with synchronized block
             synchronized (ChatManager.class) {
                 if (instance == null) {
-                    instance = new ChatManager();
+                    instance = new ChatManager(inContext);
                 }
             }
         }
@@ -427,7 +431,7 @@ public class ChatManager {
 
     private void sendFriendImageRequest(Friend receiver, Context context) {
         FriendImageRequest friendImageRequest = new FriendImageRequest(receiver, context);
-        ChatManager chatManager = ChatManager.getInstance();
+        ChatManager chatManager = ChatManager.getInstance(context);
         chatManager.enqueueOutGoingMessageQueue(friendImageRequest);
     }
 
