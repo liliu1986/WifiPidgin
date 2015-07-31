@@ -101,16 +101,24 @@ public abstract class Message {
         JSONObject receiver = json.getJSONObject(MESSAGE_RECEIVER);
         InetAddress senderIp = InetAddress.getByName(ipFormatter(sender.getString(MESSAGE_IP)));
         byte[] senderMac = macAddressHexStringToByte(sender.getString(MESSAGE_MAC));
+        FriendDao fd = DaoFactory.getInstance().getFriendDao(context, DaoFactory.DaoType.SQLITE_DAO, null);
+        Friend dfFriend = fd.findByMacAddress(senderMac);
+        Friend friend;
         int senderPort = sender.getInt(MESSAGE_PORT);
+        if (dfFriend != null){
+            friend = dfFriend;
+            friend.setPort(senderPort);
+        }else{
+            friend = new Friend(senderMac,senderIp,senderPort);
+            friend.setDescription(sender.optString(MESSAGE_DESCRIPTION));
+            friend.setName(sender.optString(MESSAGE_NAME));
+        }
+        this.sender = friend;
 
         InetAddress receiverIp = InetAddress.getByName(ipFormatter(receiver.getString(MESSAGE_IP)));
         byte[] receiverMac = macAddressHexStringToByte(receiver.getString(MESSAGE_MAC));
         int receiverPort = receiver.getInt(MESSAGE_PORT);
 
-        Friend friend = new Friend(senderMac,senderIp,senderPort);
-        friend.setDescription(sender.optString(MESSAGE_DESCRIPTION));
-        friend.setName(sender.optString(MESSAGE_NAME));
-        this.sender = friend;
 
 
         // receiver should be myself: kick in with the most up-to-date myself value from DB
@@ -124,7 +132,7 @@ public abstract class Message {
         myself.setName(receiver.optString(MESSAGE_NAME));
        */
 
-        FriendDao fd = DaoFactory.getInstance().getFriendDao(context,DaoFactory.DaoType.SQLITE_DAO, null);
+
         Friend myself = fd.findById(Friend.SELF_ID);
 
         Friend receiverJson = new Friend(receiverMac,receiverIp,receiverPort);

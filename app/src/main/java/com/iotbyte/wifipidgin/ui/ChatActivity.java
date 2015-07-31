@@ -2,8 +2,11 @@ package com.iotbyte.wifipidgin.ui;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.Button;
@@ -27,6 +30,7 @@ public class ChatActivity extends Activity {
     ChatManager chatManager;
     Chat chat;
     Context context;
+    Intent i;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,6 +70,28 @@ public class ChatActivity extends Activity {
                 refreshChatList();
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_chat, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                return true;
+            case R.id.chat_participants:
+                i = new Intent(this, ChannelPropertyActivity.class);
+                i.putExtra("ChannelId", ChannelId);
+                startActivity(i);
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private void sendChatMessage() {
