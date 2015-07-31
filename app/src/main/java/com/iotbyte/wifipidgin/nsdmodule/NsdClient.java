@@ -121,7 +121,7 @@ public class NsdClient {
                                 newFriend.setLastOnlineTimeStamp(tsTemp);
                                 //friendOnlineHashMap.put(friendMacString, newFriend);
                                 FriendCreationRequest creationRequest = new FriendCreationRequest(newFriend, mContext);
-                                ChatManager chatManager = ChatManager.getInstance();
+                                ChatManager chatManager = ChatManager.getInstance(mContext);
                                 chatManager.enqueueOutGoingMessageQueue(creationRequest);
 
                                 friendOnlineHashMap.put(friendMacString, newFriend);
@@ -146,7 +146,7 @@ public class NsdClient {
                                 if (dbFriend == null){
                                     Log.d(TAG, "This is not in DB yet. send the creation request.");
                                     FriendCreationRequest creationRequest = new FriendCreationRequest(newFriend, mContext);
-                                    ChatManager chatManager = ChatManager.getInstance();
+                                    ChatManager chatManager = ChatManager.getInstance(mContext);
                                     chatManager.enqueueOutGoingMessageQueue(creationRequest);
                                 } else if ((!dbFriend.getIp().equals(host))
                                         || dbFriend.getPort() != friendPort){

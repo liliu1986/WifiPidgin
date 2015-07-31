@@ -51,7 +51,7 @@ class FriendInfoUpdateRequest extends Message {
             json.put(MESSAGE_SENDER, sender);
             json.put(MESSAGE_RECEIVER, receiver);
             json.put(MESSAGE_TIMESTAMP, this.timestamp.toString());
-
+            json.put(MESSAGE_TRY_TIMES,this.getRetryNumber());
             //this is for easy to visualize/debugging purpose
             return json.toString(4);
 

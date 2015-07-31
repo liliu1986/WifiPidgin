@@ -75,8 +75,6 @@ public class ChannelCreationRequest extends Message {
             this.channel.addFriend(friend);
         }
         this.type = MessageType.CHANNEL_CREATION_REQUEST;
-
-
     }
 
 
@@ -141,7 +139,7 @@ public class ChannelCreationRequest extends Message {
             json.put(MESSAGE_CHANNEL_NAME, this.channelName);
             json.put(MESSAGE_CHANNEL_DESCRIPTION, this.channelDescription);
             json.put(FRIEND_LIST, friendList);
-
+            json.put(MESSAGE_TRY_TIMES,this.getRetryNumber());
             //TODO:: change to json.toString() to save on transmission space,
             // return json.toString();
 

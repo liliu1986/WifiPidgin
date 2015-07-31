@@ -69,7 +69,7 @@ public class FriendCreationResponse extends Message {
             json.put(MESSAGE_SENDER,sender);
             json.put(MESSAGE_RECEIVER,receiver);
             json.put(MESSAGE_TIMESTAMP,this.timestamp.toString()); //check this out
-
+            json.put(MESSAGE_TRY_TIMES,this.getRetryNumber());
             //TODO:: change to json.toString() to save on transmission space,
             // return json.toString();
 

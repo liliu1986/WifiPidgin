@@ -105,7 +105,7 @@ public class ChatMessage extends Message {
             json.put(MESSAGE_CHANNEL_IDENTIFIER,this.channelIdentifier);
             json.put(MESSAGE_IMAGE_HASH,this.imageHashCode);
             json.put(MESSAGE_NAME_DESCRIPTION_HASH,this.nameDescriptionHashCode);
-
+            json.put(MESSAGE_TRY_TIMES,this.getRetryNumber());
             //TODO:: change to json.toString() to save on transmission space,
             // return json.toString();
 

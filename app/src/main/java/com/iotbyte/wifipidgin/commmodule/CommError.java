@@ -6,5 +6,5 @@ package com.iotbyte.wifipidgin.commmodule;
 public enum CommError {
     NO_ERROR,
     NO_SOCKET_OPENED,
-
+    MSG_NOT_SENT,
 }

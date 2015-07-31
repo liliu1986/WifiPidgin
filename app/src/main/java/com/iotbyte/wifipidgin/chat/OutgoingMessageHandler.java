@@ -27,8 +27,8 @@ public class OutgoingMessageHandler  {
         public void run() {
 
             while (!Thread.currentThread().isInterrupted()) {
-                if (!ChatManager.getInstance().isOutGoingMessageQueueEmpty()){
-                    ChatManager.getInstance().dequeueOutGoingMessageQueue(context); // handled by ChatManager
+                if (!ChatManager.getInstance(context).isOutGoingMessageQueueEmpty()){
+                    ChatManager.getInstance(context).dequeueOutGoingMessageQueue(context); // handled by ChatManager
                 }
 
             }

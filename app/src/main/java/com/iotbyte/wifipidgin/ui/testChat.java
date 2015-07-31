@@ -117,18 +117,18 @@ public class testChat extends ActionBarActivity implements View.OnClickListener{
                 try {
                     destIP = InetAddress.getByName(ipString);
                     byte[] aMac = {0xf,0xc,0xa,0xa,0x1,0x4,0x7,0x9,0xa,0xe,0xb,0xd}; //fc:aa:14:79:ae:bd
+                    //byte[] aMac = {0xf,0x8,0xa,0x9,0xd,0x0,0x6,0x7,0xe,0xd,0xc,0x5}; //fc:aa:14:79:ae:bd
                     Friend aFriend = new Friend(aMac,destIP,port);
-
                     ChatMessage chatmessage = new ChatMessage(aFriend,"e2qjseahfwo3i",msgTextView.getText().toString(),getApplicationContext());
 
-                    ChatManager chatManager = ChatManager.getInstance();
+                    ChatManager chatManager = ChatManager.getInstance(getApplicationContext());
                     chatManager.enqueueOutGoingMessageQueue(chatmessage);
 
 
 
                     Log.d(TAG, "Trying to connect to server at : " + destIP.toString() + ": " + port);
 
-                    mMessageClient = new MessageClient();
+                    mMessageClient = new MessageClient(getApplicationContext());
 
                     if (mMessageClient != null){
                         Log.d(TAG, "Sending the msg Now!!!");
