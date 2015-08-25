@@ -47,7 +47,7 @@ public class UiNotificationHelper {
          */
         Intent intent = new Intent(context, ChatActivity.class);
         intent.putExtra("ChannelId", channel.getChannelIdentifier());
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Build notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
@@ -80,7 +80,7 @@ public class UiNotificationHelper {
         Intent intent = new Intent(context, AcceptChannelInviteActivity.class);
         intent.putExtra("channelCreationRequestJson", message.convertMessageToJson());
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setContentIntent(pendingIntent)
