@@ -32,7 +32,6 @@
         android:layout_marginTop="20dp" />
 
     <EditText
-        android:text="User Description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/image_border"
@@ -42,8 +41,8 @@
         android:gravity="center_vertical"
         android:layout_marginTop="20dp"
         android:layout_below="@+id/user_name"
-        android:layout_alignLeft="@+id/user_name"
-        android:layout_alignStart="@+id/user_name" />
+        android:layout_centerHorizontal="true"
+        android:hint="Please enter your Description" />
 
     <Button
         android:layout_width="wrap_content"
@@ -52,8 +51,9 @@
         android:id="@+id/save_user_profile"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignRight="@+id/cancel_edit"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_toLeftOf="@+id/cancel_edit"
+        android:layout_toStartOf="@+id/cancel_edit" />
 
     <Button
         android:layout_width="wrap_content"
