@@ -80,8 +80,6 @@ public class FriendStatusTrackingService extends Service  {
                             Log.d(TAG, "Removing friend from Hashmap");
                             friendOnlineHashMap.removeFriendbyMac(Utils.macAddressByteToHexString(friend.getMac()));
 
-                        }else{
-                            //Log.d(TAG, Math.abs(currentTime - lastOnlineTime)+" ms");
                         }
                     }
                 }
