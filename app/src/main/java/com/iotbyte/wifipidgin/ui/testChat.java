@@ -39,7 +39,7 @@ public class testChat extends ActionBarActivity implements View.OnClickListener{
     private static final String TAG = "testChat";
     private MessageServer mMessageServer;
     private MessageClient mMessageClient = null;
-    NsdWrapper mNsdWrapper;
+    //NsdWrapper mNsdWrapper;
     private Handler mUpdateHandler;
     CommModuleBroadcastReceiver myReceiver;
 

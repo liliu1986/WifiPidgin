@@ -77,6 +77,7 @@ public class FriendStatusTrackingService extends Service  {
                                 dbFriend.setStatus(Friend.FriendStatus.OFFLINE);
                                 fd.update(dbFriend);
                             }
+                            Log.d(TAG, "Removing friend from Hashmap");
                             friendOnlineHashMap.removeFriendbyMac(Utils.macAddressByteToHexString(friend.getMac()));
 
                         }
@@ -103,6 +104,6 @@ public class FriendStatusTrackingService extends Service  {
     private final String TAG = "StatusTrackingService";
     private Thread mThread;
     private final int delayInterval = 100;
-    private final int onlineTimeoutPeriod = 500000;
+    private final int onlineTimeoutPeriod = 100000;
     private FriendDao fd;
 }

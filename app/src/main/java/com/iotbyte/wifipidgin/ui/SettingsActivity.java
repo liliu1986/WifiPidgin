@@ -18,6 +18,11 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.iotbyte.wifipidgin.R;
+import com.iotbyte.wifipidgin.dao.DaoFactory;
+import com.iotbyte.wifipidgin.dao.FriendDao;
+import com.iotbyte.wifipidgin.friend.Friend;
+import com.iotbyte.wifipidgin.friend.Myself;
+import com.iotbyte.wifipidgin.nsdmodule.NsdServer;
 
 import java.util.List;
 
@@ -138,7 +143,26 @@ public class SettingsActivity extends PreferenceActivity {
             } else {
                 // For all other preferences, set the summary to the value's
                 // simple string representation.
-                Log.d(TAG, "Changed Preference " + preference.getKey());
+                Log.d(TAG, "Changed Preference " + preference.getKey()+ " to " + stringValue);
+                //Update user's visibility in DB
+                FriendDao fd = DaoFactory.getInstance()
+                        .getFriendDao(preference.getContext(), DaoFactory.DaoType.SQLITE_DAO, null);
+                Friend selfFriend = fd.findById(Myself.SELF_ID);
+                Myself self = new Myself(selfFriend);
+
+                NsdServer mNsdServer = NsdServer.getInstance();
+                if (stringValue.equals("true")){
+                    self.setFavourite(true);
+                    if (mNsdServer != null)
+                        mNsdServer.broadcastService();
+                }else if (stringValue.equals("false")){
+                    self.setFavourite(false);
+                    if (mNsdServer != null)
+                        mNsdServer.stopBroadcastService();
+                }else {
+                    Log.w(TAG, "Unknown status");
+                }
+                fd.update(self);
 
                 preference.setSummary(stringValue);
             }
@@ -163,8 +187,13 @@ public class SettingsActivity extends PreferenceActivity {
         // current value.
 
         if (preference.getKey().equals("visibility_checkbox")){
+            FriendDao fd = DaoFactory.getInstance()
+                    .getFriendDao(preference.getContext(), DaoFactory.DaoType.SQLITE_DAO, null);
+            Friend selfFriend = fd.findById(Myself.SELF_ID);
+            Myself self = new Myself(selfFriend);
+
             sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
-                    PreferenceManager.getDefaultSharedPreferences(preference.getContext()).getBoolean(preference.getKey(), false));
+                    PreferenceManager.getDefaultSharedPreferences(preference.getContext()).getBoolean(preference.getKey(), self.isFavourite()));
         }
 
     }

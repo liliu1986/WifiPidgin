@@ -91,9 +91,7 @@ public class EditUserProfileActivity extends ActionBarActivity implements View.O
 
                 //Set the description in textView
                 TextView userDescriptionTextView = (TextView) findViewById(R.id.user_description);
-                if (null == userDescription){
-                    userDescriptionTextView.setText("This is my description");
-                }else{
+                if (null != userDescription){
                     userDescriptionTextView.setText(userDescription);
                 }
 

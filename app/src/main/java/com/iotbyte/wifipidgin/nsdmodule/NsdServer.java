@@ -17,7 +17,7 @@ public class NsdServer {
 	Context mContext;
 	NsdManager mNsdManager;
 
-    NsdManager.RegistrationListener mRegistrationListener;
+    NsdManager.RegistrationListener mRegistrationListener = null;
     
     public static boolean RegisterredServiceFlag = false;
     
@@ -31,19 +31,33 @@ public class NsdServer {
 	private ServerSocket mServerSocket = null;
 	private ServerStarter mServerStarter;
     private InetAddress nsdHost;
+    private static NsdServer instance = null;
 
     //private ServerSocket mServerSocket;
-    public NsdServer(Context context, ServerSocket inServerSocket) {
+    private NsdServer(Context context, ServerSocket inServerSocket) {
         mContext = context;
         mServerSocket = inServerSocket;
         mNsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
         
         setServerPort(mServerSocket.getLocalPort());
+        this.initializeNsdServer();
         //mServerStarter = new ServerStarter();
     }
 
-    public void initializeNsdServer() {
-        initializeServiceBroadcastListener();
+    public static synchronized NsdServer getInstance(Context context, ServerSocket inServerSocket) {
+        if (instance == null) {
+            instance = new NsdServer(context, inServerSocket);
+        }
+        return instance;
+    }
+
+    public static synchronized NsdServer getInstance(){
+        return instance;
+    }
+
+    private void initializeNsdServer() {
+        if (mRegistrationListener == null)
+            initializeServiceBroadcastListener();
     }
     
     private void initializeServiceBroadcastListener() {
@@ -61,7 +75,6 @@ public class NsdServer {
                 //Log.d(TAG, "My Port is " + NsdServiceInfo.getPort());
 
             }
-            
             @Override
             public void onRegistrationFailed(NsdServiceInfo arg0, int arg1) {
             	Log.d(TAG, "The service " + mServiceName + " cannot be registered!");
@@ -69,7 +82,7 @@ public class NsdServer {
 
             @Override
             public void onServiceUnregistered(NsdServiceInfo arg0) {
-            	Log.d(TAG, "Unregisterring the service!");
+            	Log.d(TAG, "Unregistering the service!");
             }
             
             @Override
@@ -79,7 +92,16 @@ public class NsdServer {
             
         };
     }
-    
+    public void stopBroadcastService(){
+        if (mRegistrationListener != null){
+            try {
+                mNsdManager.unregisterService(mRegistrationListener);
+            } catch(IllegalArgumentException e) {
+                Log.w(TAG, "The listener has not been registered");
+            }
+
+        }
+    }
     public void broadcastService() {
     	int port=getServerPort();
     	
@@ -101,7 +123,7 @@ public class NsdServer {
 
         //Log.e(TAG, "The service name is about set to be " + mServiceName);
         //Log.e(TAG, "The service name is set to be " + serviceInfo.getServiceName());
-        
+
         mNsdManager.registerService(
                 serviceInfo, NsdManager.PROTOCOL_DNS_SD, mRegistrationListener);
         

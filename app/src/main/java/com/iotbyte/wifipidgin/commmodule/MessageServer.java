@@ -67,16 +67,19 @@ public class MessageServer   {
                     e.printStackTrace();
                 }
                 //After the message server socket is created, broadcast it.
-                mNsdServer = new NsdServer(getServerContext(), mServerSocket);
-                mNsdServer.initializeNsdServer();
-                mNsdServer.broadcastService();
-
+                mNsdServer = NsdServer.getInstance(getServerContext(), mServerSocket);
 
                 //Update the ip and port for User self
                 FriendDao fd = DaoFactory.getInstance()
                         .getFriendDao(mContext, DaoFactory.DaoType.SQLITE_DAO, null);
                 Friend selfFriend = fd.findById(Myself.SELF_ID);
                 Myself self = new Myself(selfFriend);
+
+                //isFaverate for Myself represents the user's visibility(share the same DB field).
+                if (self.isFavourite()){
+                    //If the user has set his/herself to visible, broadcast.
+                    mNsdServer.broadcastService();
+                }
 
                 InetAddress myIP = null;
                 WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
