@@ -75,7 +75,7 @@ public class MessageServer   {
                 Friend selfFriend = fd.findById(Myself.SELF_ID);
                 Myself self = new Myself(selfFriend);
 
-
+                //isFaverate for Myself represents the user's visibility(share the same DB field).
                 if (self.isFavourite()){
                     //If the user has set his/herself to visible, broadcast.
                     mNsdServer.broadcastService();
