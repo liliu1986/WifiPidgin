@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Wifipidgin</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">设置</string>
+    <string name="title_activity_about_page">About_page</string>
+    <string name="title_activity_about">关于</string>
+    <string name="title_activity_display_namecard">DisplayNamecardActivity</string>
+    <string name="title_edit_user_profile">更新用户信息</string>
+    <string name="title_activity_test_chat">testChat</string>
+    <string name="title_activity_create_channel">创建对话</string>
+    <string name="title_activity_delete_channel">删除对话</string>
+    <string name="message_server_service_name">Message Server Service</string>
+    <string name="createChannel">创建对话</string>
+    <string name="CreateChannelConfirm">创建对话</string>
+    <string name="EnterChannelName">输入对话名称</string>
+    <string name="Cancel">取消</string>
+    <string name="OK">确定</string>
+    <string name="DeleteChannel">删除所选对话</string>
+    <string name="Send">发送</string>
+    <string name="enterMessage">输入信息</string>
+    <string name="incoming_message_handler_service">Incoming Message Handler Service</string>
+    <string name="outgoing_message_handling_service">Outgoing Message Handling Service</string>
+    <string name="EnterChannelDesciption">输入对话描述</string>
+    <string name="acceptChannelRequest">同意</string>
+    <string name="refuseChannelRequest">拒绝</string>
+    <string name="participants">参与者</string>
+</resources>
