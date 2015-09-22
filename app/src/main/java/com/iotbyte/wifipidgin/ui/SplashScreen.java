@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.widget.ImageView;
 
 import com.iotbyte.wifipidgin.R;
 
@@ -17,6 +18,8 @@ public class SplashScreen extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+        ImageView iv= (ImageView) findViewById(R.id.imgLogo);
+        iv.setBackgroundResource(R.drawable.splashscreen);
 
         new Handler().postDelayed(new Runnable() {
 
